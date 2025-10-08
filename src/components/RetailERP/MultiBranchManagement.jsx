@@ -1,0 +1,589 @@
+import React, { useState } from 'react';
+import { 
+  Building2, 
+  MapPin, 
+  Users, 
+  DollarSign, 
+  Package, 
+  TrendingUp, 
+  Phone, 
+  Mail,
+  Clock,
+  BarChart3,
+  Plus,
+  Edit,
+  Eye,
+  X,
+  Store
+} from 'lucide-react';
+
+const MultiBranchManagement = () => {
+  const [selectedBranch, setSelectedBranch] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [viewMode, setViewMode] = useState('grid'); // grid or list
+
+  // Mock branch data
+  const branches = [
+    {
+      id: 'BR001',
+      name: 'Downtown Store',
+      code: 'DT001',
+      address: '123 Main Street, Downtown',
+      city: 'New York',
+      state: 'NY',
+      zipCode: '10001',
+      phone: '+1 (555) 123-4567',
+      email: 'downtown@sybeez.com',
+      manager: 'Sarah Johnson',
+      managerPhone: '+1 (555) 123-4568',
+      status: 'active',
+      openingHours: '9:00 AM - 9:00 PM',
+      totalEmployees: 12,
+      monthlySales: 45250,
+      monthlyTarget: 50000,
+      inventoryValue: 125000,
+      customerCount: 1250,
+      performance: {
+        salesGrowth: 15.2,
+        customerSatisfaction: 4.6,
+        inventory: 92
+      },
+      recentActivity: [
+        { type: 'sale', amount: 245.50, time: '2 hours ago' },
+        { type: 'stock_received', items: 50, time: '4 hours ago' },
+        { type: 'employee_checkin', employee: 'John Doe', time: '6 hours ago' }
+      ]
+    },
+    {
+      id: 'BR002',
+      name: 'Mall Branch',
+      code: 'ML002',
+      address: '456 Shopping Center, Level 2',
+      city: 'Los Angeles',
+      state: 'CA',
+      zipCode: '90210',
+      phone: '+1 (555) 234-5678',
+      email: 'mall@sybeez.com',
+      manager: 'Michael Chen',
+      managerPhone: '+1 (555) 234-5679',
+      status: 'active',
+      openingHours: '10:00 AM - 10:00 PM',
+      totalEmployees: 18,
+      monthlySales: 38750,
+      monthlyTarget: 45000,
+      inventoryValue: 98000,
+      customerCount: 980,
+      performance: {
+        salesGrowth: 8.7,
+        customerSatisfaction: 4.4,
+        inventory: 87
+      },
+      recentActivity: [
+        { type: 'sale', amount: 89.90, time: '1 hour ago' },
+        { type: 'return', amount: -45.00, time: '3 hours ago' },
+        { type: 'promotion_applied', discount: '15%', time: '5 hours ago' }
+      ]
+    },
+    {
+      id: 'BR003',
+      name: 'Airport Store',
+      code: 'AP003',
+      address: 'Terminal 1, Gate B12',
+      city: 'Chicago',
+      state: 'IL',
+      zipCode: '60666',
+      phone: '+1 (555) 345-6789',
+      email: 'airport@sybeez.com',
+      manager: 'Jennifer Brown',
+      managerPhone: '+1 (555) 345-6790',
+      status: 'active',
+      openingHours: '5:00 AM - 11:00 PM',
+      totalEmployees: 8,
+      monthlySales: 28450,
+      monthlyTarget: 30000,
+      inventoryValue: 65000,
+      customerCount: 750,
+      performance: {
+        salesGrowth: 22.1,
+        customerSatisfaction: 4.2,
+        inventory: 78
+      },
+      recentActivity: [
+        { type: 'sale', amount: 156.75, time: '30 minutes ago' },
+        { type: 'employee_checkout', employee: 'Lisa Wilson', time: '2 hours ago' },
+        { type: 'inventory_alert', product: 'Travel Adapter', time: '4 hours ago' }
+      ]
+    },
+    {
+      id: 'BR004',
+      name: 'Suburban Branch',
+      code: 'SB004',
+      address: '789 Oak Avenue, Westfield',
+      city: 'Houston',
+      state: 'TX',
+      zipCode: '77001',
+      phone: '+1 (555) 456-7890',
+      email: 'suburban@sybeez.com',
+      manager: 'David Wilson',
+      managerPhone: '+1 (555) 456-7891',
+      status: 'maintenance',
+      openingHours: '9:00 AM - 8:00 PM',
+      totalEmployees: 10,
+      monthlySales: 30300,
+      monthlyTarget: 35000,
+      inventoryValue: 78000,
+      customerCount: 650,
+      performance: {
+        salesGrowth: -2.3,
+        customerSatisfaction: 4.1,
+        inventory: 95
+      },
+      recentActivity: [
+        { type: 'maintenance', issue: 'POS System Update', time: '1 day ago' },
+        { type: 'stock_audit', status: 'completed', time: '2 days ago' },
+        { type: 'staff_meeting', topic: 'Q4 Goals', time: '3 days ago' }
+      ]
+    }
+  ];
+
+  const totalStats = {
+    totalBranches: branches.length,
+    activeBranches: branches.filter(b => b.status === 'active').length,
+    totalEmployees: branches.reduce((sum, b) => sum + b.totalEmployees, 0),
+    totalSales: branches.reduce((sum, b) => sum + b.monthlySales, 0),
+    totalInventoryValue: branches.reduce((sum, b) => sum + b.inventoryValue, 0),
+    avgSalesGrowth: branches.reduce((sum, b) => sum + b.performance.salesGrowth, 0) / branches.length
+  };
+
+  const getStatusColor = (status) => {
+    switch(status) {
+      case 'active': return 'bg-green-100 text-green-800';
+      case 'maintenance': return 'bg-yellow-100 text-yellow-800';
+      case 'closed': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getPerformanceColor = (value, type) => {
+    if (type === 'growth') {
+      return value > 0 ? 'text-green-600' : 'text-red-600';
+    }
+    if (type === 'satisfaction') {
+      return value >= 4.5 ? 'text-green-600' : value >= 4.0 ? 'text-yellow-600' : 'text-red-600';
+    }
+    if (type === 'inventory') {
+      return value >= 90 ? 'text-green-600' : value >= 80 ? 'text-yellow-600' : 'text-red-600';
+    }
+    return 'text-gray-600';
+  };
+
+  return (
+    <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-900">Multi-Branch Management</h1>
+          <p className="text-gray-600">Monitor and manage all retail branches</p>
+        </div>
+        <div className="flex space-x-3">
+          <div className="flex bg-white rounded-lg p-1 border">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`px-3 py-1 rounded text-sm ${viewMode === 'grid' ? 'bg-blue-600 text-white' : 'text-gray-600'}`}
+            >
+              Grid
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`px-3 py-1 rounded text-sm ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'text-gray-600'}`}
+            >
+              List
+            </button>
+          </div>
+          <button 
+            onClick={() => setShowAddModal(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+          >
+            <Plus size={16} />
+            <span>Add Branch</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Overall Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-6 mb-8">
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Total Branches</p>
+              <p className="text-2xl font-bold text-blue-600">{totalStats.totalBranches}</p>
+            </div>
+            <Building2 className="h-8 w-8 text-blue-600" />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Active Branches</p>
+              <p className="text-2xl font-bold text-green-600">{totalStats.activeBranches}</p>
+            </div>
+            <Store className="h-8 w-8 text-green-600" />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Total Employees</p>
+              <p className="text-2xl font-bold text-purple-600">{totalStats.totalEmployees}</p>
+            </div>
+            <Users className="h-8 w-8 text-purple-600" />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Combined Sales</p>
+              <p className="text-2xl font-bold text-green-600">${totalStats.totalSales.toLocaleString()}</p>
+            </div>
+            <DollarSign className="h-8 w-8 text-green-600" />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Inventory Value</p>
+              <p className="text-2xl font-bold text-orange-600">${totalStats.totalInventoryValue.toLocaleString()}</p>
+            </div>
+            <Package className="h-8 w-8 text-orange-600" />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Avg Growth</p>
+              <p className={`text-2xl font-bold ${getPerformanceColor(totalStats.avgSalesGrowth, 'growth')}`}>
+                {totalStats.avgSalesGrowth.toFixed(1)}%
+              </p>
+            </div>
+            <TrendingUp className="h-8 w-8 text-gray-600" />
+          </div>
+        </div>
+      </div>
+
+      {/* Branches Display */}
+      {viewMode === 'grid' ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {branches.map((branch) => (
+            <div key={branch.id} className="bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">{branch.name}</h3>
+                    <p className="text-sm text-gray-500">{branch.code}</p>
+                  </div>
+                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(branch.status)}`}>
+                    {branch.status}
+                  </span>
+                </div>
+
+                <div className="space-y-3 mb-4">
+                  <div className="flex items-center text-sm text-gray-600">
+                    <MapPin className="h-4 w-4 mr-2" />
+                    <span>{branch.city}, {branch.state}</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Users className="h-4 w-4 mr-2" />
+                    <span>{branch.totalEmployees} employees</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Clock className="h-4 w-4 mr-2" />
+                    <span>{branch.openingHours}</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <p className="text-xs text-gray-500">Monthly Sales</p>
+                    <p className="text-lg font-semibold text-green-600">${branch.monthlySales.toLocaleString()}</p>
+                    <p className="text-xs text-gray-500">Target: ${branch.monthlyTarget.toLocaleString()}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Growth</p>
+                    <p className={`text-lg font-semibold ${getPerformanceColor(branch.performance.salesGrowth, 'growth')}`}>
+                      {branch.performance.salesGrowth > 0 ? '+' : ''}{branch.performance.salesGrowth}%
+                    </p>
+                    <p className="text-xs text-gray-500">vs last month</p>
+                  </div>
+                </div>
+
+                <div className="flex space-x-2">
+                  <button 
+                    onClick={() => setSelectedBranch(branch)}
+                    className="flex-1 bg-blue-600 text-white text-sm py-2 px-3 rounded-lg hover:bg-blue-700 flex items-center justify-center space-x-1"
+                  >
+                    <Eye size={14} />
+                    <span>Details</span>
+                  </button>
+                  <button className="bg-gray-100 text-gray-700 text-sm py-2 px-3 rounded-lg hover:bg-gray-200">
+                    <Edit size={14} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Branch</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Manager</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sales</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Growth</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {branches.map((branch) => (
+                  <tr key={branch.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">{branch.name}</div>
+                        <div className="text-sm text-gray-500">{branch.code}</div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {branch.city}, {branch.state}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{branch.manager}</div>
+                      <div className="text-sm text-gray-500">{branch.totalEmployees} employees</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">${branch.monthlySales.toLocaleString()}</div>
+                      <div className="text-sm text-gray-500">Target: ${branch.monthlyTarget.toLocaleString()}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`text-sm font-medium ${getPerformanceColor(branch.performance.salesGrowth, 'growth')}`}>
+                        {branch.performance.salesGrowth > 0 ? '+' : ''}{branch.performance.salesGrowth}%
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(branch.status)}`}>
+                        {branch.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex space-x-2">
+                        <button 
+                          onClick={() => setSelectedBranch(branch)}
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          <Eye size={16} />
+                        </button>
+                        <button className="text-green-600 hover:text-green-900">
+                          <Edit size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Branch Details Modal */}
+      {selectedBranch && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-10 mx-auto p-5 border w-11/12 max-w-4xl shadow-lg rounded-md bg-white">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-gray-900">{selectedBranch.name} - Details</h3>
+              <button onClick={() => setSelectedBranch(null)}>
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Branch Information */}
+              <div>
+                <h4 className="text-lg font-medium text-gray-900 mb-4">Branch Information</h4>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Code:</span>
+                    <span className="font-medium">{selectedBranch.code}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Address:</span>
+                    <span className="font-medium text-right">{selectedBranch.address}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Phone:</span>
+                    <span className="font-medium">{selectedBranch.phone}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Email:</span>
+                    <span className="font-medium">{selectedBranch.email}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Manager:</span>
+                    <span className="font-medium">{selectedBranch.manager}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Hours:</span>
+                    <span className="font-medium">{selectedBranch.openingHours}</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Performance Metrics */}
+              <div>
+                <h4 className="text-lg font-medium text-gray-900 mb-4">Performance Metrics</h4>
+                <div className="space-y-4">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Sales Growth:</span>
+                      <span className={`font-bold ${getPerformanceColor(selectedBranch.performance.salesGrowth, 'growth')}`}>
+                        {selectedBranch.performance.salesGrowth > 0 ? '+' : ''}{selectedBranch.performance.salesGrowth}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Customer Satisfaction:</span>
+                      <span className={`font-bold ${getPerformanceColor(selectedBranch.performance.customerSatisfaction, 'satisfaction')}`}>
+                        {selectedBranch.performance.customerSatisfaction}/5.0
+                      </span>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Inventory Level:</span>
+                      <span className={`font-bold ${getPerformanceColor(selectedBranch.performance.inventory, 'inventory')}`}>
+                        {selectedBranch.performance.inventory}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Activity */}
+            <div className="mt-6">
+              <h4 className="text-lg font-medium text-gray-900 mb-4">Recent Activity</h4>
+              <div className="space-y-3">
+                {selectedBranch.recentActivity.map((activity, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div>
+                      <p className="font-medium text-gray-900 capitalize">{activity.type.replace('_', ' ')}</p>
+                      <p className="text-sm text-gray-600">
+                        {activity.amount && `$${activity.amount}`}
+                        {activity.items && `${activity.items} items`}
+                        {activity.employee && activity.employee}
+                        {activity.discount && `${activity.discount} discount`}
+                        {activity.issue && activity.issue}
+                        {activity.status && `Status: ${activity.status}`}
+                        {activity.topic && activity.topic}
+                        {activity.product && activity.product}
+                      </p>
+                    </div>
+                    <span className="text-sm text-gray-500">{activity.time}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setSelectedBranch(null)}
+                className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50"
+              >
+                Close
+              </button>
+              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                Edit Branch
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Branch Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-10 mx-auto p-5 border w-11/12 max-w-2xl shadow-lg rounded-md bg-white">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-gray-900">Add New Branch</h3>
+              <button onClick={() => setShowAddModal(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Branch Name</label>
+                <input type="text" className="w-full border border-gray-300 rounded-lg px-3 py-2" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Branch Code</label>
+                <input type="text" className="w-full border border-gray-300 rounded-lg px-3 py-2" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                <input type="text" className="w-full border border-gray-300 rounded-lg px-3 py-2" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                <input type="text" className="w-full border border-gray-300 rounded-lg px-3 py-2" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+                <input type="text" className="w-full border border-gray-300 rounded-lg px-3 py-2" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <input type="text" className="w-full border border-gray-300 rounded-lg px-3 py-2" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" className="w-full border border-gray-300 rounded-lg px-3 py-2" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Manager</label>
+                <input type="text" className="w-full border border-gray-300 rounded-lg px-3 py-2" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Opening Hours</label>
+                <input type="text" className="w-full border border-gray-300 rounded-lg px-3 py-2" placeholder="e.g., 9:00 AM - 9:00 PM" />
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                Add Branch
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default MultiBranchManagement;
