@@ -138,10 +138,10 @@ const Settings = () => (
   </div>
 );
  
-// if (process.env.NODE_ENV === 'production') {
-  if (process.env.NODE_ENV === 'development') {
-    // makeServer({ environment: 'production' });
-    makeServer({ environment: 'development' });
+if (process.env.NODE_ENV === 'production') {
+  // if (process.env.NODE_ENV === 'development') {
+    makeServer({ environment: 'production' });
+    // makeServer({ environment: 'development' });
   }
   
 
