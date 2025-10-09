@@ -347,19 +347,19 @@ const InvoiceManagement = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900" title="View">
+                      <button aria-label={`View ${invoice.invoiceNumber}`} className="text-blue-600 hover:text-blue-900" title="View">
                         <Eye size={16} />
                       </button>
-                      <button className="text-gray-600 hover:text-gray-900" title="Edit">
+                      <button aria-label={`Edit ${invoice.invoiceNumber}`} className="text-gray-600 hover:text-gray-900" title="Edit">
                         <Edit size={16} />
                       </button>
-                      <button className="text-green-600 hover:text-green-900" title="Download">
+                      <button aria-label={`Download ${invoice.invoiceNumber}`} className="text-green-600 hover:text-green-900" title="Download">
                         <Download size={16} />
                       </button>
-                      <button className="text-purple-600 hover:text-purple-900" title="Send">
+                      <button aria-label={`Send ${invoice.invoiceNumber}`} className="text-purple-600 hover:text-purple-900" title="Send">
                         <Send size={16} />
                       </button>
-                      <button className="text-orange-600 hover:text-orange-900" title="Duplicate">
+                      <button aria-label={`Duplicate ${invoice.invoiceNumber}`} className="text-orange-600 hover:text-orange-900" title="Duplicate">
                         <Copy size={16} />
                       </button>
                     </div>

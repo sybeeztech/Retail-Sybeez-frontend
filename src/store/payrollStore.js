@@ -10,16 +10,24 @@ export const usePayrollStore = create((set, get) => ({
   
   // Check user permissions based on role 
   checkPayrollPermission: (action = 'view') => {
-    // This would typically come from your auth store
-    const userRole = JSON.parse(localStorage.getItem('auth-storage')).state.user.employee.role || 'employee';
-    const userDepartment = JSON.parse(localStorage.getItem('auth-storage')).state.user.employee.department || '';
-    const userEmployeeId = JSON.parse(localStorage.getItem('auth-storage')).state.user.employeeId || '';
-    
-    if (['super_admin', 'admin'].includes(userRole)) return true;
-    if (userRole === 'manager' && action === 'view') return true;
-    if (userRole === 'employee' && action === 'view_self') return true;
-    
-    return false;
+    try {
+      const authStorage = localStorage.getItem('auth-storage');
+      if (!authStorage) {
+        return action === 'view_self'; // Allow employees to view their own data
+      }
+      
+      const parsedAuth = JSON.parse(authStorage);
+      const userRole = parsedAuth?.state?.user?.employee?.role || 'employee';
+      
+      if (['super_admin', 'admin'].includes(userRole)) return true;
+      if (userRole === 'manager' && action === 'view') return true;
+      if (userRole === 'employee' && action === 'view_self') return true;
+      
+      return false;
+    } catch (error) {
+      console.warn('Error checking permissions, defaulting to limited access:', error);
+      return action === 'view_self';
+    }
   },
 
   processPayroll: async (payPeriod) => {
@@ -187,10 +195,33 @@ export const usePayrollStore = create((set, get) => ({
 
   // Helper to get current user info
   getCurrentUserInfo: () => {
-    return {
-      role: JSON.parse(localStorage.getItem('auth-storage')).state.user.employee.role || 'employee',
-      department: JSON.parse(localStorage.getItem('auth-storage')).state.user.employee.department || '',
-      employeeId: JSON.parse(localStorage.getItem('auth-storage')).state.user.employeeId || ''
-    };
+    try {
+      const authStorage = localStorage.getItem('auth-storage');
+      if (!authStorage) {
+        return {
+          role: 'employee',
+          department: '',
+          employeeId: 'EMP001'
+        };
+      }
+      
+      const parsedAuth = JSON.parse(authStorage);
+      const state = parsedAuth?.state;
+      const user = state?.user;
+      const employee = user?.employee;
+      
+      return {
+        role: employee?.role || 'employee',
+        department: employee?.department || '',
+        employeeId: user?.employeeId || 'EMP001'
+      };
+    } catch (error) {
+      console.warn('Error accessing user info, using defaults:', error);
+      return {
+        role: 'employee',
+        department: '',
+        employeeId: 'EMP001'
+      };
+    }
   }
 }));

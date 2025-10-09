@@ -4,19 +4,37 @@ import { useDepartmentStore } from '../../store/departmentStore';
 import { usePayrollStore } from '../../store/payrollStore';
 
 const PayrollDashboard = () => {
-  const { employees, fetchEmployees } = useEmployeeStore();
-  const { departments, fetchDepartments } = useDepartmentStore();
-  const { 
-    payrollData, 
-    processPayroll, 
-    runPayroll, 
-    generateTaxForms, 
-    generateComplianceReport,
-    getEmployeeSalarySlip,
-    getPayrollHistory,
-    checkPayrollPermission,
-    getCurrentUserInfo 
-  } = usePayrollStore();
+  const [error, setError] = useState(null);
+  
+  // Safely access stores with error handling
+  let employees = [], fetchEmployees = () => {}, departments = [], fetchDepartments = () => {};
+  let payrollData = {}, processPayroll = () => {}, runPayroll = () => {}, generateTaxForms = () => {};
+  let generateComplianceReport = () => {}, getEmployeeSalarySlip = () => {}, getPayrollHistory = () => {};
+  let checkPayrollPermission = () => false, getCurrentUserInfo = () => ({ role: 'employee', department: '', employeeId: 'EMP001' });
+  
+  try {
+    const employeeStore = useEmployeeStore();
+    const departmentStore = useDepartmentStore();
+    const payrollStore = usePayrollStore();
+    
+    employees = employeeStore.employees || [];
+    fetchEmployees = employeeStore.fetchEmployees || (() => {});
+    departments = departmentStore.departments || [];
+    fetchDepartments = departmentStore.fetchDepartments || (() => {});
+    
+    payrollData = payrollStore.payrollData || {};
+    processPayroll = payrollStore.processPayroll || (() => {});
+    runPayroll = payrollStore.runPayroll || (() => {});
+    generateTaxForms = payrollStore.generateTaxForms || (() => {});
+    generateComplianceReport = payrollStore.generateComplianceReport || (() => {});
+    getEmployeeSalarySlip = payrollStore.getEmployeeSalarySlip || (() => {});
+    getPayrollHistory = payrollStore.getPayrollHistory || (() => {});
+    checkPayrollPermission = payrollStore.checkPayrollPermission || (() => false);
+    getCurrentUserInfo = payrollStore.getCurrentUserInfo || (() => ({ role: 'employee', department: '', employeeId: 'EMP001' }));
+  } catch (err) {
+    console.error('Error initializing payroll stores:', err);
+    setError(err.message);
+  }
 
   // Fetch employees on component mount
   useEffect(() => {
@@ -39,7 +57,12 @@ const PayrollDashboard = () => {
     endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // Monthly pay period
   });
 
-  const currentUser = getCurrentUserInfo();
+  let currentUser = { role: 'employee', department: '', employeeId: 'EMP001' };
+  try {
+    currentUser = getCurrentUserInfo();
+  } catch (err) {
+    console.error('Error getting current user info:', err);
+  }
 
   // Filter employees based on user role
   const getFilteredEmployees = () => {
@@ -169,6 +192,13 @@ const PayrollDashboard = () => {
 
   return ( 
     <div className="p-6 bg-gray-50 min-h-screen">
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <strong>Error loading payroll dashboard:</strong> {error}
+          <br />
+          <small>Please check the console for more details or contact your administrator.</small>
+        </div>
+      )}
 
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Payroll Dashboard</h1>

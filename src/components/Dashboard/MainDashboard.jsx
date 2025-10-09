@@ -94,6 +94,19 @@ function MainDashboard() {
         { label: 'Profit Margin', value: '64%', trend: '+4.8%' },
       ]
     },
+    {
+      title: 'Business Analytics',
+      description: 'Comprehensive insights across all business operations',
+      icon: BarChart3,
+      gradient: 'from-purple-500 to-purple-600',
+      hoverGradient: 'from-purple-600 to-purple-700',
+      link: '/analytics',
+      stats: [
+        { label: 'Revenue Growth', value: '+18.5%', trend: '+2.3%' },
+        { label: 'Customer Satisfaction', value: '4.3/5', trend: '+5.2%' },
+        { label: 'Performance Score', value: '114%', trend: '+14%' },
+      ]
+    },
   ];
 
   const quickActions = [
@@ -124,6 +137,13 @@ function MainDashboard() {
       link: '/hrm/attendance/daily', 
       color: 'from-amber-500 to-amber-600',
       description: 'View attendance'
+    },
+    { 
+      title: 'View Analytics', 
+      icon: BarChart3, 
+      link: '/analytics', 
+      color: 'from-purple-500 to-purple-600',
+      description: 'Business insights'
     },
   ];
 

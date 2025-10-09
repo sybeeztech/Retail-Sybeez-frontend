@@ -315,7 +315,7 @@ function Sidebar() {
                 </NavLink>
                 
                 <NavLink 
-                  to="/finance/tax" 
+                  to="/finance/tax-compliance" 
                   className={({ isActive }) => 
                     `flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
                       isActive 
@@ -349,20 +349,6 @@ function Sidebar() {
             {expandedSections.crm && (
               <div className="ml-6 mt-1 space-y-1">
                 <NavLink 
-                  to="/crm/dashboard" 
-                  className={({ isActive }) => 
-                    `flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
-                      isActive 
-                        ? 'bg-orange-50 text-orange-700' 
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                    }`
-                  }
-                >
-                  <LayoutDashboard className="mr-3 h-4 w-4" />
-                  Dashboard
-                </NavLink>
-                
-                <NavLink 
                   to="/crm/customers" 
                   className={({ isActive }) => 
                     `flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
@@ -372,8 +358,50 @@ function Sidebar() {
                     }`
                   }
                 >
+                  <LayoutDashboard className="mr-3 h-4 w-4" />
+                  Customer Dashboard
+                </NavLink>
+                
+                <NavLink 
+                  to="/crm/contacts" 
+                  className={({ isActive }) => 
+                    `flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
+                      isActive 
+                        ? 'bg-orange-50 text-orange-700' 
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }`
+                  }
+                >
                   <UserPlus className="mr-3 h-4 w-4" />
-                  Customers
+                  Contact Management
+                </NavLink>
+                
+                <NavLink 
+                  to="/crm/leads" 
+                  className={({ isActive }) => 
+                    `flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
+                      isActive 
+                        ? 'bg-orange-50 text-orange-700' 
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }`
+                  }
+                >
+                  <Target className="mr-3 h-4 w-4" />
+                  Leads Management
+                </NavLink>
+                
+                <NavLink 
+                  to="/crm/pipeline" 
+                  className={({ isActive }) => 
+                    `flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
+                      isActive 
+                        ? 'bg-orange-50 text-orange-700' 
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }`
+                  }
+                >
+                  <TrendingUp className="mr-3 h-4 w-4" />
+                  Sales Pipeline
                 </NavLink>
                 
                 <NavLink 
@@ -387,7 +415,7 @@ function Sidebar() {
                   }
                 >
                   <Heart className="mr-3 h-4 w-4" />
-                  Loyalty
+                  Loyalty Program
                 </NavLink>
                 
                 <NavLink 
@@ -401,7 +429,7 @@ function Sidebar() {
                   }
                 >
                   <Mail className="mr-3 h-4 w-4" />
-                  Campaigns
+                  Marketing Campaigns
                 </NavLink>
               </div>
             )}

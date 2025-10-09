@@ -14,10 +14,21 @@ import CRMDashboard from './components/CRM/CRMDashboard';
 import LeadsManagement from './components/CRM/LeadsManagement';
 import SalesPipeline from './components/CRM/SalesPipeline';
 import ContactManagement from './components/CRM/ContactManagement';
-import FinanceDashboard from './components/Finance/FinanceDashboard';
+import IndianRetailCRM from './components/CRM/IndianRetailCRM';
+import IndianRetailContactManagement from './components/CRM/IndianRetailContactManagement';
+import IndianRetailLeadsManagement from './components/CRM/IndianRetailLeadsManagement';
+import IndianRetailSalesPipeline from './components/CRM/IndianRetailSalesPipeline';
+import IndianRetailMarketingCampaigns from './components/CRM/IndianRetailMarketingCampaigns';
+import MainFinanceDashboard from './components/Finance/MainFinanceDashboard';
+import TransactionManagement from './components/Finance/TransactionManagement';
+import TaxCompliance from './components/Finance/TaxCompliance';
 import InvoiceManagement from './components/Finance/InvoiceManagement';
 import BudgetManagement from './components/Finance/BudgetManagement';
 import FinancialReports from './components/Finance/FinancialReports';
+import BusinessAnalytics from './components/Analytics/BusinessAnalytics';
+import SalesTrends from './components/AI/SalesTrends';
+import CustomerTrends from './components/AI/CustomerTrends';
+import Alerts from './components/AI/Alerts';
 import SupplyChainDashboard from './components/SupplyChain/SupplyChainDashboard';
 import SupplierManagement from './components/SupplyChain/SupplierManagement';
 import InventoryManagement from './components/SupplyChain/InventoryManagement';
@@ -112,16 +123,7 @@ const Finance = () => (
 
 const HRM = () => <HRMDashboard />;
 
-const Analytics = () => (
-  <div className="p-6">
-    <h1 className="text-2xl font-semibold text-gray-900 mb-6">Analytics</h1>
-    <div className="bg-white rounded-lg shadow">
-      <div className="p-6">
-        <p>Analytics coming soon...</p>
-      </div>
-    </div>
-  </div>
-);
+const Analytics = () => <BusinessAnalytics />;
 
 const Settings = () => (
   <div className="p-6">
@@ -164,7 +166,6 @@ function App() {
               <Route path="/customers" element={<Customers />} />
               <Route path="/inventory" element={<ProductInventoryManagement />} />
               <Route path="/finance" element={<Finance />} />
-              <Route path="/analytics" element={<Analytics />} />
               <Route path="/settings" element={<Settings />} />
               
               {/* HRM Routes */}
@@ -179,30 +180,40 @@ function App() {
               {/* <Route path="/hrm/profile/:id" element={<EmployeeProfile />} /> */}
               
               {/* Finance Routes */}
-              <Route path="/finance/dashboard" element={<FinanceDashboard />} />
+              <Route path="/finance/dashboard" element={<MainFinanceDashboard />} />
               <Route path="/finance/invoices" element={<InvoiceManagement />} />
               <Route path="/finance/budget" element={<BudgetManagement />} />
               <Route path="/finance/reports" element={<FinancialReports />} />
-              <Route path="/finance/transactions" element={<FinanceDashboard />} />
+              <Route path="/finance/transactions" element={<TransactionManagement />} />
               <Route path="/finance/pl-statement" element={<FinancialReports />} />
               <Route path="/finance/balance-sheet" element={<FinancialReports />} />
               <Route path="/finance/cash-flow" element={<FinancialReports />} />
-              <Route path="/finance/tax-compliance" element={<FinancialReports />} />
+              <Route path="/finance/tax-compliance" element={<TaxCompliance />} />
               
               {/* CRM Routes */}
-              <Route path="/crm" element={<CRMDashboard />} />
-              <Route path="/crm/customers" element={<CRMDashboard />} />
-              <Route path="/crm/leads" element={<LeadsManagement />} />
-              <Route path="/crm/pipeline" element={<SalesPipeline />} />
-              <Route path="/crm/contacts" element={<ContactManagement />} />
-              <Route path="/crm/loyalty" element={<CRMDashboard />} />
-              <Route path="/crm/campaigns" element={<CRMDashboard />} />
+              <Route path="/crm" element={<IndianRetailCRM />} />
+              <Route path="/crm/customers" element={<IndianRetailCRM />} />
+              <Route path="/crm/leads" element={<IndianRetailLeadsManagement />} />
+              <Route path="/crm/pipeline" element={<IndianRetailSalesPipeline />} />
+              <Route path="/crm/contacts" element={<IndianRetailContactManagement />} />
+              <Route path="/crm/loyalty" element={<IndianRetailCRM />} />
+              <Route path="/crm/campaigns" element={<IndianRetailMarketingCampaigns />} />
+              
+              {/* Legacy CRM Routes for backward compatibility */}
+              <Route path="/crm/legacy/dashboard" element={<CRMDashboard />} />
+              <Route path="/crm/legacy/leads" element={<LeadsManagement />} />
+              <Route path="/crm/legacy/pipeline" element={<SalesPipeline />} />
+              <Route path="/crm/legacy/contacts" element={<ContactManagement />} />
+              
+              {/* Business Analytics Routes */}
+              <Route path="/analytics" element={<BusinessAnalytics />} />
+              <Route path="/ai-insights" element={<BusinessAnalytics />} />
+              <Route path="/business-analytics" element={<BusinessAnalytics />} />
               
               {/* AI Insights Routes */}
-              <Route path="/ai-insights" element={<Analytics />} />
-              <Route path="/ai-insights/sales-trends" element={<Analytics />} />
-              <Route path="/ai-insights/customer-trends" element={<Analytics />} />
-              <Route path="/ai-insights/alerts" element={<Analytics />} />
+              <Route path="/ai/sales-trends" element={<SalesTrends />} />
+              <Route path="/ai/customer-trends" element={<CustomerTrends />} />
+              <Route path="/ai/alerts" element={<Alerts />} />
               
               {/* Supply Chain Routes */}
               <Route path="/supply-chain" element={<SupplyChainDashboard />} />

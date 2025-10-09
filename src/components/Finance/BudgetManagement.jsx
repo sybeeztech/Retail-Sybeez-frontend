@@ -421,9 +421,9 @@ const BudgetManagement = () => {
                         <span className="text-sm text-gray-600">{sub.name}</span>
                         <div className="flex items-center space-x-2">
                           <div className="w-20 bg-gray-200 rounded-full h-2">
-                            <div 
+                            <div
                               className="bg-blue-500 h-2 rounded-full"
-                              style={{ width: `${(sub.spent / sub.budgeted) * 100}%` }}
+                              style={{ width: `${sub.budgeted ? (sub.spent / sub.budgeted) * 100 : 0}%` }}
                             ></div>
                           </div>
                           <span className="text-sm font-medium text-gray-900">
