@@ -21,10 +21,9 @@ const EmployeeDirectory = () => {
   const [departmentFilter, setDepartmentFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
-
-  // Sample employee data
-  const employees = [
+  const [employees, setEmployees] = useState([
     {
       id: 1,
       employeeId: 'EMP001',
@@ -185,11 +184,26 @@ const EmployeeDirectory = () => {
       location: 'Denver, CO',
       avatar: null
     }
-  ];
+  ]);
+
+  const [newEmployee, setNewEmployee] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    department: '',
+    position: '',
+    manager: '',
+    hireDate: '',
+    salary: '',
+    location: '',
+    status: 'Active'
+  });
 
   const departments = ['All', 'Engineering', 'Sales', 'Marketing', 'HR', 'Finance', 'Management'];
   const statuses = ['All', 'Active', 'Inactive', 'On Leave'];
 
+  // Filter employees based on search and filters
   const filteredEmployees = employees.filter(employee => {
     const matchesSearch = 
       employee.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -207,6 +221,7 @@ const EmployeeDirectory = () => {
   const totalEmployees = employees.length;
   const activeEmployees = employees.filter(emp => emp.status === 'Active').length;
 
+  // Format date for display
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -215,8 +230,95 @@ const EmployeeDirectory = () => {
     });
   };
 
+  // Get initials for avatar
   const getInitials = (firstName, lastName) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`;
+  };
+
+  // Generate new employee ID
+  const generateEmployeeId = () => {
+    const lastId = employees.length > 0 
+      ? Math.max(...employees.map(emp => parseInt(emp.employeeId.replace('EMP', ''))))
+      : 0;
+    return `EMP${String(lastId + 1).padStart(3, '0')}`;
+  };
+
+  // Add new employee
+  const handleAddEmployee = () => {
+    if (!newEmployee.firstName || !newEmployee.lastName || !newEmployee.email || !newEmployee.department) {
+      alert('Please fill in all required fields: First Name, Last Name, Email, and Department');
+      return;
+    }
+
+    const employee = {
+      id: employees.length + 1,
+      employeeId: generateEmployeeId(),
+      ...newEmployee,
+      salary: newEmployee.salary ? `$${newEmployee.salary.replace(/\$/g, '')}` : '$0',
+      hireDate: newEmployee.hireDate || new Date().toISOString().split('T')[0]
+    };
+
+    setEmployees([...employees, employee]);
+    setNewEmployee({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      department: '',
+      position: '',
+      manager: '',
+      hireDate: '',
+      salary: '',
+      location: '',
+      status: 'Active'
+    });
+    setShowAddModal(false);
+    alert('Employee added successfully!');
+  };
+
+  // Update employee
+  const handleUpdateEmployee = () => {
+    if (!selectedEmployee.firstName || !selectedEmployee.lastName || !selectedEmployee.email || !selectedEmployee.department) {
+      alert('Please fill in all required fields: First Name, Last Name, Email, and Department');
+      return;
+    }
+
+    setEmployees(employees.map(emp => 
+      emp.id === selectedEmployee.id ? selectedEmployee : emp
+    ));
+    setShowEditModal(false);
+    setSelectedEmployee(null);
+    alert('Employee updated successfully!');
+  };
+
+  // Delete employee with confirmation
+  const handleDeleteEmployee = (employee) => {
+    if (window.confirm(`Are you sure you want to delete ${employee.firstName} ${employee.lastName}? This action cannot be undone.`)) {
+      setEmployees(employees.filter(emp => emp.id !== employee.id));
+      alert('Employee deleted successfully!');
+    }
+  };
+
+  // Handle input changes for new employee form
+  const handleNewEmployeeChange = (field, value) => {
+    setNewEmployee(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  // Handle input changes for edit employee form
+  const handleEditEmployeeChange = (field, value) => {
+    setSelectedEmployee(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  // Open edit modal
+  const handleEditClick = (employee) => {
+    setSelectedEmployee({...employee});
+    setShowEditModal(true);
   };
 
   return (
@@ -407,10 +509,16 @@ const EmployeeDirectory = () => {
                     >
                       <Eye size={16} />
                     </button>
-                    <button className="text-gray-600 hover:text-gray-900">
+                    <button 
+                      onClick={() => handleEditClick(employee)}
+                      className="text-gray-600 hover:text-gray-900"
+                    >
                       <Edit size={16} />
                     </button>
-                    <button className="text-red-600 hover:text-red-900">
+                    <button 
+                      onClick={() => handleDeleteEmployee(employee)}
+                      className="text-red-600 hover:text-red-900"
+                    >
                       <Trash2 size={16} />
                     </button>
                   </div>
@@ -432,7 +540,7 @@ const EmployeeDirectory = () => {
       </div>
 
       {/* Employee Details Modal */}
-      {selectedEmployee && (
+      {selectedEmployee && !showEditModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-10 mx-auto p-5 border w-4/5 max-w-2xl shadow-lg rounded-md bg-white">
             <div className="mt-3">
@@ -514,7 +622,10 @@ const EmployeeDirectory = () => {
                 >
                   Close
                 </button>
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                <button 
+                  onClick={() => handleEditClick(selectedEmployee)}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                >
                   Edit Employee
                 </button>
               </div>
@@ -540,30 +651,36 @@ const EmployeeDirectory = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    First Name
+                    First Name *
                   </label>
                   <input
                     type="text"
+                    value={newEmployee.firstName}
+                    onChange={(e) => handleNewEmployeeChange('firstName', e.target.value)}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Enter first name"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Last Name
+                    Last Name *
                   </label>
                   <input
                     type="text"
+                    value={newEmployee.lastName}
+                    onChange={(e) => handleNewEmployeeChange('lastName', e.target.value)}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Enter last name"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
+                    Email *
                   </label>
                   <input
                     type="email"
+                    value={newEmployee.email}
+                    onChange={(e) => handleNewEmployeeChange('email', e.target.value)}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Enter email address"
                   />
@@ -574,15 +691,21 @@ const EmployeeDirectory = () => {
                   </label>
                   <input
                     type="tel"
+                    value={newEmployee.phone}
+                    onChange={(e) => handleNewEmployeeChange('phone', e.target.value)}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Enter phone number"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Department
+                    Department *
                   </label>
-                  <select className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <select 
+                    value={newEmployee.department}
+                    onChange={(e) => handleNewEmployeeChange('department', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
                     <option value="">Select department</option>
                     {departments.slice(1).map(dept => (
                       <option key={dept} value={dept}>{dept}</option>
@@ -595,6 +718,8 @@ const EmployeeDirectory = () => {
                   </label>
                   <input
                     type="text"
+                    value={newEmployee.position}
+                    onChange={(e) => handleNewEmployeeChange('position', e.target.value)}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Enter job position"
                   />
@@ -605,6 +730,8 @@ const EmployeeDirectory = () => {
                   </label>
                   <input
                     type="date"
+                    value={newEmployee.hireDate}
+                    onChange={(e) => handleNewEmployeeChange('hireDate', e.target.value)}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -614,9 +741,49 @@ const EmployeeDirectory = () => {
                   </label>
                   <input
                     type="text"
+                    value={newEmployee.salary}
+                    onChange={(e) => handleNewEmployeeChange('salary', e.target.value)}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="e.g., $75,000"
+                    placeholder="e.g., 75000"
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    value={newEmployee.location}
+                    onChange={(e) => handleNewEmployeeChange('location', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="e.g., New York, NY"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Manager
+                  </label>
+                  <input
+                    type="text"
+                    value={newEmployee.manager}
+                    onChange={(e) => handleNewEmployeeChange('manager', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter manager name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Status
+                  </label>
+                  <select 
+                    value={newEmployee.status}
+                    onChange={(e) => handleNewEmployeeChange('status', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    {statuses.slice(1).map(status => (
+                      <option key={status} value={status}>{status}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <div className="flex justify-end space-x-3 mt-6">
@@ -627,10 +794,172 @@ const EmployeeDirectory = () => {
                   Cancel
                 </button>
                 <button
-                  onClick={() => setShowAddModal(false)}
+                  onClick={handleAddEmployee}
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
                 >
                   Add Employee
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Employee Modal */}
+      {showEditModal && selectedEmployee && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-10 mx-auto p-5 border w-4/5 max-w-2xl shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium text-gray-900">Edit Employee</h3>
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <Plus size={20} className="rotate-45" />
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    First Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedEmployee.firstName}
+                    onChange={(e) => handleEditEmployeeChange('firstName', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Last Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedEmployee.lastName}
+                    onChange={(e) => handleEditEmployeeChange('lastName', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email *
+                  </label>
+                  <input
+                    type="email"
+                    value={selectedEmployee.email}
+                    onChange={(e) => handleEditEmployeeChange('email', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Phone
+                  </label>
+                  <input
+                    type="tel"
+                    value={selectedEmployee.phone}
+                    onChange={(e) => handleEditEmployeeChange('phone', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Department *
+                  </label>
+                  <select 
+                    value={selectedEmployee.department}
+                    onChange={(e) => handleEditEmployeeChange('department', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    {departments.slice(1).map(dept => (
+                      <option key={dept} value={dept}>{dept}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Position
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedEmployee.position}
+                    onChange={(e) => handleEditEmployeeChange('position', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Hire Date
+                  </label>
+                  <input
+                    type="date"
+                    value={selectedEmployee.hireDate}
+                    onChange={(e) => handleEditEmployeeChange('hireDate', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Salary
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedEmployee.salary}
+                    onChange={(e) => handleEditEmployeeChange('salary', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedEmployee.location}
+                    onChange={(e) => handleEditEmployeeChange('location', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Manager
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedEmployee.manager || ''}
+                    onChange={(e) => handleEditEmployeeChange('manager', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Status
+                  </label>
+                  <select 
+                    value={selectedEmployee.status}
+                    onChange={(e) => handleEditEmployeeChange('status', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    {statuses.slice(1).map(status => (
+                      <option key={status} value={status}>{status}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdateEmployee}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                >
+                  Update Employee
                 </button>
               </div>
             </div>

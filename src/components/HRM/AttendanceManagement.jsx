@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Calendar, 
   Clock, 
@@ -25,94 +25,181 @@ const AttendanceManagement = () => {
   const [statusFilter, setStatusFilter] = useState('All');
   const [showMarkModal, setShowMarkModal] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [attendanceData, setAttendanceData] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [markAttendanceData, setMarkAttendanceData] = useState({
+    employeeId: '',
+    status: 'present',
+    checkIn: '09:00',
+    checkOut: '18:00',
+    notes: '',
+    location: 'Office'
+  });
+  const [showFilters, setShowFilters] = useState(false);
+  const [departmentFilter, setDepartmentFilter] = useState('All');
+  const [dateRange, setDateRange] = useState({
+    start: new Date().toISOString().split('T')[0],
+    end: new Date().toISOString().split('T')[0]
+  });
 
-  // Sample attendance data
-  const attendanceData = [
-    {
-      id: 1,
-      employeeId: 'EMP001',
-      name: 'John Smith',
-      department: 'Engineering',
-      position: 'Software Developer',
-      checkIn: '09:15',
-      checkOut: '18:30',
-      workHours: '9h 15m',
-      status: 'present',
-      overtime: '0h 30m',
-      location: 'Office',
-      notes: ''
-    },
-    {
-      id: 2,
-      employeeId: 'EMP002',
-      name: 'Sarah Johnson',
-      department: 'Marketing',
-      position: 'Marketing Manager',
-      checkIn: '08:45',
-      checkOut: '17:45',
-      workHours: '9h 00m',
-      status: 'present',
-      overtime: '0h 00m',
-      location: 'Office',
-      notes: ''
-    },
-    {
-      id: 3,
-      employeeId: 'EMP003',
-      name: 'Mike Chen',
-      department: 'Sales',
-      position: 'Sales Representative',
-      checkIn: '09:30',
-      checkOut: '',
-      workHours: '-- --',
-      status: 'present',
-      overtime: '-- --',
-      location: 'Remote',
-      notes: 'Working from home'
-    },
-    {
-      id: 4,
-      employeeId: 'EMP004',
-      name: 'Lisa Rodriguez',
-      department: 'HR',
-      position: 'HR Specialist',
-      checkIn: '',
-      checkOut: '',
-      workHours: '-- --',
-      status: 'absent',
-      overtime: '-- --',
-      location: '',
-      notes: 'Sick leave'
-    },
-    {
-      id: 5,
-      employeeId: 'EMP005',
-      name: 'David Wilson',
-      department: 'Finance',
-      position: 'Financial Analyst',
-      checkIn: '08:30',
-      checkOut: '',
-      workHours: '-- --',
-      status: 'present',
-      overtime: '-- --',
-      location: 'Office',
-      notes: ''
-    },
-    {
-      id: 6,
-      employeeId: 'EMP006',
-      name: 'Emma Davis',
-      department: 'Engineering',
-      position: 'UI/UX Designer',
-      checkIn: '10:00',
-      checkOut: '19:15',
-      workHours: '9h 15m',
-      status: 'late',
-      overtime: '1h 15m',
-      location: 'Office',
-      notes: 'Late arrival - traffic'
-    }
-  ];
+  // Initialize sample data
+  useEffect(() => {
+    const sampleEmployees = [
+      {
+        id: 1,
+        employeeId: 'EMP001',
+        name: 'John Smith',
+        department: 'Engineering',
+        position: 'Software Developer',
+        email: 'john.smith@company.com',
+        phone: '+1-555-0101'
+      },
+      {
+        id: 2,
+        employeeId: 'EMP002',
+        name: 'Sarah Johnson',
+        department: 'Marketing',
+        position: 'Marketing Manager',
+        email: 'sarah.johnson@company.com',
+        phone: '+1-555-0102'
+      },
+      {
+        id: 3,
+        employeeId: 'EMP003',
+        name: 'Mike Chen',
+        department: 'Sales',
+        position: 'Sales Representative',
+        email: 'mike.chen@company.com',
+        phone: '+1-555-0103'
+      },
+      {
+        id: 4,
+        employeeId: 'EMP004',
+        name: 'Lisa Rodriguez',
+        department: 'HR',
+        position: 'HR Specialist',
+        email: 'lisa.rodriguez@company.com',
+        phone: '+1-555-0104'
+      },
+      {
+        id: 5,
+        employeeId: 'EMP005',
+        name: 'David Wilson',
+        department: 'Finance',
+        position: 'Financial Analyst',
+        email: 'david.wilson@company.com',
+        phone: '+1-555-0105'
+      },
+      {
+        id: 6,
+        employeeId: 'EMP006',
+        name: 'Emma Davis',
+        department: 'Engineering',
+        position: 'UI/UX Designer',
+        email: 'emma.davis@company.com',
+        phone: '+1-555-0106'
+      }
+    ];
+
+    const sampleAttendance = [
+      {
+        id: 1,
+        employeeId: 'EMP001',
+        date: new Date().toISOString().split('T')[0],
+        checkIn: '09:15',
+        checkOut: '18:30',
+        workHours: '9h 15m',
+        status: 'present',
+        overtime: '0h 30m',
+        location: 'Office',
+        notes: ''
+      },
+      {
+        id: 2,
+        employeeId: 'EMP002',
+        date: new Date().toISOString().split('T')[0],
+        checkIn: '08:45',
+        checkOut: '17:45',
+        workHours: '9h 00m',
+        status: 'present',
+        overtime: '0h 00m',
+        location: 'Office',
+        notes: ''
+      },
+      {
+        id: 3,
+        employeeId: 'EMP003',
+        date: new Date().toISOString().split('T')[0],
+        checkIn: '09:30',
+        checkOut: '',
+        workHours: '-- --',
+        status: 'present',
+        overtime: '-- --',
+        location: 'Remote',
+        notes: 'Working from home'
+      },
+      {
+        id: 4,
+        employeeId: 'EMP004',
+        date: new Date().toISOString().split('T')[0],
+        checkIn: '',
+        checkOut: '',
+        workHours: '-- --',
+        status: 'absent',
+        overtime: '-- --',
+        location: '',
+        notes: 'Sick leave'
+      },
+      {
+        id: 5,
+        employeeId: 'EMP005',
+        date: new Date().toISOString().split('T')[0],
+        checkIn: '08:30',
+        checkOut: '',
+        workHours: '-- --',
+        status: 'present',
+        overtime: '-- --',
+        location: 'Office',
+        notes: ''
+      },
+      {
+        id: 6,
+        employeeId: 'EMP006',
+        date: new Date().toISOString().split('T')[0],
+        checkIn: '10:00',
+        checkOut: '19:15',
+        workHours: '9h 15m',
+        status: 'late',
+        overtime: '1h 15m',
+        location: 'Office',
+        notes: 'Late arrival - traffic'
+      }
+    ];
+
+    setEmployees(sampleEmployees);
+    setAttendanceData(sampleAttendance);
+  }, []);
+
+  // Calculate work hours and overtime
+  const calculateWorkHours = (checkIn, checkOut) => {
+    if (!checkIn || !checkOut) return { workHours: '-- --', overtime: '-- --' };
+
+    const [inHour, inMin] = checkIn.split(':').map(Number);
+    const [outHour, outMin] = checkOut.split(':').map(Number);
+
+    const totalMinutes = (outHour * 60 + outMin) - (inHour * 60 + inMin);
+    const workHours = Math.floor(totalMinutes / 60);
+    const workMinutes = totalMinutes % 60;
+
+    const overtimeMinutes = Math.max(0, totalMinutes - (9 * 60)); // 9 hours standard
+    const overtimeHours = Math.floor(overtimeMinutes / 60);
+    const overtimeMins = overtimeMinutes % 60;
+
+    return {
+      workHours: `${workHours}h ${workMinutes}m`,
+      overtime: overtimeMinutes > 0 ? `${overtimeHours}h ${overtimeMins}m` : '0h 00m'
+    };
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -134,28 +221,148 @@ const AttendanceManagement = () => {
     }
   };
 
-  const filteredData = attendanceData.filter(emp => {
+  // Filter data based on search, status, and department
+  const filteredData = attendanceData.filter(record => {
+    const employee = employees.find(emp => emp.employeeId === record.employeeId);
+    if (!employee) return false;
+
     const matchesSearch = 
-      emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      emp.employeeId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      emp.department.toLowerCase().includes(searchTerm.toLowerCase());
+      employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.employeeId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.department.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesStatus = statusFilter === 'All' || emp.status === statusFilter.toLowerCase();
-    
-    return matchesSearch && matchesStatus;
+    const matchesStatus = statusFilter === 'All' || record.status === statusFilter.toLowerCase();
+    const matchesDepartment = departmentFilter === 'All' || employee.department === departmentFilter;
+    const matchesDate = record.date === selectedDate;
+
+    return matchesSearch && matchesStatus && matchesDepartment && matchesDate;
   });
 
-  // Summary statistics
-  const totalEmployees = attendanceData.length;
-  const presentEmployees = attendanceData.filter(emp => emp.status === 'present' || emp.status === 'late').length;
-  const absentEmployees = attendanceData.filter(emp => emp.status === 'absent').length;
-  const lateEmployees = attendanceData.filter(emp => emp.status === 'late').length;
-  const attendanceRate = ((presentEmployees / totalEmployees) * 100).toFixed(1);
+  // Get unique departments for filter
+  const departments = ['All', ...new Set(employees.map(emp => emp.department))];
 
-  const markAttendance = (employeeId, status) => {
-    // Handle attendance marking logic here
-    console.log(`Marking ${status} for employee ${employeeId}`);
+  // Summary statistics
+  const todaysAttendance = attendanceData.filter(record => record.date === selectedDate);
+  const totalEmployees = employees.length;
+  const presentEmployees = todaysAttendance.filter(emp => emp.status === 'present' || emp.status === 'late').length;
+  const absentEmployees = todaysAttendance.filter(emp => emp.status === 'absent').length;
+  const lateEmployees = todaysAttendance.filter(emp => emp.status === 'late').length;
+  const attendanceRate = totalEmployees > 0 ? ((presentEmployees / totalEmployees) * 100).toFixed(1) : '0.0';
+
+  // Mark attendance function
+  const markAttendance = () => {
+    if (!markAttendanceData.employeeId) {
+      alert('Please select an employee');
+      return;
+    }
+
+    const employee = employees.find(emp => emp.id === parseInt(markAttendanceData.employeeId));
+    if (!employee) return;
+
+    const { workHours, overtime } = calculateWorkHours(
+      markAttendanceData.checkIn, 
+      markAttendanceData.checkOut
+    );
+
+    const newAttendance = {
+      id: Date.now(),
+      employeeId: employee.employeeId,
+      date: selectedDate,
+      checkIn: markAttendanceData.status === 'absent' ? '' : markAttendanceData.checkIn,
+      checkOut: markAttendanceData.status === 'absent' ? '' : markAttendanceData.checkOut,
+      workHours: markAttendanceData.status === 'absent' ? '-- --' : workHours,
+      status: markAttendanceData.status,
+      overtime: markAttendanceData.status === 'absent' ? '-- --' : overtime,
+      location: markAttendanceData.location,
+      notes: markAttendanceData.notes
+    };
+
+    // Update or add attendance record
+    const existingIndex = attendanceData.findIndex(
+      record => record.employeeId === employee.employeeId && record.date === selectedDate
+    );
+
+    if (existingIndex >= 0) {
+      const updatedData = [...attendanceData];
+      updatedData[existingIndex] = newAttendance;
+      setAttendanceData(updatedData);
+    } else {
+      setAttendanceData(prev => [...prev, newAttendance]);
+    }
+
     setShowMarkModal(false);
+    resetMarkAttendanceForm();
+  };
+
+  const resetMarkAttendanceForm = () => {
+    setMarkAttendanceData({
+      employeeId: '',
+      status: 'present',
+      checkIn: '09:00',
+      checkOut: '18:00',
+      notes: '',
+      location: 'Office'
+    });
+  };
+
+  // Edit attendance function
+  const editAttendance = (employeeId) => {
+    const record = attendanceData.find(
+      record => record.employeeId === employeeId && record.date === selectedDate
+    );
+    
+    if (record) {
+      const employee = employees.find(emp => emp.employeeId === employeeId);
+      setMarkAttendanceData({
+        employeeId: employee.id.toString(),
+        status: record.status,
+        checkIn: record.checkIn || '09:00',
+        checkOut: record.checkOut || '18:00',
+        notes: record.notes,
+        location: record.location || 'Office'
+      });
+      setShowMarkModal(true);
+    }
+  };
+
+  // Export to CSV function
+  const exportToCSV = () => {
+    const headers = ['Employee ID', 'Name', 'Department', 'Date', 'Check In', 'Check Out', 'Work Hours', 'Status', 'Overtime', 'Location', 'Notes'];
+    
+    const csvData = filteredData.map(record => {
+      const employee = employees.find(emp => emp.employeeId === record.employeeId);
+      return [
+        record.employeeId,
+        employee?.name || '',
+        employee?.department || '',
+        record.date,
+        record.checkIn || '--:--',
+        record.checkOut || '--:--',
+        record.workHours,
+        record.status,
+        record.overtime,
+        record.location || '',
+        record.notes || ''
+      ];
+    });
+
+    const csvContent = [
+      headers.join(','),
+      ...csvData.map(row => row.map(field => `"${field}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `attendance-${selectedDate}.csv`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  // Get employee details for a record
+  const getEmployeeDetails = (employeeId) => {
+    return employees.find(emp => emp.employeeId === employeeId) || {};
   };
 
   return (
@@ -175,7 +382,10 @@ const AttendanceManagement = () => {
               className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <button
-              onClick={() => setShowMarkModal(true)}
+              onClick={() => {
+                resetMarkAttendanceForm();
+                setShowMarkModal(true);
+              }}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
             >
               <Plus size={16} />
@@ -276,16 +486,81 @@ const AttendanceManagement = () => {
                 <option value="Late">Late</option>
                 <option value="Partial">Partial</option>
               </select>
-              <button className="bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
+              
+              <select
+                value={departmentFilter}
+                onChange={(e) => setDepartmentFilter(e.target.value)}
+                className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                {departments.map(dept => (
+                  <option key={dept} value={dept}>{dept}</option>
+                ))}
+              </select>
+
+              <button 
+                onClick={() => setShowFilters(!showFilters)}
+                className="bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-50 flex items-center space-x-2"
+              >
                 <Filter size={16} />
                 <span>More Filters</span>
               </button>
-              <button className="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 flex items-center space-x-2">
+              
+              <button 
+                onClick={exportToCSV}
+                className="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 flex items-center space-x-2"
+              >
                 <Download size={16} />
                 <span>Export</span>
               </button>
             </div>
           </div>
+
+          {/* Advanced Filters */}
+          {showFilters && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Date Range
+                  </label>
+                  <div className="flex space-x-2">
+                    <input
+                      type="date"
+                      value={dateRange.start}
+                      onChange={(e) => setDateRange(prev => ({...prev, start: e.target.value}))}
+                      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    <input
+                      type="date"
+                      value={dateRange.end}
+                      onChange={(e) => setDateRange(prev => ({...prev, end: e.target.value}))}
+                      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Location
+                  </label>
+                  <select className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="All">All Locations</option>
+                    <option value="Office">Office</option>
+                    <option value="Remote">Remote</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Overtime
+                  </label>
+                  <select className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="All">All</option>
+                    <option value="With Overtime">With Overtime</option>
+                    <option value="Without Overtime">Without Overtime</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Attendance Table */}
@@ -320,93 +595,96 @@ const AttendanceManagement = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredData.map((employee) => (
-                <tr key={employee.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center">
-                          <span className="text-sm font-medium text-gray-700">
-                            {employee.name.split(' ').map(n => n[0]).join('')}
-                          </span>
+              {filteredData.map((record) => {
+                const employee = getEmployeeDetails(record.employeeId);
+                return (
+                  <tr key={record.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10">
+                          <div className="h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center">
+                            <span className="text-sm font-medium text-gray-700">
+                              {employee.name?.split(' ').map(n => n[0]).join('')}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">{employee.name}</div>
+                          <div className="text-sm text-gray-500">{record.employeeId}</div>
                         </div>
                       </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{employee.name}</div>
-                        <div className="text-sm text-gray-500">{employee.employeeId}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{employee.department}</div>
+                      <div className="text-sm text-gray-500">{employee.position}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900 flex items-center">
+                        {record.checkIn ? (
+                          <>
+                            <Clock size={16} className="mr-2 text-green-500" />
+                            {record.checkIn}
+                          </>
+                        ) : (
+                          <span className="text-gray-400">-- : --</span>
+                        )}
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{employee.department}</div>
-                    <div className="text-sm text-gray-500">{employee.position}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 flex items-center">
-                      {employee.checkIn ? (
-                        <>
-                          <Clock size={16} className="mr-2 text-green-500" />
-                          {employee.checkIn}
-                        </>
-                      ) : (
-                        <span className="text-gray-400">-- : --</span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900 flex items-center">
+                        {record.checkOut ? (
+                          <>
+                            <Clock size={16} className="mr-2 text-red-500" />
+                            {record.checkOut}
+                          </>
+                        ) : (
+                          <span className="text-gray-400">-- : --</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{record.workHours}</div>
+                      {record.overtime !== '-- --' && record.overtime !== '0h 00m' && (
+                        <div className="text-xs text-orange-600">OT: {record.overtime}</div>
                       )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 flex items-center">
-                      {employee.checkOut ? (
-                        <>
-                          <Clock size={16} className="mr-2 text-red-500" />
-                          {employee.checkOut}
-                        </>
-                      ) : (
-                        <span className="text-gray-400">-- : --</span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{employee.workHours}</div>
-                    {employee.overtime !== '-- --' && employee.overtime !== '0h 00m' && (
-                      <div className="text-xs text-orange-600">OT: {employee.overtime}</div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(employee.status)}`}>
-                      {getStatusIcon(employee.status)}
-                      <span className="ml-1">
-                        {employee.status.charAt(0).toUpperCase() + employee.status.slice(1)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(record.status)}`}>
+                        {getStatusIcon(record.status)}
+                        <span className="ml-1">
+                          {record.status.charAt(0).toUpperCase() + record.status.slice(1)}
+                        </span>
                       </span>
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center text-sm text-gray-900">
-                      <MapPin size={16} className="mr-1 text-gray-400" />
-                      {employee.location || 'N/A'}
-                    </div>
-                    {employee.notes && (
-                      <div className="text-xs text-gray-500">{employee.notes}</div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900">
-                        <Eye size={16} />
-                      </button>
-                      <button className="text-gray-600 hover:text-gray-900">
-                        <Edit size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center text-sm text-gray-900">
+                        <MapPin size={16} className="mr-1 text-gray-400" />
+                        {record.location || 'N/A'}
+                      </div>
+                      {record.notes && (
+                        <div className="text-xs text-gray-500">{record.notes}</div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex space-x-2">
+                        <button 
+                          onClick={() => editAttendance(record.employeeId)}
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          <Edit size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
 
           {filteredData.length === 0 && (
             <div className="text-center py-12">
               <Users className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No employees found</h3>
+              <h3 className="mt-2 text-sm font-medium text-gray-900">No attendance records found</h3>
               <p className="mt-1 text-sm text-gray-500">
                 Try adjusting your search or filters
               </p>
@@ -434,9 +712,13 @@ const AttendanceManagement = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Employee
                   </label>
-                  <select className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <select 
+                    value={markAttendanceData.employeeId}
+                    onChange={(e) => setMarkAttendanceData(prev => ({...prev, employeeId: e.target.value}))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
                     <option value="">Select employee</option>
-                    {attendanceData.map(emp => (
+                    {employees.map(emp => (
                       <option key={emp.id} value={emp.id}>
                         {emp.name} ({emp.employeeId})
                       </option>
@@ -447,28 +729,67 @@ const AttendanceManagement = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Status
                   </label>
-                  <select className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <select 
+                    value={markAttendanceData.status}
+                    onChange={(e) => setMarkAttendanceData(prev => ({...prev, status: e.target.value}))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
                     <option value="present">Present</option>
                     <option value="absent">Absent</option>
                     <option value="late">Late</option>
                     <option value="partial">Partial Day</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Check In Time
-                  </label>
-                  <input
-                    type="time"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
+                
+                {markAttendanceData.status !== 'absent' && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Check In Time
+                      </label>
+                      <input
+                        type="time"
+                        value={markAttendanceData.checkIn}
+                        onChange={(e) => setMarkAttendanceData(prev => ({...prev, checkIn: e.target.value}))}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Check Out Time
+                      </label>
+                      <input
+                        type="time"
+                        value={markAttendanceData.checkOut}
+                        onChange={(e) => setMarkAttendanceData(prev => ({...prev, checkOut: e.target.value}))}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Location
+                      </label>
+                      <select 
+                        value={markAttendanceData.location}
+                        onChange={(e) => setMarkAttendanceData(prev => ({...prev, location: e.target.value}))}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        <option value="Office">Office</option>
+                        <option value="Remote">Remote</option>
+                        <option value="Client Site">Client Site</option>
+                      </select>
+                    </div>
+                  </>
+                )}
+                
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Notes (Optional)
                   </label>
                   <textarea
                     rows={3}
+                    value={markAttendanceData.notes}
+                    onChange={(e) => setMarkAttendanceData(prev => ({...prev, notes: e.target.value}))}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Add any notes or remarks"
                   />
@@ -482,10 +803,10 @@ const AttendanceManagement = () => {
                   Cancel
                 </button>
                 <button
-                  onClick={() => markAttendance(selectedEmployee, 'present')}
+                  onClick={markAttendance}
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
                 >
-                  Mark Attendance
+                  {markAttendanceData.employeeId ? 'Update' : 'Mark'} Attendance
                 </button>
               </div>
             </div>

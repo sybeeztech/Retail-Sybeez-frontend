@@ -7,34 +7,38 @@ const PayrollDashboard = () => {
   const [error, setError] = useState(null);
   
   // Safely access stores with error handling
-  let employees = [], fetchEmployees = () => {}, departments = [], fetchDepartments = () => {};
-  let payrollData = {}, processPayroll = () => {}, runPayroll = () => {}, generateTaxForms = () => {};
-  let generateComplianceReport = () => {}, getEmployeeSalarySlip = () => {}, getPayrollHistory = () => {};
-  let checkPayrollPermission = () => false, getCurrentUserInfo = () => ({ role: 'employee', department: '', employeeId: 'EMP001' });
+  // let employees = [], fetchEmployees = () => {}, departments = [], fetchDepartments = () => {};
+  // let payrollData = {}, processPayroll = () => {}, runPayroll = () => {}, generateTaxForms = () => {};
+  // let generateComplianceReport = () => {}, getEmployeeSalarySlip = () => {}, getPayrollHistory = () => {};
+  // let checkPayrollPermission = () => false, getCurrentUserInfo = () => ({ role: 'employee', department: '', employeeId: 'EMP001' });
   
   try {
     const employeeStore = useEmployeeStore();
     const departmentStore = useDepartmentStore();
     const payrollStore = usePayrollStore();
     
-    employees = employeeStore.employees || [];
-    fetchEmployees = employeeStore.fetchEmployees || (() => {});
-    departments = departmentStore.departments || [];
-    fetchDepartments = departmentStore.fetchDepartments || (() => {});
+    // employees = employeeStore.employees || [];
+    // fetchEmployees = employeeStore.fetchEmployees || (() => {});
+    // departments = departmentStore.departments || [];
+    // fetchDepartments = departmentStore.fetchDepartments || (() => {});
     
-    payrollData = payrollStore.payrollData || {};
-    processPayroll = payrollStore.processPayroll || (() => {});
-    runPayroll = payrollStore.runPayroll || (() => {});
-    generateTaxForms = payrollStore.generateTaxForms || (() => {});
-    generateComplianceReport = payrollStore.generateComplianceReport || (() => {});
-    getEmployeeSalarySlip = payrollStore.getEmployeeSalarySlip || (() => {});
-    getPayrollHistory = payrollStore.getPayrollHistory || (() => {});
-    checkPayrollPermission = payrollStore.checkPayrollPermission || (() => false);
-    getCurrentUserInfo = payrollStore.getCurrentUserInfo || (() => ({ role: 'employee', department: '', employeeId: 'EMP001' }));
+    // payrollData = payrollStore.payrollData || {};
+    // processPayroll = payrollStore.processPayroll || (() => {});
+    // runPayroll = payrollStore.runPayroll || (() => {});
+    // generateTaxForms = payrollStore.generateTaxForms || (() => {});
+    // generateComplianceReport = payrollStore.generateComplianceReport || (() => {});
+    // getEmployeeSalarySlip = payrollStore.getEmployeeSalarySlip || (() => {});
+    // getPayrollHistory = payrollStore.getPayrollHistory || (() => {});
+    // checkPayrollPermission = payrollStore.checkPayrollPermission || (() => false);
+    // getCurrentUserInfo = payrollStore.getCurrentUserInfo || (() => ({ role: 'employee', department: '', employeeId: 'EMP001' }));
   } catch (err) {
     console.error('Error initializing payroll stores:', err);
     setError(err.message);
   }
+
+  const { employees, fetchEmployees } = useEmployeeStore();
+  const { departments, fetchDepartments } = useDepartmentStore();
+  const { payrollData, processPayroll, runPayroll, generateTaxForms, generateComplianceReport, getEmployeeSalarySlip, getPayrollHistory, checkPayrollPermission, getCurrentUserInfo } = usePayrollStore();
 
   // Fetch employees on component mount
   useEffect(() => {
@@ -58,7 +62,7 @@ const PayrollDashboard = () => {
   });
 
   let currentUser = { role: 'employee', department: '', employeeId: 'EMP001' };
-  try {
+  try { 
     currentUser = getCurrentUserInfo();
   } catch (err) {
     console.error('Error getting current user info:', err);
@@ -126,7 +130,7 @@ const PayrollDashboard = () => {
   const handleViewPayrollHistory = async () => {
     const history = await getPayrollHistory();
     if (history) {
-      setPayrollHistory(history);
+      setPayrollHistory(history.results);
       setShowPayrollHistory(true);
       setShowSummary(false);
       setShowTaxForms(false);
@@ -448,35 +452,91 @@ const PayrollDashboard = () => {
 
 
       {/* Payroll History */}
-      {showPayrollHistory && payrollHistory.length > 0 && (
-        <div className="mt-6 bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Payroll History</h2>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead>
-                <tr>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Pay Period</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Processed Date</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Employees</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Total Net Pay</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {payrollHistory.map((payroll, index) => (
-                  <tr key={index}>
-                    <td className="px-4 py-3">{payroll.payrollPeriod}</td>
-                    <td className="px-4 py-3">{new Date(payroll.createdAt).toLocaleDateString()}</td>
-                    <td className="px-4 py-3">{payroll.results?.length || 0}</td>
-                    <td className="px-4 py-3">
-                      ₹{payroll.results?.reduce((sum, result) => sum + (result.netPay || 0), 0).toLocaleString('en-IN') || '0'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+{showPayrollHistory && payrollHistory.length > 0 && (
+  <div className="mt-6 bg-white p-6 rounded-lg shadow">
+    <h2 className="text-xl font-semibold mb-4">Payroll History</h2>
+    <div className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead>
+          <tr>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Pay Period</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Processed Date</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Employees</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Total Net Pay</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-200">
+          {payrollHistory.map((payroll, index) => {
+            // Format pay period for display
+            const payPeriod = payroll.payrollPeriod;
+            const periodDisplay = payPeriod && payPeriod.startDate && payPeriod.endDate 
+              ? `${new Date(payPeriod.startDate).toLocaleDateString()} - ${new Date(payPeriod.endDate).toLocaleDateString()}`
+              : 'N/A';
+            
+            // Get processed date - use createdAt if available, otherwise current date
+            const processedDate = payroll.createdAt 
+              ? new Date(payroll.createdAt).toLocaleDateString()
+              : new Date().toLocaleDateString();
+            
+            // Count employees and calculate total net pay
+            const employeeCount = payroll.results ? payroll.results.length : 0;
+            const totalNetPay = payroll.results 
+              ? payroll.results.reduce((sum, result) => sum + (result.netPay || 0), 0)
+              : 0;
+
+            return (
+              <tr key={payroll.id || index}>
+                <td className="px-4 py-3">{periodDisplay}</td>
+                <td className="px-4 py-3">{processedDate}</td>
+                <td className="px-4 py-3">{employeeCount}</td>
+                <td className="px-4 py-3">
+                  <span className={`px-2 py-1 rounded-full text-xs ${
+                    payroll.processed 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {payroll.processed ? 'Processed' : 'Pending'}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  ₹{totalNetPay.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+
+    {/* Add a button to view details of a specific payroll run */}
+    <div className="mt-6 flex justify-between items-center">
+      <p className="text-sm text-gray-600">
+        Showing {payrollHistory.length} payroll runs
+      </p>
+      <button 
+        className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+        onClick={() => {
+          // You can implement functionality to view detailed breakdown of a specific payroll run
+          alert('Feature: View detailed payroll breakdown for a specific period');
+        }}
+      >
+        View Detailed Report
+      </button>
+    </div>
+  </div>
+)}
+
+{/* Show empty state if no payroll history */}
+{showPayrollHistory && payrollHistory.length === 0 && (
+  <div className="mt-6 bg-white p-6 rounded-lg shadow">
+    <h2 className="text-xl font-semibold mb-4">Payroll History</h2>
+    <div className="text-center py-8 text-gray-500">
+      <p>No payroll history found.</p>
+      <p className="text-sm mt-2">Process your first payroll to see history here.</p>
+    </div>
+  </div>
+)}
 
 
 

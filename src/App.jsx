@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Sidebar from './components/Layout/Sidebar';
 import TopBar from './components/Layout/TopBar';
 import SimpleChatbot from './components/SimpleChatbot';
+import LoginPage from './components/Auth/LoginPage';
 
 // Retail ERP Components
 import RetailERPDashboard from './components/RetailERP/RetailERPDashboard';
@@ -41,6 +42,7 @@ import DepartmentManagement from './components/HRM/DepartmentManagement';
 import AttendanceManagement from './components/HRM/AttendanceManagement';
 import LeaveManagement from './components/HRM/LeaveManagement';
 import PerformanceManagement from './components/HRM/PerformanceManagement';
+import { makeServer } from './mirage/server';
 // import ChatBot from './components/ChatBot/ChatBot';
 
 // Component placeholders
@@ -135,6 +137,13 @@ const Settings = () => (
     </div>
   </div>
 );
+ 
+// if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'development') {
+    // makeServer({ environment: 'production' });
+    makeServer({ environment: 'development' });
+  }
+  
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -151,7 +160,9 @@ function App() {
             <Routes>
               <Route path="/" element={<Navigate to="/retail-erp/dashboard" />} />
               <Route path="/dashboard" element={<Navigate to="/retail-erp/dashboard" />} />
-              
+              <Route path="/login" element={<LoginPage />} />
+
+
               {/* Retail ERP Routes */}
               <Route path="/retail-erp" element={<RetailERPDashboard />} />
               <Route path="/retail-erp/dashboard" element={<RetailERPDashboard />} />

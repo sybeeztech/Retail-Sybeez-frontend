@@ -3,19 +3,31 @@ import { create } from 'zustand';
 
 // Mock API calls for Mirage.js
 const api = {
-  getDepartments: () => fetch('/api/departments').then(res => {
+  getDepartments: () => fetch('/api/departments', {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('auth-token')}`
+    }
+  }).then(res => {
     if (!res.ok) {
       throw new Error(`HTTP error! status: ${res.status}`);
     }
     return res.json();
   }),
-  getDepartment: (id) => fetch(`/api/departments/${id}`).then(res => {
+  getDepartment: (id) => fetch(`/api/departments/${id}`, {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('auth-token')}`
+    }
+  }).then(res => {
     if (!res.ok) {
       throw new Error(`HTTP error! status: ${res.status}`);
     }
     return res.json();
   }),
-  getEmployeesByDepartment: (departmentId) => fetch(`/api/departments/${departmentId}/employees`).then(res => {
+  getEmployeesByDepartment: (departmentId) => fetch(`/api/departments/${departmentId}/employees`, {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('auth-token')}`
+    }
+  }).then(res => {
     if (!res.ok) {
       throw new Error(`HTTP error! status: ${res.status}`);
     }
@@ -23,7 +35,7 @@ const api = {
   }),
   addDepartment: (department) => fetch('/api/departments', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('auth-token')}` },
     body: JSON.stringify(department)
   }).then(res => {
     if (!res.ok) {
@@ -33,7 +45,7 @@ const api = {
   }),
   updateDepartment: (id, department) => fetch(`/api/departments/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('auth-token')}` },
     body: JSON.stringify(department)
   }).then(res => {
     if (!res.ok) {

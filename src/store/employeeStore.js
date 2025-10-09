@@ -89,6 +89,7 @@ export const useEmployeeStore = create((set, get) => ({
       const response = await api.getEmployees();
 
       const employees = response.employees || response;
+      console.log('Fetched employees:', employees);
       set({ employees, loading: false });
       
       // Fetch documents for each employee

@@ -17,7 +17,7 @@ export const usePayrollStore = create((set, get) => ({
       }
       
       const parsedAuth = JSON.parse(authStorage);
-      const userRole = parsedAuth?.state?.user?.employee?.role || 'employee';
+      const userRole = parsedAuth?.state?.user?.employee_info?.role || 'employee';
       
       if (['super_admin', 'admin'].includes(userRole)) return true;
       if (userRole === 'manager' && action === 'view') return true;
@@ -42,6 +42,7 @@ export const usePayrollStore = create((set, get) => ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth-token')}`,
         },
         body: JSON.stringify({ payPeriod }),
       });
@@ -82,6 +83,7 @@ export const usePayrollStore = create((set, get) => ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth-token')}`,
         },
       });
       
@@ -107,7 +109,11 @@ export const usePayrollStore = create((set, get) => ({
     }
 
     try {
-      const response = await fetch('/api/payroll/tax-forms');
+      const response = await fetch('/api/payroll/tax-forms', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth-token')}`
+        }
+      });
       
       if (!response.ok) {
         throw new Error('Failed to generate tax forms');
@@ -129,7 +135,11 @@ export const usePayrollStore = create((set, get) => ({
     }
 
     try {
-      const response = await fetch('/api/payroll/compliance-reports');
+      const response = await fetch('/api/payroll/compliance-reports', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth-token')}`
+        }
+      });
       
       if (!response.ok) {
         throw new Error('Failed to generate compliance report');
@@ -146,8 +156,8 @@ export const usePayrollStore = create((set, get) => ({
 
   getEmployeeSalarySlip: async (employeeId) => {
     const userEmployeeId = JSON.parse(localStorage.getItem('auth-storage')).state.user.employeeId || '';
-    const userRole = JSON.parse(localStorage.getItem('auth-storage')).state.user.employee.role || 'employee';
-    const userDepartment = JSON.parse(localStorage.getItem('auth-storage')).state.user.employee.role.department || '';
+    const userRole = JSON.parse(localStorage.getItem('auth-storage')).state.user.employee_info.role || 'employee';
+    const userDepartment = JSON.parse(localStorage.getItem('auth-storage')).state.user.employee_info.department || '';
     
     // Employees can only view their own salary slip
     if (userRole === 'employee' && employeeId !== userEmployeeId) {
@@ -156,8 +166,12 @@ export const usePayrollStore = create((set, get) => ({
     }
 
     try {
-      const response = await fetch(`/api/payroll/employee/${employeeId}/salary-slip`);
-      
+      const response = await fetch(`/api/payroll/employee/${employeeId}/salary-slip`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth-token')}`
+        }
+      });
+       
       if (!response.ok) {
         throw new Error('Failed to fetch salary slip');
       }
@@ -178,7 +192,11 @@ export const usePayrollStore = create((set, get) => ({
     }
 
     try {
-      const response = await fetch('/api/payroll/history');
+      const response = await fetch('/api/payroll/history', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth-token')}`
+        }
+      });
       
       if (!response.ok) {
         throw new Error('Failed to fetch payroll history');
@@ -208,7 +226,7 @@ export const usePayrollStore = create((set, get) => ({
       const parsedAuth = JSON.parse(authStorage);
       const state = parsedAuth?.state;
       const user = state?.user;
-      const employee = user?.employee;
+      const employee = user?.employee_info;
       
       return {
         role: employee?.role || 'employee',
