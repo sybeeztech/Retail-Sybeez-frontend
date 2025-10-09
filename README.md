@@ -179,3 +179,9 @@ This project is part of a business management system integration and is intended
 ---
 
 **Note**: This application currently uses placeholder components for many features. The core architecture and routing are complete, providing a solid foundation for implementing full business management functionality.# Retail-Sybeez-frontend
+
+## HRM Update:
+1. Added missing functionalities for Employees and Attendance section frontend (without integrating mirage)
+2. Completed Payroll section frontend with functionalities with integrating mirage
+3. To use Payroll, first go to login page '/login' in Url. Then login with the email **john.doe@company.com** instead of username, for the demo data to load in local storage. Password can be any.
+4. Because Payroll data is integrated with mirage and retrieving with help of local storage, it has to be done like this. This should be changed while implementing backend.
