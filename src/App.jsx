@@ -43,6 +43,17 @@ import AttendanceManagement from './components/HRM/AttendanceManagement';
 import LeaveManagement from './components/HRM/LeaveManagement';
 import PerformanceManagement from './components/HRM/PerformanceManagement';
 import { makeServer } from './mirage/server';
+
+
+import SetupStep1 from './components/retailSetup/SetupStep1';
+import SetupStep2 from './components/retailSetup/SetupStep2';
+import SetupStep3 from './components/retailSetup/SetupStep3';
+import SetupStep4 from './components/retailSetup/SetupStep4';
+import SetupStep5 from './components/retailSetup/SetupStep5';
+import SetupStep6 from './components/retailSetup/SetupStep6';
+import SetupStep7 from './components/retailSetup/SetupStep7';
+import SetupStep8 from './components/retailSetup/SetupStep8';
+import SetupStep9 from './components/retailSetup/SetupStep9';
 // import ChatBot from './components/ChatBot/ChatBot';
 
 // Component placeholders
@@ -137,6 +148,38 @@ const Settings = () => (
     </div>
   </div>
 );
+
+// Layout component for pages with sidebar and topbar
+const MainLayout = ({ children }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  return (
+    <div className="flex h-screen bg-gray-100">
+      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <TopBar setSidebarOpen={setSidebarOpen} />
+        
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
+          {children}
+        </main>
+      </div>
+      
+      {/* Simple Chatbot Component */}
+      <SimpleChatbot />
+    </div>
+  );
+};
+
+// Layout component for pages without sidebar and topbar
+const AuthLayout = ({ children }) => {
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {children}
+    </div>
+  );
+};
+
  
 if (process.env.NODE_ENV === 'production') {
   // if (process.env.NODE_ENV === 'development') {
@@ -150,17 +193,89 @@ function App() {
 
   return (
     <Router>
+      <Routes>
+        {/* Routes without layout (login and setup pages) */}
+        <Route path="/login" element={
+          <AuthLayout>
+            <LoginPage />
+          </AuthLayout>
+        } />
+        
+        <Route path="/retail/step1" element={
+          <AuthLayout>
+            <SetupStep1 />
+          </AuthLayout>
+        } />
+        <Route path="/retail/step2" element={
+          <AuthLayout>
+            <SetupStep2 />
+          </AuthLayout>
+        } />
+        <Route path="/retail/step3" element={
+          <AuthLayout>
+            <SetupStep3 />
+          </AuthLayout>
+        } />
+        <Route path="/retail/step4" element={
+          <AuthLayout>
+            <SetupStep4 />
+          </AuthLayout>
+        } />
+        <Route path="/retail/step5" element={
+          <AuthLayout>
+            <SetupStep5 />
+          </AuthLayout>
+        } />
+        <Route path="/retail/step6" element={
+          <AuthLayout>
+            <SetupStep6 />
+          </AuthLayout>
+        } />
+        <Route path="/retail/step7" element={
+          <AuthLayout>
+            <SetupStep7 />
+          </AuthLayout>
+        } />
+        <Route path="/retail/step8" element={
+          <AuthLayout>
+            <SetupStep8 />
+          </AuthLayout>
+        } />
+        <Route path="/retail/step9" element={
+          <AuthLayout>
+            <SetupStep9 />
+          </AuthLayout>
+        } />
+
+
+{/* 
       <div className="flex h-screen bg-gray-100">
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
         
         <div className="flex-1 flex flex-col overflow-hidden">
           <TopBar setSidebarOpen={setSidebarOpen} />
           
-          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
+          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100"> */}
+
+          {/* All other routes with main layout */}
+        <Route path="*" element={
+          <MainLayout>
+
             <Routes>
               <Route path="/" element={<Navigate to="/retail-erp/dashboard" />} />
               <Route path="/dashboard" element={<Navigate to="/retail-erp/dashboard" />} />
-              <Route path="/login" element={<LoginPage />} />
+              {/* <Route path="/login" element={<LoginPage />} /> */}
+
+              {/* Retail setup after login page */}
+              <Route path="/retail/step1" element={<SetupStep1 />} />
+              <Route path="/retail/step2" element={<SetupStep2 />} />
+              <Route path="/retail/step3" element={<SetupStep3 />} />
+              <Route path="/retail/step4" element={<SetupStep4 />} />
+              <Route path="/retail/step5" element={<SetupStep5 />} />
+              <Route path="/retail/step6" element={<SetupStep6 />} />
+              <Route path="/retail/step7" element={<SetupStep7 />} />
+              <Route path="/retail/step8" element={<SetupStep8 />} />
+              <Route path="/retail/step9" element={<SetupStep9 />} />
 
 
               {/* Retail ERP Routes */}
@@ -233,12 +348,15 @@ function App() {
               <Route path="/supply-chain/inventory" element={<InventoryManagement />} />
               <Route path="/supply-chain/warehouse" element={<WarehouseManagement />} />
             </Routes>
-          </main>
-        </div>
+            </MainLayout>
+        } />
+          {/* </main>
+        </div> */}
         
         {/* Simple Chatbot Component */}
-        <SimpleChatbot />
-      </div>
+        {/* <SimpleChatbot /> */}
+      {/* </div> */}
+       </Routes>
     </Router>
   );
 }

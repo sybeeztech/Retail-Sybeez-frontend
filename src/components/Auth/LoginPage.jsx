@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { clearStorageAndReload } from '../../utils/storageUtils';
 import { Building, User, Lock, Eye, EyeOff } from 'lucide-react';
+import { useSetupStore } from '../../store/setupStore';
 
 function LoginPage() {
   const [credentials, setCredentials] = useState({
@@ -11,6 +12,7 @@ function LoginPage() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const { login, loading, error, clearError } = useAuthStore();
+  const { stepData } = useSetupStore();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -19,7 +21,12 @@ function LoginPage() {
     
     const result = await login(credentials);
     if (result.success) {
-      navigate('/');
+      // Check if store already has setup data
+      if (Object.keys(stepData).length > 0) {
+        navigate('/');
+      } else {
+        navigate('/retail/step1');
+      }
     }
   };
 

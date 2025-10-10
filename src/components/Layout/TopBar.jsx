@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Bell, User, LogOut, Settings, Menu, Search, ChevronDown, UserCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 function TopBar({ onMobileMenuClick }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const navigate = useNavigate();
 
   // Mock user data for the integrated app
   const user = {
@@ -15,6 +17,9 @@ function TopBar({ onMobileMenuClick }) {
   const handleLogout = () => {
     console.log('Logout clicked');
     setShowUserMenu(false);
+
+    localStorage.removeItem('auth-storage');
+    navigate('/login');
   };
 
   const getGreeting = () => {
