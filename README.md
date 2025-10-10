@@ -180,8 +180,18 @@ This project is part of a business management system integration and is intended
 
 **Note**: This application currently uses placeholder components for many features. The core architecture and routing are complete, providing a solid foundation for implementing full business management functionality.# Retail-Sybeez-frontend
 
+## Step by step setup pages update with logout function
+1. After login, if the setup steps data is null, then it shows the step by step setup pages, and finally retail erp dashboard
+2. The setup data is stored in store/setupStore, currently it just stores the setup data, not doing anything with it.
+3. If the setup steps data is already there, then after login directly go to retail erp dashboard
+4. Added Logout functionality by removing 'auth-storage' item in local storage
+5. To check this functionality, after login for first time and setup steps. Then logout, and login again. It will not show the setup steps again.
+6. This should be properly handled when implemented backend (we should check setup data available for each user).
+7. Removed sidebar and topbar components from Login and setup pages, it will only after login and setup.
+
 ## HRM Update:
 1. Added missing functionalities for Employees and Attendance section frontend (without integrating mirage)
 2. Completed Payroll section frontend with functionalities with integrating mirage
 3. To use Payroll, first go to login page '/login' in Url. Then login with the email **john.doe@company.com** instead of username, for the demo data to load in local storage. Password can be any.
 4. Because Payroll data is integrated with mirage and retrieving with help of local storage, it has to be done like this. This should be changed while implementing backend.
+
