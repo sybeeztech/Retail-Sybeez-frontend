@@ -57,6 +57,10 @@ export const useAuthStore = create(
         });
       },
 
+      setUser: (user) => set({ user }),
+      setToken: (token) => set({ token }),
+      setAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
+
       clearError: () => set({ error: null }),
     }),
     {

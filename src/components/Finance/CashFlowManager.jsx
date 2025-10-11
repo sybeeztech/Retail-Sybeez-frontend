@@ -69,10 +69,9 @@ const CashFlowManager = () => {
       time: '11:15 AM',
       type: 'out',
       category: 'Expense',
-      description: 'Shop Rent',
+      description: 'Monthly Shop Rent - October 2024',
       amount: 15000,
-      paymentMethod: 'cash',
-      description: 'Monthly Shop Rent - October 2024'
+      paymentMethod: 'cash'
     },
     {
       id: 5,

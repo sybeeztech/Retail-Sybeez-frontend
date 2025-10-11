@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Bot, User, Minimize2 } from 'lucide-react';
+import useSettingsStore from '../store/settingsStore';
 
 const SimpleChatbot = () => {
+  const { theme } = useSettingsStore();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState([
@@ -127,8 +129,12 @@ const SimpleChatbot = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className={`fixed bottom-6 right-6 bg-white rounded-lg shadow-2xl border border-gray-200 z-50 transition-all duration-300 ${
+        <div className={`fixed bottom-6 right-6 rounded-lg shadow-2xl border z-50 transition-all duration-300 ${
           isMinimized ? 'w-80 h-16' : 'w-80 h-96'
+        } ${
+          theme === 'dark' 
+            ? 'bg-gray-800 border-gray-700' 
+            : 'bg-white border-gray-200'
         }`}>
           {/* Chat Header */}
           <div className="bg-blue-600 text-white p-4 rounded-t-lg flex items-center justify-between">
@@ -158,7 +164,9 @@ const SimpleChatbot = () => {
           {!isMinimized && (
             <>
               {/* Chat Messages */}
-              <div className="h-64 overflow-y-auto p-4 space-y-3">
+              <div className={`h-64 overflow-y-auto p-4 space-y-3 ${
+                theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+              }`}>
                 {messages.map((message) => (
                   <div
                     key={message.id}
@@ -168,18 +176,30 @@ const SimpleChatbot = () => {
                       message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''
                     }`}>
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        message.sender === 'bot' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'
+                        message.sender === 'bot' 
+                          ? theme === 'dark' 
+                            ? 'bg-blue-900 text-blue-300' 
+                            : 'bg-blue-100 text-blue-600'
+                          : theme === 'dark' 
+                            ? 'bg-gray-700 text-gray-300' 
+                            : 'bg-gray-100 text-gray-600'
                       }`}>
                         {message.sender === 'bot' ? <Bot size={16} /> : <User size={16} />}
                       </div>
                       <div className={`rounded-lg p-3 ${
                         message.sender === 'user'
                           ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-900'
+                          : theme === 'dark'
+                            ? 'bg-gray-700 text-gray-100'
+                            : 'bg-gray-100 text-gray-900'
                       }`}>
                         <p className="text-sm whitespace-pre-line">{message.text}</p>
                         <p className={`text-xs mt-1 ${
-                          message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
+                          message.sender === 'user' 
+                            ? 'text-blue-100' 
+                            : theme === 'dark' 
+                              ? 'text-gray-400' 
+                              : 'text-gray-500'
                         }`}>
                           {formatTime(message.timestamp)}
                         </p>
@@ -191,10 +211,18 @@ const SimpleChatbot = () => {
                 {isTyping && (
                   <div className="flex justify-start">
                     <div className="flex items-start space-x-2 max-w-xs">
-                      <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        theme === 'dark' 
+                          ? 'bg-blue-900 text-blue-300' 
+                          : 'bg-blue-100 text-blue-600'
+                      }`}>
                         <Bot size={16} />
                       </div>
-                      <div className="bg-gray-100 text-gray-900 rounded-lg p-3">
+                      <div className={`rounded-lg p-3 ${
+                        theme === 'dark' 
+                          ? 'bg-gray-700 text-gray-100' 
+                          : 'bg-gray-100 text-gray-900'
+                      }`}>
                         <div className="flex space-x-1">
                           <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                           <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
@@ -208,7 +236,11 @@ const SimpleChatbot = () => {
               </div>
 
               {/* Chat Input */}
-              <div className="border-t border-gray-200 p-4">
+              <div className={`border-t p-4 ${
+                theme === 'dark' 
+                  ? 'border-gray-700 bg-gray-800' 
+                  : 'border-gray-200 bg-white'
+              }`}>
                 <div className="flex space-x-2">
                   <input
                     type="text"
@@ -216,7 +248,11 @@ const SimpleChatbot = () => {
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Type your message..."
-                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark'
+                        ? 'border-gray-600 bg-gray-700 text-gray-100 placeholder-gray-400'
+                        : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                    }`}
                   />
                   <button
                     onClick={handleSendMessage}
