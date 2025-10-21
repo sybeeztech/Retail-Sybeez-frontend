@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Layout/Sidebar';
 import TopBar from './components/Layout/TopBar';
 import SimpleChatbot from './components/SimpleChatbot';
 import LoginPage from './components/Auth/LoginPage';
+
+// Login Component
+import LoginPage from './Login/LoginPage';
+import ProtectedRoute from './components/ProtectedRoute';
+
+// Setup Components
+import SetupWrapper from './components/retailSetup/SetupWrapper';
 
 // Retail ERP Components
 import RetailERPDashboard from './components/RetailERP/RetailERPDashboard';
@@ -26,12 +33,15 @@ import TaxCompliance from './components/Finance/TaxCompliance';
 import InvoiceManagement from './components/Finance/InvoiceManagement';
 import BudgetManagement from './components/Finance/BudgetManagement';
 import FinancialReports from './components/Finance/FinancialReports';
-import BusinessAnalytics from './components/Analytics/BusinessAnalytics';
+import BusinessAnalytics from './components/Analytics/BusinessAnalyticsOptimized';
 import SalesTrends from './components/AI/SalesTrends';
 import CustomerTrends from './components/AI/CustomerTrends';
 import Alerts from './components/AI/Alerts';
 import SupplyChainDashboard from './components/SupplyChain/SupplyChainDashboard';
 import SupplierManagement from './components/SupplyChain/SupplierManagement';
+import Settings from './components/Settings/Settings';
+import ProfileSettings from './components/Profile/ProfileSettings';
+import HelpPage from './pages/HelpPage';
 import InventoryManagement from './components/SupplyChain/InventoryManagement';
 import WarehouseManagement from './components/SupplyChain/WarehouseManagement';
 import HRMDashboard from './components/HRM/Dashboard';
@@ -55,6 +65,9 @@ import SetupStep7 from './components/retailSetup/SetupStep7';
 import SetupStep8 from './components/retailSetup/SetupStep8';
 import SetupStep9 from './components/retailSetup/SetupStep9';
 // import ChatBot from './components/ChatBot/ChatBot';
+
+// Import the settings store
+import useSettingsStore from './store/settingsStore';
 
 // Component placeholders
 const Dashboard = () => (
@@ -138,225 +151,132 @@ const HRM = () => <HRMDashboard />;
 
 const Analytics = () => <BusinessAnalytics />;
 
-const Settings = () => (
-  <div className="p-6">
-    <h1 className="text-2xl font-semibold text-gray-900 mb-6">Settings</h1>
-    <div className="bg-white rounded-lg shadow">
-      <div className="p-6">
-        <p>Settings coming soon...</p>
-      </div>
-    </div>
-  </div>
-);
-
-// Layout component for pages with sidebar and topbar
-const MainLayout = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  return (
-    <div className="flex h-screen bg-gray-100">
-      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-      
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <TopBar setSidebarOpen={setSidebarOpen} />
-        
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
-          {children}
-        </main>
-      </div>
-      
-      {/* Simple Chatbot Component */}
-      <SimpleChatbot />
-    </div>
-  );
-};
-
-// Layout component for pages without sidebar and topbar
-const AuthLayout = ({ children }) => {
-  return (
-    <div className="min-h-screen bg-gray-100">
-      {children}
-    </div>
-  );
-};
-
- 
 if (process.env.NODE_ENV === 'production') {
   // if (process.env.NODE_ENV === 'development') {
     makeServer({ environment: 'production' });
     // makeServer({ environment: 'development' });
   }
-  
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { theme } = useSettingsStore();
+
+  // Apply theme to document root
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [theme]);
 
   return (
     <Router>
       <Routes>
-        {/* Routes without layout (login and setup pages) */}
-        <Route path="/login" element={
-          <AuthLayout>
-            <LoginPage />
-          </AuthLayout>
-        } />
+        {/* Root redirect to login */}
+        <Route path="/" element={<Navigate to="/login" />} />
         
-        <Route path="/retail/step1" element={
-          <AuthLayout>
-            <SetupStep1 />
-          </AuthLayout>
-        } />
-        <Route path="/retail/step2" element={
-          <AuthLayout>
-            <SetupStep2 />
-          </AuthLayout>
-        } />
-        <Route path="/retail/step3" element={
-          <AuthLayout>
-            <SetupStep3 />
-          </AuthLayout>
-        } />
-        <Route path="/retail/step4" element={
-          <AuthLayout>
-            <SetupStep4 />
-          </AuthLayout>
-        } />
-        <Route path="/retail/step5" element={
-          <AuthLayout>
-            <SetupStep5 />
-          </AuthLayout>
-        } />
-        <Route path="/retail/step6" element={
-          <AuthLayout>
-            <SetupStep6 />
-          </AuthLayout>
-        } />
-        <Route path="/retail/step7" element={
-          <AuthLayout>
-            <SetupStep7 />
-          </AuthLayout>
-        } />
-        <Route path="/retail/step8" element={
-          <AuthLayout>
-            <SetupStep8 />
-          </AuthLayout>
-        } />
-        <Route path="/retail/step9" element={
-          <AuthLayout>
-            <SetupStep9 />
-          </AuthLayout>
-        } />
-
-
-{/* 
-      <div className="flex h-screen bg-gray-100">
-        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        {/* Public Routes */}
+        <Route path="/login" element={<LoginPage />} />
         
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <TopBar setSidebarOpen={setSidebarOpen} />
-          
-          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100"> */}
-
-          {/* All other routes with main layout */}
-        <Route path="*" element={
-          <MainLayout>
-
-            <Routes>
-              <Route path="/" element={<Navigate to="/retail-erp/dashboard" />} />
-              <Route path="/dashboard" element={<Navigate to="/retail-erp/dashboard" />} />
-              {/* <Route path="/login" element={<LoginPage />} /> */}
-
-              {/* Retail setup after login page */}
-              <Route path="/retail/step1" element={<SetupStep1 />} />
-              <Route path="/retail/step2" element={<SetupStep2 />} />
-              <Route path="/retail/step3" element={<SetupStep3 />} />
-              <Route path="/retail/step4" element={<SetupStep4 />} />
-              <Route path="/retail/step5" element={<SetupStep5 />} />
-              <Route path="/retail/step6" element={<SetupStep6 />} />
-              <Route path="/retail/step7" element={<SetupStep7 />} />
-              <Route path="/retail/step8" element={<SetupStep8 />} />
-              <Route path="/retail/step9" element={<SetupStep9 />} />
-
-
-              {/* Retail ERP Routes */}
-              <Route path="/retail-erp" element={<RetailERPDashboard />} />
-              <Route path="/retail-erp/dashboard" element={<RetailERPDashboard />} />
-              <Route path="/retail-erp/inventory" element={<ProductInventoryManagement />} />
-              <Route path="/retail-erp/purchases" element={<SupplierManagement />} />
-              <Route path="/retail-erp/sales-pos" element={<POSSystem />} />
-              <Route path="/retail-erp/suppliers" element={<SupplierManagement />} />
-              <Route path="/retail-erp/branches" element={<MultiBranchManagement />} />
-              
-              {/* Legacy Routes for backward compatibility */}
-              <Route path="/orders" element={<Orders />} />
-              <Route path="/customers" element={<Customers />} />
-              <Route path="/inventory" element={<ProductInventoryManagement />} />
-              <Route path="/finance" element={<Finance />} />
-              <Route path="/settings" element={<Settings />} />
-              
-              {/* HRM Routes */}
-              <Route path="/hrm" element={<HRMDashboard />} />
-              <Route path="/hrm/dashboard" element={<HRMDashboard />} />
-              <Route path="/hrm/employees" element={<EmployeeDirectory />} />
-              <Route path="/hrm/attendance" element={<AttendanceManagement />} />
-              <Route path="/hrm/leave" element={<LeaveManagement />} />
-              <Route path="/hrm/payroll" element={<PayrollDashboard />} />
-              <Route path="/hrm/performance" element={<PerformanceManagement />} />
-              <Route path="/hrm/departments" element={<DepartmentManagement />} />
-              {/* <Route path="/hrm/profile/:id" element={<EmployeeProfile />} /> */}
-              
-              {/* Finance Routes */}
-              <Route path="/finance/dashboard" element={<MainFinanceDashboard />} />
-              <Route path="/finance/invoices" element={<InvoiceManagement />} />
-              <Route path="/finance/budget" element={<BudgetManagement />} />
-              <Route path="/finance/reports" element={<FinancialReports />} />
-              <Route path="/finance/transactions" element={<TransactionManagement />} />
-              <Route path="/finance/pl-statement" element={<FinancialReports />} />
-              <Route path="/finance/balance-sheet" element={<FinancialReports />} />
-              <Route path="/finance/cash-flow" element={<FinancialReports />} />
-              <Route path="/finance/tax-compliance" element={<TaxCompliance />} />
-              
-              {/* CRM Routes */}
-              <Route path="/crm" element={<IndianRetailCRM />} />
-              <Route path="/crm/customers" element={<IndianRetailCRM />} />
-              <Route path="/crm/leads" element={<IndianRetailLeadsManagement />} />
-              <Route path="/crm/pipeline" element={<IndianRetailSalesPipeline />} />
-              <Route path="/crm/contacts" element={<IndianRetailContactManagement />} />
-              <Route path="/crm/loyalty" element={<IndianRetailCRM />} />
-              <Route path="/crm/campaigns" element={<IndianRetailMarketingCampaigns />} />
-              
-              {/* Legacy CRM Routes for backward compatibility */}
-              <Route path="/crm/legacy/dashboard" element={<CRMDashboard />} />
-              <Route path="/crm/legacy/leads" element={<LeadsManagement />} />
-              <Route path="/crm/legacy/pipeline" element={<SalesPipeline />} />
-              <Route path="/crm/legacy/contacts" element={<ContactManagement />} />
-              
-              {/* Business Analytics Routes */}
-              <Route path="/analytics" element={<BusinessAnalytics />} />
-              <Route path="/ai-insights" element={<BusinessAnalytics />} />
-              <Route path="/business-analytics" element={<BusinessAnalytics />} />
-              
-              {/* AI Insights Routes */}
-              <Route path="/ai/sales-trends" element={<SalesTrends />} />
-              <Route path="/ai/customer-trends" element={<CustomerTrends />} />
-              <Route path="/ai/alerts" element={<Alerts />} />
-              
-              {/* Supply Chain Routes */}
-              <Route path="/supply-chain" element={<SupplyChainDashboard />} />
-              <Route path="/supply-chain/dashboard" element={<SupplyChainDashboard />} />
-              <Route path="/supply-chain/suppliers" element={<SupplierManagement />} />
-              <Route path="/supply-chain/inventory" element={<InventoryManagement />} />
-              <Route path="/supply-chain/warehouse" element={<WarehouseManagement />} />
-            </Routes>
-            </MainLayout>
-        } />
-          {/* </main>
-        </div> */}
+        {/* Setup Routes */}
+        <Route path="/retail/setup/*" element={<SetupWrapper />} />
         
-        {/* Simple Chatbot Component */}
-        {/* <SimpleChatbot /> */}
-      {/* </div> */}
-       </Routes>
+        {/* Protected Main Application */}
+        <Route path="/*" element={
+          <ProtectedRoute>
+            <div className={`flex h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
+              <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+              
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <TopBar setSidebarOpen={setSidebarOpen} />
+                
+                <main className={`flex-1 overflow-x-hidden overflow-y-auto ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
+                  <Routes>
+                    <Route path="/" element={<Navigate to="/retail-erp/dashboard" replace />} />
+                    <Route path="/dashboard" element={<Navigate to="/retail-erp/dashboard" replace />} />
+                    
+                    {/* Retail ERP Routes */}
+                    <Route path="/retail-erp" element={<RetailERPDashboard />} />
+                    <Route path="/retail-erp/dashboard" element={<RetailERPDashboard />} />
+                    <Route path="/retail-erp/inventory" element={<ProductInventoryManagement />} />
+                    <Route path="/retail-erp/purchases" element={<SupplierManagement />} />
+                    <Route path="/retail-erp/sales-pos" element={<POSSystem />} />
+                    <Route path="/retail-erp/suppliers" element={<SupplierManagement />} />
+                    <Route path="/retail-erp/branches" element={<MultiBranchManagement />} />
+                    
+                    {/* Legacy Routes for backward compatibility */}
+                    <Route path="/orders" element={<Orders />} />
+                    <Route path="/customers" element={<Customers />} />
+                    <Route path="/inventory" element={<ProductInventoryManagement />} />
+                    <Route path="/finance" element={<Finance />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="/profile" element={<ProfileSettings />} />
+                    <Route path="/help" element={<HelpPage />} />
+                    
+                    {/* HRM Routes */}
+                    <Route path="/hrm" element={<HRMDashboard />} />
+                    <Route path="/hrm/dashboard" element={<HRMDashboard />} />
+                    <Route path="/hrm/employees" element={<EmployeeDirectory />} />
+                    <Route path="/hrm/attendance" element={<AttendanceManagement />} />
+                    <Route path="/hrm/leave" element={<LeaveManagement />} />
+                    <Route path="/hrm/payroll" element={<PayrollDashboard />} />
+                    <Route path="/hrm/performance" element={<PerformanceManagement />} />
+                    <Route path="/hrm/departments" element={<DepartmentManagement />} />
+                    
+                    {/* Finance Routes */}
+                    <Route path="/finance/dashboard" element={<MainFinanceDashboard />} />
+                    <Route path="/finance/invoices" element={<InvoiceManagement />} />
+                    <Route path="/finance/budget" element={<BudgetManagement />} />
+                    <Route path="/finance/reports" element={<FinancialReports />} />
+                    <Route path="/finance/transactions" element={<TransactionManagement />} />
+                    <Route path="/finance/pl-statement" element={<FinancialReports />} />
+                    <Route path="/finance/balance-sheet" element={<FinancialReports />} />
+                    <Route path="/finance/cash-flow" element={<FinancialReports />} />
+                    <Route path="/finance/tax-compliance" element={<TaxCompliance />} />
+                    
+                    {/* CRM Routes */}
+                    <Route path="/crm" element={<IndianRetailCRM />} />
+                    <Route path="/crm/customers" element={<IndianRetailCRM />} />
+                    <Route path="/crm/leads" element={<IndianRetailLeadsManagement />} />
+                    <Route path="/crm/pipeline" element={<IndianRetailSalesPipeline />} />
+                    <Route path="/crm/contacts" element={<IndianRetailContactManagement />} />
+                    <Route path="/crm/loyalty" element={<IndianRetailCRM />} />
+                    <Route path="/crm/campaigns" element={<IndianRetailMarketingCampaigns />} />
+                    
+                    {/* Legacy CRM Routes for backward compatibility */}
+                    <Route path="/crm/legacy/dashboard" element={<CRMDashboard />} />
+                    <Route path="/crm/legacy/leads" element={<LeadsManagement />} />
+                    <Route path="/crm/legacy/pipeline" element={<SalesPipeline />} />
+                    <Route path="/crm/legacy/contacts" element={<ContactManagement />} />
+                    
+                    {/* Business Analytics Routes */}
+                    <Route path="/analytics" element={<BusinessAnalytics />} />
+                    <Route path="/ai-insights" element={<BusinessAnalytics />} />
+                    <Route path="/business-analytics" element={<BusinessAnalytics />} />
+                    
+                    {/* AI Insights Routes */}
+                    <Route path="/ai/sales-trends" element={<SalesTrends />} />
+                    <Route path="/ai/customer-trends" element={<CustomerTrends />} />
+                    <Route path="/ai/alerts" element={<Alerts />} />
+                    
+                    {/* Supply Chain Routes */}
+                    <Route path="/supply-chain" element={<SupplyChainDashboard />} />
+                    <Route path="/supply-chain/dashboard" element={<SupplyChainDashboard />} />
+                    <Route path="/supply-chain/suppliers" element={<SupplierManagement />} />
+                    <Route path="/supply-chain/inventory" element={<InventoryManagement />} />
+                    <Route path="/supply-chain/warehouse" element={<WarehouseManagement />} />
+                  </Routes>
+                </main>
+              </div>
+              
+              {/* Simple Chatbot Component */}
+              <SimpleChatbot />
+            </div>
+          </ProtectedRoute>
+        } />
+      </Routes>
     </Router>
   );
 }

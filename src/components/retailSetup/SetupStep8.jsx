@@ -32,7 +32,8 @@ const SetupStep8 = () => {
       boardName: boardName
     });
     // Navigate to dashboard or next step
-    navigate("/retail/step9");  
+    // navigate("/retail/step9");
+    navigate('/');  
   };
 
   return (

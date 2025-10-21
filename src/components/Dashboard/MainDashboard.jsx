@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import useSettingsStore from '../../store/settingsStore';
 import { 
   Users, 
   Package, 
@@ -20,6 +21,7 @@ import {
 } from 'lucide-react';
 
 function MainDashboard() {
+  const { theme } = useSettingsStore();
   const [stats, setStats] = useState({
     totalEmployees: 25,
     presentToday: 22,
@@ -53,6 +55,38 @@ function MainDashboard() {
 
     fetchStats();
   }, []);
+
+  // Greeting data function
+  const getGreetingData = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) {
+      return {
+        greeting: 'Good Morning',
+        message: 'Ready to manage your business',
+        icon: '☀️',
+        bgColor: 'bg-gradient-to-r from-blue-50 to-cyan-50',
+        textColor: 'text-blue-800'
+      };
+    } else if (hour < 17) {
+      return {
+        greeting: 'Good Afternoon',
+        message: 'Keep up the great work!',
+        icon: '☀️',
+        bgColor: 'bg-gradient-to-r from-amber-50 to-orange-50',
+        textColor: 'text-amber-800'
+      };
+    } else {
+      return {
+        greeting: 'Good Evening',
+        message: 'Time to wrap up and relax!',
+        icon: '🌙',
+        bgColor: 'bg-gradient-to-r from-indigo-50 to-purple-50',
+        textColor: 'text-indigo-800'
+      };
+    }
+  };
+
+  const greetingData = getGreetingData();
 
   const moduleCards = [
     {
@@ -183,10 +217,18 @@ function MainDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className={`min-h-screen ${
+      theme === 'dark' 
+        ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' 
+        : 'bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50'
+    }`}>
       <div className="space-y-6 md:space-y-8">
         {/* Header */}
-        <div className="relative overflow-hidden bg-white rounded-xl md:rounded-2xl shadow-xl border border-gray-100">
+        <div className={`relative overflow-hidden rounded-xl md:rounded-2xl shadow-xl border ${
+          theme === 'dark' 
+            ? 'bg-gray-800 border-gray-700' 
+            : 'bg-white border-gray-100'
+        }`}>
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 opacity-90"></div>
           <div className="relative px-4 md:px-8 py-8 md:py-12">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -211,13 +253,28 @@ function MainDashboard() {
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-16 -translate-x-16"></div>
         </div>
 
+        {/* Greeting Card */}
+        <div className={`${greetingData.bgColor} rounded-xl shadow-sm border border-gray-100 p-6`}>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className={`text-2xl font-bold mb-2 ${greetingData.textColor}`}>{greetingData.greeting}, Admin</h1>
+              <p className="text-gray-600">{greetingData.message}</p>
+            </div>
+            <div className="text-4xl">{greetingData.icon}</div>
+          </div>
+        </div>
+
         {/* Module Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
           {moduleCards.map((module, index) => (
             <div key={index} className="group relative">
               <div className="absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl md:rounded-2xl blur-xl" 
                    style={{background: `linear-gradient(135deg, ${module.gradient.split(' ')[1]}, ${module.gradient.split(' ')[3]})`}}></div>
-              <div className="relative bg-white rounded-xl md:rounded-2xl shadow-lg border border-gray-100 overflow-hidden group-hover:shadow-2xl transition-all duration-300 transform group-hover:-translate-y-1">
+              <div className={`relative rounded-xl md:rounded-2xl shadow-lg border overflow-hidden group-hover:shadow-2xl transition-all duration-300 transform group-hover:-translate-y-1 ${
+                theme === 'dark' 
+                  ? 'bg-gray-800 border-gray-700' 
+                  : 'bg-white border-gray-100'
+              }`}>
                 {/* Header */}
                 <div className={`bg-gradient-to-r ${module.gradient} p-6`}>
                   <div className="flex items-center justify-between">
@@ -237,8 +294,12 @@ function MainDashboard() {
                   {module.stats.map((stat, statIndex) => (
                     <div key={statIndex} className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-gray-600">{stat.label}</p>
-                        <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                        <p className={`text-sm ${
+                          theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                        }`}>{stat.label}</p>
+                        <p className={`text-2xl font-bold ${
+                          theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                        }`}>{stat.value}</p>
                       </div>
                       <div className="text-right">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -267,12 +328,22 @@ function MainDashboard() {
         {/* Quick Actions & Recent Activities */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
           {/* Quick Actions */}
-          <div className="bg-white rounded-xl md:rounded-2xl shadow-lg border border-gray-100 p-4 md:p-6 lg:p-8">
+          <div className={`rounded-xl md:rounded-2xl shadow-lg border p-4 md:p-6 lg:p-8 ${
+            theme === 'dark' 
+              ? 'bg-gray-800 border-gray-700' 
+              : 'bg-white border-gray-100'
+          }`}>
             <div className="flex items-center mb-4 md:mb-6">
-              <div className="p-2 bg-blue-100 rounded-lg mr-3">
-                <Activity className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
+              <div className={`p-2 rounded-lg mr-3 ${
+                theme === 'dark' ? 'bg-blue-900/50' : 'bg-blue-100'
+              }`}>
+                <Activity className={`w-5 h-5 md:w-6 md:h-6 ${
+                  theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+                }`} />
               </div>
-              <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">Quick Actions</h2>
+              <h2 className={`text-lg md:text-xl lg:text-2xl font-bold ${
+                theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+              }`}>Quick Actions</h2>
             </div>
             <div className="grid grid-cols-1 gap-3 md:gap-4">
               {quickActions.map((action, index) => (
@@ -295,25 +366,49 @@ function MainDashboard() {
           </div>
 
           {/* Recent Activities */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+          <div className={`rounded-2xl shadow-lg border p-8 ${
+            theme === 'dark' 
+              ? 'bg-gray-800 border-gray-700' 
+              : 'bg-white border-gray-100'
+          }`}>
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center">
-                <div className="p-2 bg-green-100 rounded-lg mr-3">
-                  <Activity className="w-6 h-6 text-green-600" />
+                <div className={`p-2 rounded-lg mr-3 ${
+                  theme === 'dark' ? 'bg-green-900/50' : 'bg-green-100'
+                }`}>
+                  <Activity className={`w-6 h-6 ${
+                    theme === 'dark' ? 'text-green-400' : 'text-green-600'
+                  }`} />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">Recent Activities</h2>
+                <h2 className={`text-2xl font-bold ${
+                  theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                }`}>Recent Activities</h2>
               </div>
-              <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">View All</button>
+              <button className={`text-sm font-medium ${
+                theme === 'dark' 
+                  ? 'text-blue-400 hover:text-blue-300' 
+                  : 'text-blue-600 hover:text-blue-700'
+              }`}>View All</button>
             </div>
             <div className="space-y-4">
               {recentActivities.map((activity, index) => (
-                <div key={index} className="flex items-start p-4 rounded-xl hover:bg-gray-50 transition-colors">
-                  <div className={`flex-shrink-0 p-2 ${activity.bg} rounded-lg mr-4`}>
+                <div key={index} className={`flex items-start p-4 rounded-xl transition-colors ${
+                  theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+                }`}>
+                  <div className={`flex-shrink-0 p-2 rounded-lg mr-4 ${
+                    theme === 'dark' 
+                      ? `${activity.bg.replace('50', '900/50')}` 
+                      : activity.bg
+                  }`}>
                     <activity.icon className={`w-5 h-5 ${activity.color}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-900 font-medium">{activity.message}</p>
-                    <p className="text-gray-500 text-sm mt-1">{activity.time}</p>
+                    <p className={`font-medium ${
+                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>{activity.message}</p>
+                    <p className={`text-sm mt-1 ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>{activity.time}</p>
                   </div>
                   <div className="flex-shrink-0">
                     <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
@@ -327,12 +422,22 @@ function MainDashboard() {
         {/* System Status & Performance Metrics */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* System Status */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+          <div className={`rounded-2xl shadow-lg border p-8 ${
+            theme === 'dark' 
+              ? 'bg-gray-800 border-gray-700' 
+              : 'bg-white border-gray-100'
+          }`}>
             <div className="flex items-center mb-6">
-              <div className="p-2 bg-green-100 rounded-lg mr-3">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+              <div className={`p-2 rounded-lg mr-3 ${
+                theme === 'dark' ? 'bg-green-900/50' : 'bg-green-100'
+              }`}>
+                <CheckCircle className={`w-6 h-6 ${
+                  theme === 'dark' ? 'text-green-400' : 'text-green-600'
+                }`} />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">System Health</h2>
+              <h2 className={`text-2xl font-bold ${
+                theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+              }`}>System Health</h2>
             </div>
             <div className="space-y-6">
               {[
@@ -340,17 +445,27 @@ function MainDashboard() {
                 { name: 'Supply Chain System', status: 'Operational', uptime: '99.8%', color: 'green' },
                 { name: 'Finance System', status: 'Operational', uptime: '99.7%', color: 'green' },
               ].map((system, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                <div key={index} className={`flex items-center justify-between p-4 rounded-xl ${
+                  theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
+                }`}>
                   <div className="flex items-center">
                     <CheckCircle className={`w-5 h-5 text-${system.color}-500 mr-3`} />
                     <div>
-                      <p className="font-medium text-gray-900">{system.name}</p>
-                      <p className="text-sm text-gray-600">{system.status}</p>
+                      <p className={`font-medium ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>{system.name}</p>
+                      <p className={`text-sm ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>{system.status}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-gray-900">{system.uptime}</p>
-                    <p className="text-sm text-gray-600">Uptime</p>
+                    <p className={`font-bold ${
+                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>{system.uptime}</p>
+                    <p className={`text-sm ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>Uptime</p>
                   </div>
                 </div>
               ))}
@@ -358,12 +473,22 @@ function MainDashboard() {
           </div>
 
           {/* Performance Metrics */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+          <div className={`rounded-2xl shadow-lg border p-8 ${
+            theme === 'dark' 
+              ? 'bg-gray-800 border-gray-700' 
+              : 'bg-white border-gray-100'
+          }`}>
             <div className="flex items-center mb-6">
-              <div className="p-2 bg-indigo-100 rounded-lg mr-3">
-                <BarChart3 className="w-6 h-6 text-indigo-600" />
+              <div className={`p-2 rounded-lg mr-3 ${
+                theme === 'dark' ? 'bg-indigo-900/50' : 'bg-indigo-100'
+              }`}>
+                <BarChart3 className={`w-6 h-6 ${
+                  theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'
+                }`} />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">Performance Overview</h2>
+              <h2 className={`text-2xl font-bold ${
+                theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+              }`}>Performance Overview</h2>
             </div>
             <div className="space-y-6">
               {[
@@ -374,8 +499,12 @@ function MainDashboard() {
               ].map((metric, index) => (
                 <div key={index} className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium text-gray-900">{metric.metric}</p>
-                    <p className="text-2xl font-bold text-gray-900 mt-1">{metric.value}</p>
+                    <p className={`font-medium ${
+                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>{metric.metric}</p>
+                    <p className={`text-2xl font-bold mt-1 ${
+                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>{metric.value}</p>
                   </div>
                   <div className="text-right">
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">

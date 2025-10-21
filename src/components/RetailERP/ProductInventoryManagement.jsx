@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import useSettingsStore from '../../store/settingsStore';
 import { 
   Package, 
   Search, 
@@ -16,6 +17,7 @@ import {
 } from 'lucide-react';
 
 const ProductInventoryManagement = () => {
+  const { theme } = useSettingsStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedBranch, setSelectedBranch] = useState('All Branches');
@@ -129,12 +131,16 @@ const ProductInventoryManagement = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className={`p-6 min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Product & Inventory Management</h1>
-          <p className="text-gray-600">Manage products, track inventory, and monitor stock levels</p>
+          <h1 className={`text-2xl font-semibold ${
+            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>Product & Inventory Management</h1>
+          <p className={`${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+          }`}>Manage products, track inventory, and monitor stock levels</p>
         </div>
         <div className="flex space-x-3">
           <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center space-x-2">
@@ -153,20 +159,24 @@ const ProductInventoryManagement = () => {
 
       {/* Inventory Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className={`rounded-lg shadow p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Products</p>
+              <p className={`text-sm font-medium ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Total Products</p>
               <p className="text-2xl font-bold text-blue-600">{products.length}</p>
             </div>
             <Package className="h-8 w-8 text-blue-600" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className={`rounded-lg shadow p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Low Stock Items</p>
+              <p className={`text-sm font-medium ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Low Stock Items</p>
               <p className="text-2xl font-bold text-red-600">
                 {products.filter(p => getStockStatus(p) === 'low_stock').length}
               </p>
@@ -175,10 +185,12 @@ const ProductInventoryManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className={`rounded-lg shadow p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Stock Value</p>
+              <p className={`text-sm font-medium ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Total Stock Value</p>
               <p className="text-2xl font-bold text-green-600">
                 ${products.reduce((sum, p) => sum + (p.stock.total * p.costPrice), 0).toLocaleString()}
               </p>
@@ -187,10 +199,12 @@ const ProductInventoryManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className={`rounded-lg shadow p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Categories</p>
+              <p className={`text-sm font-medium ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Categories</p>
               <p className="text-2xl font-bold text-purple-600">{categories.length - 1}</p>
             </div>
             <Building2 className="h-8 w-8 text-purple-600" />
@@ -199,17 +213,23 @@ const ProductInventoryManagement = () => {
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
+      <div className={`rounded-lg shadow p-6 mb-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
         <div className="flex flex-wrap gap-4 items-center">
           <div className="flex-1 min-w-64">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-400'
+              }`} size={20} />
               <input
                 type="text"
                 placeholder="Search by product name, SKU, or barcode..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                  theme === 'dark' 
+                    ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+                    : 'bg-white border-gray-300 text-gray-900'
+                }`}
               />
             </div>
           </div>
@@ -217,7 +237,11 @@ const ProductInventoryManagement = () => {
           <select 
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="border border-gray-300 rounded-lg px-4 py-2"
+            className={`border rounded-lg px-4 py-2 ${
+              theme === 'dark' 
+                ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                : 'bg-white border-gray-300 text-gray-900'
+            }`}
           >
             {categories.map(category => (
               <option key={category} value={category}>{category}</option>
@@ -227,7 +251,11 @@ const ProductInventoryManagement = () => {
           <select 
             value={selectedBranch}
             onChange={(e) => setSelectedBranch(e.target.value)}
-            className="border border-gray-300 rounded-lg px-4 py-2"
+            className={`border rounded-lg px-4 py-2 ${
+              theme === 'dark' 
+                ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                : 'bg-white border-gray-300 text-gray-900'
+            }`}
           >
             {branches.map(branch => (
               <option key={branch} value={branch}>{branch}</option>
@@ -235,11 +263,19 @@ const ProductInventoryManagement = () => {
           </select>
 
           <div className="flex space-x-2">
-            <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 flex items-center space-x-2">
+            <button className={`px-4 py-2 rounded-lg flex items-center space-x-2 ${
+              theme === 'dark' 
+                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}>
               <Download size={16} />
               <span>Export</span>
             </button>
-            <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 flex items-center space-x-2">
+            <button className={`px-4 py-2 rounded-lg flex items-center space-x-2 ${
+              theme === 'dark' 
+                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}>
               <Upload size={16} />
               <span>Import</span>
             </button>
@@ -248,41 +284,79 @@ const ProductInventoryManagement = () => {
       </div>
 
       {/* Products Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className={`rounded-lg shadow overflow-hidden ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className={`${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU/Barcode</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>Product</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>SKU/Barcode</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>Category</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>Price</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>Stock</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>Status</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className={`divide-y ${
+              theme === 'dark' 
+                ? 'bg-gray-800 divide-gray-700' 
+                : 'bg-white divide-gray-200'
+            }`}>
               {filteredProducts.map((product) => (
-                <tr key={product.id} className="hover:bg-gray-50">
+                <tr key={product.id} className={`${
+                  theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+                }`}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                      <div className="text-sm text-gray-500">{product.brand}</div>
+                      <div className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>{product.name}</div>
+                      <div className={`text-sm ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`}>{product.brand}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{product.sku}</div>
-                    <div className="text-sm text-gray-500">{product.barcode}</div>
+                    <div className={`text-sm ${
+                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>{product.sku}</div>
+                    <div className={`text-sm ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>{product.barcode}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.category}</td>
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${
+                    theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>{product.category}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">${product.price}</div>
-                    <div className="text-sm text-gray-500">Cost: ${product.costPrice}</div>
+                    <div className={`text-sm ${
+                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>${product.price}</div>
+                    <div className={`text-sm ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>Cost: ${product.costPrice}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{product.stock.available}/{product.stock.total}</div>
-                    <div className="text-sm text-gray-500">Reorder: {product.stock.reorderLevel}</div>
+                    <div className={`text-sm ${
+                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>{product.stock.available}/{product.stock.total}</div>
+                    <div className={`text-sm ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>Reorder: {product.stock.reorderLevel}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(getStockStatus(product))}`}>
@@ -315,10 +389,21 @@ const ProductInventoryManagement = () => {
       {/* Product Details Modal */}
       {selectedProduct && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-10 mx-auto p-5 border w-11/12 max-w-4xl shadow-lg rounded-md bg-white">
+          <div className={`relative top-10 mx-auto p-5 border w-11/12 max-w-4xl shadow-lg rounded-md ${
+            theme === 'dark' 
+              ? 'bg-gray-800 border-gray-700' 
+              : 'bg-white border-gray-200'
+          }`}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Product Details</h3>
-              <button onClick={() => setSelectedProduct(null)}>
+              <h3 className={`text-lg font-medium ${
+                theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+              }`}>Product Details</h3>
+              <button 
+                onClick={() => setSelectedProduct(null)}
+                className={`${
+                  theme === 'dark' ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
                 <X size={20} />
               </button>
             </div>

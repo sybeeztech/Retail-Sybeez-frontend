@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import useSettingsStore from '../../store/settingsStore';
 import { 
   ShoppingCart, 
   Search, 
@@ -17,6 +18,7 @@ import {
 } from 'lucide-react';
 
 const POSSystem = () => {
+  const { theme } = useSettingsStore();
   const [cart, setCart] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -156,22 +158,34 @@ const POSSystem = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`flex h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
       {/* Left Side - Product Selection */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div className="bg-white shadow-sm p-4 border-b">
+        <div className={`shadow-sm p-4 border-b ${
+          theme === 'dark' 
+            ? 'bg-gray-800 border-gray-700' 
+            : 'bg-white border-gray-200'
+        }`}>
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold text-gray-900">🛍 POS System</h1>
+            <h1 className={`text-2xl font-semibold ${
+              theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+            }`}>🛍 POS System</h1>
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-400'
+                }`} size={20} />
                 <input
                   type="text"
                   placeholder="Search products or scan barcode..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className={`pl-10 pr-4 py-2 w-80 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+                      : 'bg-white border-gray-300 text-gray-900'
+                  }`}
                 />
               </div>
               <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center space-x-2">
@@ -183,7 +197,11 @@ const POSSystem = () => {
         </div>
 
         {/* Category Filter */}
-        <div className="bg-white p-4 border-b">
+        <div className={`p-4 border-b ${
+          theme === 'dark' 
+            ? 'bg-gray-800 border-gray-700' 
+            : 'bg-white border-gray-200'
+        }`}>
           <div className="flex space-x-2 overflow-x-auto">
             {categories.map(category => (
               <button
@@ -192,7 +210,9 @@ const POSSystem = () => {
                 className={`px-4 py-2 rounded-lg whitespace-nowrap ${
                   selectedCategory === category
                     ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : theme === 'dark'
+                      ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 {category}
@@ -208,16 +228,30 @@ const POSSystem = () => {
               <div
                 key={product.id}
                 onClick={() => addToCart(product)}
-                className="bg-white rounded-lg shadow p-4 cursor-pointer hover:shadow-md transition-shadow border"
+                className={`rounded-lg shadow p-4 cursor-pointer hover:shadow-md transition-shadow border ${
+                  theme === 'dark' 
+                    ? 'bg-gray-800 border-gray-700 hover:bg-gray-750' 
+                    : 'bg-white border-gray-200'
+                }`}
               >
-                <div className="w-full h-20 bg-gray-200 rounded-lg mb-3 flex items-center justify-center">
-                  <Package className="h-8 w-8 text-gray-400" />
+                <div className={`w-full h-20 rounded-lg mb-3 flex items-center justify-center ${
+                  theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'
+                }`}>
+                  <Package className={`h-8 w-8 ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-400'
+                  }`} />
                 </div>
-                <h3 className="font-medium text-gray-900 text-sm mb-1 line-clamp-2">{product.name}</h3>
-                <p className="text-xs text-gray-500 mb-2">{product.sku}</p>
+                <h3 className={`font-medium text-sm mb-1 line-clamp-2 ${
+                  theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                }`}>{product.name}</h3>
+                <p className={`text-xs mb-2 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`}>{product.sku}</p>
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-bold text-green-600">${product.price}</span>
-                  <span className="text-xs text-gray-500">Stock: {product.stock}</span>
+                  <span className={`text-xs ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                  }`}>Stock: {product.stock}</span>
                 </div>
               </div>
             ))}
@@ -226,7 +260,9 @@ const POSSystem = () => {
       </div>
 
       {/* Right Side - Cart & Checkout */}
-      <div className="w-96 bg-white shadow-lg flex flex-col">
+      <div className={`w-96 shadow-lg flex flex-col ${
+        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      }`}>
         {/* Cart Header */}
         <div className="p-4 border-b">
           <div className="flex items-center justify-between">

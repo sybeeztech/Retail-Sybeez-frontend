@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useNavigate } from 'react-router-dom';
+import useSettingsStore from '../../store/settingsStore';
 
 const HRMDashboard = () => {
+  const { theme } = useSettingsStore();
   const [userRole, setUserRole] = useState('admin');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -74,38 +76,6 @@ const HRMDashboard = () => {
 
   const navigate = useNavigate();
 
-  // Helper function to get time-based greeting
-  const getGreetingData = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) {
-      return {
-        greeting: 'Good Morning',
-        message: 'Have a productive day!',
-        icon: '🌅',
-        bgColor: 'bg-gradient-to-r from-blue-50 to-cyan-50',
-        textColor: 'text-blue-800'
-      };
-    } else if (hour < 18) {
-      return {
-        greeting: 'Good Afternoon',
-        message: 'Keep up the great work!',
-        icon: '☀️',
-        bgColor: 'bg-gradient-to-r from-amber-50 to-orange-50',
-        textColor: 'text-amber-800'
-      };
-    } else {
-      return {
-        greeting: 'Good Evening',
-        message: 'Time to wrap up and relax!',
-        icon: '🌙',
-        bgColor: 'bg-gradient-to-r from-indigo-50 to-purple-50',
-        textColor: 'text-indigo-800'
-      };
-    }
-  };
-
-  const greetingData = getGreetingData();
-
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const fullMonth = payload[0]?.payload?.fullMonth || label;
@@ -138,32 +108,37 @@ const HRMDashboard = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Greeting Card */}
-      <div className={`${greetingData.bgColor} rounded-xl shadow-sm border border-gray-100 p-6`}>
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold mb-2">{greetingData.greeting}, Admin</h1>
-            <p className="text-gray-600">{greetingData.message}</p>
-          </div>
-          <div className="text-4xl">{greetingData.icon}</div>
-        </div>
-      </div>
-      
+    <div className={`p-6 space-y-6 ${
+      theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
+    }`}>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
         {/* Total Employees Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <div className={`rounded-xl shadow-sm border p-5 ${
+          theme === 'dark' 
+            ? 'bg-gray-800 border-gray-700' 
+            : 'bg-white border-gray-100'
+        }`}>
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-sm font-medium text-gray-500 mb-1">Total Employees</p>
-              <h3 className="text-2xl font-bold text-gray-800">{stats.totalEmployees || 0}</h3>
+              <p className={`text-sm font-medium mb-1 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              }`}>Total Employees</p>
+              <h3 className={`text-2xl font-bold ${
+                theme === 'dark' ? 'text-gray-100' : 'text-gray-800'
+              }`}>{stats.totalEmployees || 0}</h3>
               <div className="flex items-center mt-2">
                 <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                <span className="text-xs text-gray-500">Active workforce</span>
+                <span className={`text-xs ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`}>Active workforce</span>
               </div>
             </div>
-            <div className="bg-blue-50 p-3 rounded-lg">
-              <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+            <div className={`p-3 rounded-lg ${
+              theme === 'dark' ? 'bg-blue-900/50' : 'bg-blue-50'
+            }`}>
+              <svg className={`w-5 h-5 ${
+                theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+              }`} fill="currentColor" viewBox="0 0 20 20">
                 <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/>
               </svg>
             </div>
@@ -171,18 +146,32 @@ const HRMDashboard = () => {
         </div>
 
         {/* Departments Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <div className={`rounded-xl shadow-sm border p-5 ${
+          theme === 'dark' 
+            ? 'bg-gray-800 border-gray-700' 
+            : 'bg-white border-gray-100'
+        }`}>
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-sm font-medium text-gray-500 mb-1">Departments</p>
-              <h3 className="text-2xl font-bold text-gray-800">{stats.totalDepartments || 0}</h3>
+              <p className={`text-sm font-medium mb-1 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              }`}>Departments</p>
+              <h3 className={`text-2xl font-bold ${
+                theme === 'dark' ? 'text-gray-100' : 'text-gray-800'
+              }`}>{stats.totalDepartments || 0}</h3>
               <div className="flex items-center mt-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                <span className="text-xs text-gray-500">Organized teams</span>
+                <span className={`text-xs ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`}>Organized teams</span>
               </div>
             </div>
-            <div className="bg-green-50 p-3 rounded-lg">
-              <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+            <div className={`p-3 rounded-lg ${
+              theme === 'dark' ? 'bg-green-900/50' : 'bg-green-50'
+            }`}>
+              <svg className={`w-5 h-5 ${
+                theme === 'dark' ? 'text-green-400' : 'text-green-600'
+              }`} fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clipRule="evenodd"/>
               </svg>
             </div>
@@ -190,18 +179,32 @@ const HRMDashboard = () => {
         </div>
 
         {/* Attendance Rate Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <div className={`rounded-xl shadow-sm border p-5 ${
+          theme === 'dark' 
+            ? 'bg-gray-800 border-gray-700' 
+            : 'bg-white border-gray-100'
+        }`}>
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-sm font-medium text-gray-500 mb-1">Weekly Attendance</p>
-              <h3 className="text-2xl font-bold text-gray-800">{stats.attendanceRate || '0%'}</h3>
+              <p className={`text-sm font-medium mb-1 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              }`}>Weekly Attendance</p>
+              <h3 className={`text-2xl font-bold ${
+                theme === 'dark' ? 'text-gray-100' : 'text-gray-800'
+              }`}>{stats.attendanceRate || '0%'}</h3>
               <div className="flex items-center mt-2">
                 <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
-                <span className="text-xs text-gray-500">This week</span>
+                <span className={`text-xs ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`}>This week</span>
               </div>
             </div>
-            <div className="bg-purple-50 p-3 rounded-lg">
-              <svg className="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+            <div className={`p-3 rounded-lg ${
+              theme === 'dark' ? 'bg-purple-900/50' : 'bg-purple-50'
+            }`}>
+              <svg className={`w-5 h-5 ${
+                theme === 'dark' ? 'text-purple-400' : 'text-purple-600'
+              }`} fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd"/>
               </svg>
             </div>
@@ -209,18 +212,32 @@ const HRMDashboard = () => {
         </div>
 
         {/* New Hires Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <div className={`rounded-xl shadow-sm border p-5 ${
+          theme === 'dark' 
+            ? 'bg-gray-800 border-gray-700' 
+            : 'bg-white border-gray-100'
+        }`}>
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-sm font-medium text-gray-500 mb-1">New Hires (90d)</p>
-              <h3 className="text-2xl font-bold text-gray-800">{stats.newHires || 0}</h3>
+              <p className={`text-sm font-medium mb-1 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              }`}>New Hires (90d)</p>
+              <h3 className={`text-2xl font-bold ${
+                theme === 'dark' ? 'text-gray-100' : 'text-gray-800'
+              }`}>{stats.newHires || 0}</h3>
               <div className="flex items-center mt-2">
                 <div className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
-                <span className="text-xs text-gray-500">Recent additions</span>
+                <span className={`text-xs ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`}>Recent additions</span>
               </div>
             </div>
-            <div className="bg-yellow-50 p-3 rounded-lg">
-              <svg className="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+            <div className={`p-3 rounded-lg ${
+              theme === 'dark' ? 'bg-yellow-900/50' : 'bg-yellow-50'
+            }`}>
+              <svg className={`w-5 h-5 ${
+                theme === 'dark' ? 'text-yellow-400' : 'text-yellow-600'
+              }`} fill="currentColor" viewBox="0 0 20 20">
                 <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"/>
               </svg>
             </div>
@@ -231,8 +248,12 @@ const HRMDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Employee Count Chart */}
         {monthlyEmployeeData.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold mb-4">Employee Head Count</h3>
+          <div className={`rounded-lg shadow p-6 ${
+            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+          }`}>
+            <h3 className={`text-lg font-semibold mb-4 ${
+              theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+            }`}>Employee Head Count</h3>
             <div className="h-56">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={monthlyEmployeeData}>

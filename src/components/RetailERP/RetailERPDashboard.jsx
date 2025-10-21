@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { useSetupStore } from '../../store/setupStore';
+import useSettingsStore from '../../store/settingsStore';
+import iconLogo from '../../assets/icon.png';
 import { 
   Package, 
   ShoppingCart, 
@@ -12,9 +15,18 @@ import {
   Eye,
   Plus
 } from 'lucide-react';
+import WelcomePopup from '../WelcomePopup';
 
 const RetailERPDashboard = () => {
   const [selectedBranch, setSelectedBranch] = useState('All Branches');
+  const { showWelcome, dismissWelcome, setupData } = useSetupStore();
+  const { theme } = useSettingsStore();
+  const businessName = setupData?.step3?.businessName || 'Sybeez';
+  const businessLogo = setupData?.step3?.logoPreview;
+
+  const handleCloseWelcome = () => {
+    dismissWelcome();
+  };
 
   // Mock data for retail metrics
   const retailMetrics = {
@@ -50,18 +62,37 @@ const RetailERPDashboard = () => {
   ];
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className={`p-6 min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">🛍 Sybeez Retail ERP</h1>
-          <p className="text-gray-600">Comprehensive retail management dashboard</p>
+        <div className="flex items-center space-x-3">
+          <div className={`w-12 h-12 rounded-lg flex items-center justify-center shadow-sm border ${
+            theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+          }`}>
+            <img 
+              src={iconLogo} 
+              alt="Business Logo" 
+              className="w-10 h-10 object-contain"
+            />
+          </div>
+          <div>
+            <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
+              {businessName} Retail ERP
+            </h1>
+            <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+              Comprehensive retail management dashboard
+            </p>
+          </div>
         </div>
         <div className="flex items-center space-x-4">
           <select 
             value={selectedBranch}
             onChange={(e) => setSelectedBranch(e.target.value)}
-            className="border border-gray-300 rounded-lg px-4 py-2"
+            className={`border rounded-lg px-4 py-2 ${
+              theme === 'dark' 
+                ? 'border-gray-600 bg-gray-700 text-gray-100' 
+                : 'border-gray-300 bg-white text-gray-900'
+            }`}
           >
             <option value="All Branches">All Branches</option>
             {branches.map(branch => (
@@ -73,10 +104,14 @@ const RetailERPDashboard = () => {
 
       {/* Main Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className={`rounded-lg shadow p-6 ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Sales (Monthly)</p>
+              <p className={`text-sm font-medium ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Total Sales (Monthly)</p>
               <p className="text-2xl font-bold text-green-600">${retailMetrics.totalSales.toLocaleString()}</p>
               <p className="text-sm text-green-500">+12.5% from last month</p>
             </div>
@@ -84,10 +119,14 @@ const RetailERPDashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className={`rounded-lg shadow p-6 ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Daily Sales</p>
+              <p className={`text-sm font-medium ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Daily Sales</p>
               <p className="text-2xl font-bold text-blue-600">${retailMetrics.dailySales.toLocaleString()}</p>
               <p className="text-sm text-blue-500">Today's performance</p>
             </div>
@@ -95,10 +134,14 @@ const RetailERPDashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className={`rounded-lg shadow p-6 ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Products</p>
+              <p className={`text-sm font-medium ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Total Products</p>
               <p className="text-2xl font-bold text-purple-600">{retailMetrics.totalProducts.toLocaleString()}</p>
               <p className="text-sm text-red-500">{retailMetrics.lowStockItems} low stock</p>
             </div>
@@ -106,10 +149,14 @@ const RetailERPDashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className={`rounded-lg shadow p-6 ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Active Branches</p>
+              <p className={`text-sm font-medium ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Active Branches</p>
               <p className="text-2xl font-bold text-orange-600">{retailMetrics.branches}</p>
               <p className="text-sm text-orange-500">All operational</p>
             </div>
@@ -120,52 +167,86 @@ const RetailERPDashboard = () => {
 
       {/* Secondary Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className={`rounded-lg shadow p-6 ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Inventory Status</h3>
-            <Package className="h-5 w-5 text-gray-500" />
+            <h3 className={`text-lg font-semibold ${
+              theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+            }`}>Inventory Status</h3>
+            <Package className={`h-5 w-5 ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+            }`} />
           </div>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-gray-600">Total Value:</span>
-              <span className="font-medium">${retailMetrics.totalInventoryValue.toLocaleString()}</span>
+              <span className={`${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Total Value:</span>
+              <span className={`font-medium ${
+                theme === 'dark' ? 'text-gray-200' : 'text-gray-900'
+              }`}>${retailMetrics.totalInventoryValue.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Low Stock Items:</span>
+              <span className={`${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Low Stock Items:</span>
               <span className="font-medium text-red-600">{retailMetrics.lowStockItems}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Pending Orders:</span>
+              <span className={`${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Pending Orders:</span>
               <span className="font-medium text-orange-600">{retailMetrics.pendingOrders}</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className={`rounded-lg shadow p-6 ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Customer Metrics</h3>
-            <Users className="h-5 w-5 text-gray-500" />
+            <h3 className={`text-lg font-semibold ${
+              theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+            }`}>Customer Metrics</h3>
+            <Users className={`h-5 w-5 ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+            }`} />
           </div>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-gray-600">Active Customers:</span>
-              <span className="font-medium">{retailMetrics.activeCustomers.toLocaleString()}</span>
+              <span className={`${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Active Customers:</span>
+              <span className={`font-medium ${
+                theme === 'dark' ? 'text-gray-200' : 'text-gray-900'
+              }`}>{retailMetrics.activeCustomers.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">New This Month:</span>
+              <span className={`${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>New This Month:</span>
               <span className="font-medium text-green-600">89</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Loyalty Members:</span>
+              <span className={`${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Loyalty Members:</span>
               <span className="font-medium text-blue-600">867</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className={`rounded-lg shadow p-6 ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
-            <Plus className="h-5 w-5 text-gray-500" />
+            <h3 className={`text-lg font-semibold ${
+              theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+            }`}>Quick Actions</h3>
+            <Plus className={`h-5 w-5 ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+            }`} />
           </div>
           <div className="space-y-2">
             <button className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm">
@@ -183,20 +264,34 @@ const RetailERPDashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Branch Performance */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className={`rounded-lg shadow p-6 ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Branch Performance</h3>
-            <Eye className="h-5 w-5 text-gray-500" />
+            <h3 className={`text-lg font-semibold ${
+              theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+            }`}>Branch Performance</h3>
+            <Eye className={`h-5 w-5 ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+            }`} />
           </div>
           <div className="space-y-4">
             {branches.map((branch) => (
-              <div key={branch.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div key={branch.id} className={`flex items-center justify-between p-3 rounded-lg ${
+                theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
+              }`}>
                 <div>
-                  <h4 className="font-medium text-gray-900">{branch.name}</h4>
-                  <p className="text-sm text-gray-600">Monthly Sales</p>
+                  <h4 className={`font-medium ${
+                    theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>{branch.name}</h4>
+                  <p className={`text-sm ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                  }`}>Monthly Sales</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold text-gray-900">${branch.sales.toLocaleString()}</p>
+                  <p className={`font-semibold ${
+                    theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>${branch.sales.toLocaleString()}</p>
                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
                     {branch.status}
                   </span>
@@ -207,23 +302,37 @@ const RetailERPDashboard = () => {
         </div>
 
         {/* Recent Transactions */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className={`rounded-lg shadow p-6 ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Recent Transactions</h3>
-            <TrendingUp className="h-5 w-5 text-gray-500" />
+            <h3 className={`text-lg font-semibold ${
+              theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+            }`}>Recent Transactions</h3>
+            <TrendingUp className={`h-5 w-5 ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+            }`} />
           </div>
           <div className="space-y-3">
             {recentTransactions.map((transaction) => (
-              <div key={transaction.id} className="flex items-center justify-between p-3 border-l-4 border-blue-400 bg-gray-50">
+              <div key={transaction.id} className={`flex items-center justify-between p-3 border-l-4 border-blue-400 ${
+                theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
+              }`}>
                 <div>
-                  <p className="font-medium text-gray-900">{transaction.type}</p>
-                  <p className="text-sm text-gray-600">{transaction.branch}</p>
+                  <p className={`font-medium ${
+                    theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>{transaction.type}</p>
+                  <p className={`text-sm ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                  }`}>{transaction.branch}</p>
                 </div>
                 <div className="text-right">
                   <p className={`font-semibold ${transaction.amount < 0 ? 'text-red-600' : 'text-green-600'}`}>
                     ${Math.abs(transaction.amount).toFixed(2)}
                   </p>
-                  <p className="text-sm text-gray-500">{transaction.time}</p>
+                  <p className={`text-sm ${
+                    theme === 'dark' ? 'text-gray-500' : 'text-gray-500'
+                  }`}>{transaction.time}</p>
                 </div>
               </div>
             ))}
@@ -232,23 +341,44 @@ const RetailERPDashboard = () => {
       </div>
 
       {/* Top Products */}
-      <div className="mt-6 bg-white rounded-lg shadow p-6">
+      <div className={`mt-6 rounded-lg shadow p-6 ${
+        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      }`}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Top Selling Products</h3>
-          <BarChart3 className="h-5 w-5 text-gray-500" />
+          <h3 className={`text-lg font-semibold ${
+            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>Top Selling Products</h3>
+          <BarChart3 className={`h-5 w-5 ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+          }`} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {topProducts.map((product) => (
-            <div key={product.id} className="p-4 border rounded-lg">
-              <h4 className="font-medium text-gray-900 mb-2">{product.name}</h4>
+            <div key={product.id} className={`p-4 border rounded-lg ${
+              theme === 'dark' 
+                ? 'border-gray-600 bg-gray-700' 
+                : 'border-gray-200 bg-white'
+            }`}>
+              <h4 className={`font-medium mb-2 ${
+                theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+              }`}>{product.name}</h4>
               <div className="space-y-1">
-                <p className="text-sm text-gray-600">Units Sold: <span className="font-medium">{product.sold}</span></p>
-                <p className="text-sm text-gray-600">Revenue: <span className="font-medium text-green-600">${product.revenue.toLocaleString()}</span></p>
+                <p className={`text-sm ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>Units Sold: <span className={`font-medium ${
+                  theme === 'dark' ? 'text-gray-200' : 'text-gray-900'
+                }`}>{product.sold}</span></p>
+                <p className={`text-sm ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>Revenue: <span className="font-medium text-green-600">${product.revenue.toLocaleString()}</span></p>
               </div>
             </div>
           ))}
         </div>
       </div>
+
+      {/* Welcome Popup */}
+      <WelcomePopup isOpen={showWelcome} onClose={handleCloseWelcome} />
     </div>
   );
 };

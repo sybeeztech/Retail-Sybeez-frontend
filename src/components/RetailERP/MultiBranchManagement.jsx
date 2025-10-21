@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import useSettingsStore from '../../store/settingsStore';
 import { 
   Building2, 
   MapPin, 
@@ -18,6 +19,7 @@ import {
 } from 'lucide-react';
 
 const MultiBranchManagement = () => {
+  const { theme } = useSettingsStore();
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [viewMode, setViewMode] = useState('grid'); // grid or list
@@ -178,24 +180,34 @@ const MultiBranchManagement = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className={`p-6 min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Multi-Branch Management</h1>
-          <p className="text-gray-600">Monitor and manage all retail branches</p>
+          <h1 className={`text-2xl font-semibold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>Multi-Branch Management</h1>
+          <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Monitor and manage all retail branches</p>
         </div>
         <div className="flex space-x-3">
-          <div className="flex bg-white rounded-lg p-1 border">
+          <div className={`flex rounded-lg p-1 border ${
+            theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+          }`}>
             <button
               onClick={() => setViewMode('grid')}
-              className={`px-3 py-1 rounded text-sm ${viewMode === 'grid' ? 'bg-blue-600 text-white' : 'text-gray-600'}`}
+              className={`px-3 py-1 rounded text-sm ${
+                viewMode === 'grid' 
+                  ? 'bg-blue-600 text-white' 
+                  : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}
             >
               Grid
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`px-3 py-1 rounded text-sm ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'text-gray-600'}`}
+              className={`px-3 py-1 rounded text-sm ${
+                viewMode === 'list' 
+                  ? 'bg-blue-600 text-white' 
+                  : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}
             >
               List
             </button>
@@ -212,60 +224,60 @@ const MultiBranchManagement = () => {
 
       {/* Overall Stats */}
       <div className="grid grid-cols-1 md:grid-cols-6 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className={`rounded-lg shadow p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Branches</p>
+              <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Total Branches</p>
               <p className="text-2xl font-bold text-blue-600">{totalStats.totalBranches}</p>
             </div>
             <Building2 className="h-8 w-8 text-blue-600" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className={`rounded-lg shadow p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Active Branches</p>
+              <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Active Branches</p>
               <p className="text-2xl font-bold text-green-600">{totalStats.activeBranches}</p>
             </div>
             <Store className="h-8 w-8 text-green-600" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className={`rounded-lg shadow p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Employees</p>
+              <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Total Employees</p>
               <p className="text-2xl font-bold text-purple-600">{totalStats.totalEmployees}</p>
             </div>
             <Users className="h-8 w-8 text-purple-600" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className={`rounded-lg shadow p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Combined Sales</p>
+              <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Combined Sales</p>
               <p className="text-2xl font-bold text-green-600">${totalStats.totalSales.toLocaleString()}</p>
             </div>
             <DollarSign className="h-8 w-8 text-green-600" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className={`rounded-lg shadow p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Inventory Value</p>
+              <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Inventory Value</p>
               <p className="text-2xl font-bold text-orange-600">${totalStats.totalInventoryValue.toLocaleString()}</p>
             </div>
             <Package className="h-8 w-8 text-orange-600" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className={`rounded-lg shadow p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Avg Growth</p>
+              <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Avg Growth</p>
               <p className={`text-2xl font-bold ${getPerformanceColor(totalStats.avgSalesGrowth, 'growth')}`}>
                 {totalStats.avgSalesGrowth.toFixed(1)}%
               </p>
@@ -279,12 +291,18 @@ const MultiBranchManagement = () => {
       {viewMode === 'grid' ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {branches.map((branch) => (
-            <div key={branch.id} className="bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+            <div key={branch.id} className={`rounded-lg shadow hover:shadow-md transition-shadow ${
+              theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+            }`}>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{branch.name}</h3>
-                    <p className="text-sm text-gray-500">{branch.code}</p>
+                    <h3 className={`text-lg font-semibold ${
+                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>{branch.name}</h3>
+                    <p className={`text-sm ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>{branch.code}</p>
                   </div>
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(branch.status)}`}>
                     {branch.status}
@@ -292,15 +310,21 @@ const MultiBranchManagement = () => {
                 </div>
 
                 <div className="space-y-3 mb-4">
-                  <div className="flex items-center text-sm text-gray-600">
+                  <div className={`flex items-center text-sm ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                  }`}>
                     <MapPin className="h-4 w-4 mr-2" />
                     <span>{branch.city}, {branch.state}</span>
                   </div>
-                  <div className="flex items-center text-sm text-gray-600">
+                  <div className={`flex items-center text-sm ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                  }`}>
                     <Users className="h-4 w-4 mr-2" />
                     <span>{branch.totalEmployees} employees</span>
                   </div>
-                  <div className="flex items-center text-sm text-gray-600">
+                  <div className={`flex items-center text-sm ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                  }`}>
                     <Clock className="h-4 w-4 mr-2" />
                     <span>{branch.openingHours}</span>
                   </div>
@@ -308,16 +332,24 @@ const MultiBranchManagement = () => {
 
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
-                    <p className="text-xs text-gray-500">Monthly Sales</p>
+                    <p className={`text-xs ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>Monthly Sales</p>
                     <p className="text-lg font-semibold text-green-600">${branch.monthlySales.toLocaleString()}</p>
-                    <p className="text-xs text-gray-500">Target: ${branch.monthlyTarget.toLocaleString()}</p>
+                    <p className={`text-xs ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>Target: ${branch.monthlyTarget.toLocaleString()}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Growth</p>
+                    <p className={`text-xs ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>Growth</p>
                     <p className={`text-lg font-semibold ${getPerformanceColor(branch.performance.salesGrowth, 'growth')}`}>
                       {branch.performance.salesGrowth > 0 ? '+' : ''}{branch.performance.salesGrowth}%
                     </p>
-                    <p className="text-xs text-gray-500">vs last month</p>
+                    <p className={`text-xs ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>vs last month</p>
                   </div>
                 </div>
 
@@ -329,7 +361,11 @@ const MultiBranchManagement = () => {
                     <Eye size={14} />
                     <span>Details</span>
                   </button>
-                  <button className="bg-gray-100 text-gray-700 text-sm py-2 px-3 rounded-lg hover:bg-gray-200">
+                  <button className={`text-sm py-2 px-3 rounded-lg ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}>
                     <Edit size={14} />
                   </button>
                 </div>
@@ -338,39 +374,77 @@ const MultiBranchManagement = () => {
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className={`rounded-lg shadow overflow-hidden ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className={`min-w-full divide-y ${
+              theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'
+            }`}>
+              <thead className={`${
+                theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
+              }`}>
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Branch</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Manager</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sales</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Growth</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>Branch</th>
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>Location</th>
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>Manager</th>
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>Sales</th>
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>Growth</th>
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>Status</th>
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>Actions</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className={`divide-y ${
+                theme === 'dark' ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-gray-200'
+              }`}>
                 {branches.map((branch) => (
-                  <tr key={branch.id} className="hover:bg-gray-50">
+                  <tr key={branch.id} className={`${
+                    theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+                  }`}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className="text-sm font-medium text-gray-900">{branch.name}</div>
-                        <div className="text-sm text-gray-500">{branch.code}</div>
+                        <div className={`text-sm font-medium ${
+                          theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                        }`}>{branch.name}</div>
+                        <div className={`text-sm ${
+                          theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                        }`}>{branch.code}</div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className={`px-6 py-4 whitespace-nowrap text-sm ${
+                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>
                       {branch.city}, {branch.state}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{branch.manager}</div>
-                      <div className="text-sm text-gray-500">{branch.totalEmployees} employees</div>
+                      <div className={`text-sm ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>{branch.manager}</div>
+                      <div className={`text-sm ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`}>{branch.totalEmployees} employees</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">${branch.monthlySales.toLocaleString()}</div>
-                      <div className="text-sm text-gray-500">Target: ${branch.monthlyTarget.toLocaleString()}</div>
+                      <div className={`text-sm ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>${branch.monthlySales.toLocaleString()}</div>
+                      <div className={`text-sm ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`}>Target: ${branch.monthlyTarget.toLocaleString()}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`text-sm font-medium ${getPerformanceColor(branch.performance.salesGrowth, 'growth')}`}>
@@ -386,11 +460,15 @@ const MultiBranchManagement = () => {
                       <div className="flex space-x-2">
                         <button 
                           onClick={() => setSelectedBranch(branch)}
-                          className="text-blue-600 hover:text-blue-900"
+                          className={`hover:opacity-80 ${
+                            theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+                          }`}
                         >
                           <Eye size={16} />
                         </button>
-                        <button className="text-green-600 hover:text-green-900">
+                        <button className={`hover:opacity-80 ${
+                          theme === 'dark' ? 'text-green-400' : 'text-green-600'
+                        }`}>
                           <Edit size={16} />
                         </button>
                       </div>

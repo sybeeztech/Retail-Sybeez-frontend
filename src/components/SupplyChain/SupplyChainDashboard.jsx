@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import useSettingsStore from '../../store/settingsStore';
 import { 
   Truck, 
   Package, 
@@ -28,6 +29,7 @@ import {
 } from 'lucide-react';
 
 const SupplyChainDashboard = () => {
+  const { theme } = useSettingsStore();
   const [selectedPeriod, setSelectedPeriod] = useState('This Month');
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -215,19 +217,29 @@ const SupplyChainDashboard = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className={`p-6 min-h-screen ${
+      theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
+    }`}>
       {/* Header */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Supply Chain Dashboard</h1>
-            <p className="text-gray-600">Monitor and manage your entire supply chain operations</p>
+            <h1 className={`text-2xl font-semibold ${
+              theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+            }`}>Supply Chain Dashboard</h1>
+            <p className={`${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>Monitor and manage your entire supply chain operations</p>
           </div>
           <div className="flex space-x-3">
             <select
               value={selectedPeriod}
               onChange={(e) => setSelectedPeriod(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                theme === 'dark' 
+                  ? 'bg-gray-800 border-gray-600 text-gray-100' 
+                  : 'bg-white border-gray-300 text-gray-900'
+              }`}
             >
               <option value="Today">Today</option>
               <option value="This Week">This Week</option>

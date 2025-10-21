@@ -25,8 +25,10 @@ import {
   Building,
   Star
 } from 'lucide-react';
+import useSettingsStore from '../../store/settingsStore';
 
 const InventoryManagement = () => {
+  const { theme } = useSettingsStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -255,16 +257,26 @@ const InventoryManagement = () => {
   const outOfStockItems = inventoryItems.filter(item => getStockLevel(item.currentStock, item.reorderPoint, item.maxStock) === 'out_of_stock').length;
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className={`p-6 min-h-screen ${
+      theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
+    }`}>
       {/* Header */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Inventory Management</h1>
-            <p className="text-gray-600">Track and manage your product inventory</p>
+            <h1 className={`text-2xl font-semibold ${
+              theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+            }`}>Inventory Management</h1>
+            <p className={`${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>Track and manage your product inventory</p>
           </div>
           <div className="flex space-x-3">
-            <button className="bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
+            <button className={`border px-3 py-2 rounded-lg flex items-center space-x-2 ${
+              theme === 'dark' 
+                ? 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600' 
+                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+            }`}>
               <RefreshCw size={16} />
               <span>Refresh</span>
             </button>
@@ -284,7 +296,9 @@ const InventoryManagement = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className={`rounded-lg shadow p-6 ${
+            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+          }`}>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Items</p>

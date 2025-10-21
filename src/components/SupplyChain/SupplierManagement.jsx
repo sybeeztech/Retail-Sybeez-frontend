@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import useSettingsStore from '../../store/settingsStore';
 import { 
   Plus, 
   Search, 
@@ -29,6 +30,7 @@ import {
 } from 'lucide-react';
 
 const SupplierManagement = () => {
+  const { theme } = useSettingsStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -204,13 +206,17 @@ const SupplierManagement = () => {
   const averageRating = suppliers.reduce((sum, s) => sum + s.rating, 0) / suppliers.length;
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className={`p-6 min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Header */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Supplier Management</h1>
-            <p className="text-gray-600">Manage your supplier relationships and performance</p>
+            <h1 className={`text-2xl font-semibold ${
+              theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+            }`}>Supplier Management</h1>
+            <p className={`${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>Manage your supplier relationships and performance</p>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
@@ -223,10 +229,12 @@ const SupplierManagement = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className={`rounded-lg shadow p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Suppliers</p>
+                <p className={`text-sm font-medium ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>Total Suppliers</p>
                 <p className="text-2xl font-bold text-blue-600">{totalSuppliers}</p>
               </div>
               <div className="bg-blue-100 p-3 rounded-full">
@@ -235,10 +243,12 @@ const SupplierManagement = () => {
             </div>
           </div>
           
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className={`rounded-lg shadow p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Active Suppliers</p>
+                <p className={`text-sm font-medium ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>Active Suppliers</p>
                 <p className="text-2xl font-bold text-green-600">{activeSuppliers}</p>
               </div>
               <div className="bg-green-100 p-3 rounded-full">
@@ -247,10 +257,12 @@ const SupplierManagement = () => {
             </div>
           </div>
           
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className={`rounded-lg shadow p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Spend</p>
+                <p className={`text-sm font-medium ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>Total Spend</p>
                 <p className="text-2xl font-bold text-purple-600">{formatCurrency(totalSpend)}</p>
               </div>
               <div className="bg-purple-100 p-3 rounded-full">
@@ -259,14 +271,18 @@ const SupplierManagement = () => {
             </div>
           </div>
           
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className={`rounded-lg shadow p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Avg Rating</p>
+                <p className={`text-sm font-medium ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>Avg Rating</p>
                 <p className="text-2xl font-bold text-yellow-600">{averageRating.toFixed(1)}</p>
                 <div className="flex items-center mt-1">
                   <Star className="text-yellow-400 fill-current" size={16} />
-                  <span className="text-sm text-gray-500 ml-1">out of 5</span>
+                  <span className={`text-sm ml-1 ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                  }`}>out of 5</span>
                 </div>
               </div>
               <div className="bg-yellow-100 p-3 rounded-full">
@@ -278,18 +294,26 @@ const SupplierManagement = () => {
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white rounded-lg shadow mb-6">
-        <div className="p-6 border-b border-gray-200">
+      <div className={`rounded-lg shadow mb-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+        <div className={`p-6 border-b ${
+          theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+        }`}>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
             <div className="flex-1 max-w-lg">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-400'
+                }`} size={20} />
                 <input
                   type="text"
                   placeholder="Search suppliers..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+                      : 'bg-white border-gray-300 text-gray-900'
+                  }`}
                 />
               </div>
             </div>
@@ -297,14 +321,22 @@ const SupplierManagement = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  theme === 'dark' 
+                    ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                    : 'bg-white border-gray-300 text-gray-900'
+                }`}
               >
                 <option value="All">All Status</option>
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
                 <option value="Pending">Pending</option>
               </select>
-              <button className="bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
+              <button className={`border px-3 py-2 rounded-lg flex items-center space-x-2 ${
+                theme === 'dark' 
+                  ? 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600' 
+                  : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+              }`}>
                 <Filter size={16} />
                 <span>More Filters</span>
               </button>
@@ -319,43 +351,73 @@ const SupplierManagement = () => {
         {/* Supplier Table */}
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className={`${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>
                   Supplier
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>
                   Contact
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>
                   Performance
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>
                   Orders & Spend
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>
                   Risk Level
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className={`divide-y ${
+              theme === 'dark' 
+                ? 'bg-gray-800 divide-gray-700' 
+                : 'bg-white divide-gray-200'
+            }`}>
               {filteredSuppliers.map((supplier) => (
-                <tr key={supplier.id} className="hover:bg-gray-50">
+                <tr key={supplier.id} className={`${
+                  theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+                }`}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="bg-gray-100 p-2 rounded-full mr-3">
-                        <Building size={16} className="text-gray-600" />
+                      <div className={`p-2 rounded-full mr-3 ${
+                        theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'
+                      }`}>
+                        <Building size={16} className={`${
+                          theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                        }`} />
                       </div>
                       <div>
-                        <div className="text-sm font-medium text-gray-900">{supplier.name}</div>
-                        <div className="text-sm text-gray-500">{supplier.category}</div>
-                        <div className="text-xs text-gray-400 flex items-center mt-1">
+                        <div className={`text-sm font-medium ${
+                          theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                        }`}>{supplier.name}</div>
+                        <div className={`text-sm ${
+                          theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                        }`}>{supplier.category}</div>
+                        <div className={`text-xs flex items-center mt-1 ${
+                          theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                        }`}>
                           <MapPin size={12} className="mr-1" />
                           {supplier.country}
                         </div>
@@ -364,12 +426,18 @@ const SupplierManagement = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{supplier.contactPerson}</div>
-                      <div className="text-sm text-gray-500 flex items-center">
+                      <div className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>{supplier.contactPerson}</div>
+                      <div className={`text-sm flex items-center ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`}>
                         <Mail size={12} className="mr-1" />
                         {supplier.email}
                       </div>
-                      <div className="text-sm text-gray-500 flex items-center">
+                      <div className={`text-sm flex items-center ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`}>
                         <Phone size={12} className="mr-1" />
                         {supplier.phone}
                       </div>
@@ -379,25 +447,41 @@ const SupplierManagement = () => {
                     <div className="space-y-1">
                       <div className="flex items-center">
                         {getPerformanceIcon(supplier.rating)}
-                        <span className="text-sm font-medium text-gray-900 ml-2">{supplier.rating}/5</span>
+                        <span className={`text-sm font-medium ml-2 ${
+                          theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                        }`}>{supplier.rating}/5</span>
                       </div>
-                      <div className="text-xs text-gray-500">OTD: {supplier.onTimeDelivery}%</div>
-                      <div className="text-xs text-gray-500">Quality: {supplier.qualityScore}/5</div>
-                      <div className="text-xs text-gray-500">Lead Time: {supplier.leadTime} days</div>
+                      <div className={`text-xs ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`}>OTD: {supplier.onTimeDelivery}%</div>
+                      <div className={`text-xs ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`}>Quality: {supplier.qualityScore}/5</div>
+                      <div className={`text-xs ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`}>Lead Time: {supplier.leadTime} days</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{supplier.totalOrders} orders</div>
-                      <div className="text-sm text-gray-500">{formatCurrency(supplier.totalSpend)}</div>
-                      <div className="text-xs text-gray-400">Avg: {formatCurrency(supplier.averageOrderValue)}</div>
+                      <div className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>{supplier.totalOrders} orders</div>
+                      <div className={`text-sm ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`}>{formatCurrency(supplier.totalSpend)}</div>
+                      <div className={`text-xs ${
+                        theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                      }`}>Avg: {formatCurrency(supplier.averageOrderValue)}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(supplier.status)}`}>
                       {supplier.status.charAt(0).toUpperCase() + supplier.status.slice(1)}
                     </span>
-                    <div className="text-xs text-gray-500 mt-1">
+                    <div className={`text-xs mt-1 ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>
                       Last order: {new Date(supplier.lastOrderDate).toLocaleDateString()}
                     </div>
                   </td>
@@ -409,19 +493,27 @@ const SupplierManagement = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
                       <button 
-                        className="text-blue-600 hover:text-blue-900" 
+                        className={`hover:opacity-80 ${
+                          theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+                        }`}
                         title="View Details"
                         onClick={() => setSelectedSupplier(supplier)}
                       >
                         <Eye size={16} />
                       </button>
-                      <button className="text-gray-600 hover:text-gray-900" title="Edit">
+                      <button className={`hover:opacity-80 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`} title="Edit">
                         <Edit size={16} />
                       </button>
-                      <button className="text-green-600 hover:text-green-900" title="Download Report">
+                      <button className={`hover:opacity-80 ${
+                        theme === 'dark' ? 'text-green-400' : 'text-green-600'
+                      }`} title="Download Report">
                         <Download size={16} />
                       </button>
-                      <button className="text-red-600 hover:text-red-900" title="Delete">
+                      <button className={`hover:opacity-80 ${
+                        theme === 'dark' ? 'text-red-400' : 'text-red-600'
+                      }`} title="Delete">
                         <Trash2 size={16} />
                       </button>
                     </div>
@@ -434,9 +526,15 @@ const SupplierManagement = () => {
 
         {filteredSuppliers.length === 0 && (
           <div className="text-center py-12">
-            <Building className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No suppliers found</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <Building className={`mx-auto h-12 w-12 ${
+              theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+            }`} />
+            <h3 className={`mt-2 text-sm font-medium ${
+              theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+            }`}>No suppliers found</h3>
+            <p className={`mt-1 text-sm ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+            }`}>
               {searchTerm || statusFilter !== 'All' 
                 ? 'Try adjusting your search or filters'
                 : 'Get started by adding your first supplier'
@@ -449,63 +547,99 @@ const SupplierManagement = () => {
       {/* Create Supplier Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+          <div className={`relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md ${
+            theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'
+          }`}>
             <div className="mt-3">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">Add New Supplier</h3>
+                <h3 className={`text-lg font-medium ${
+                  theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                }`}>Add New Supplier</h3>
                 <button
                   onClick={() => setShowCreateModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className={`${
+                    theme === 'dark' ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'
+                  }`}
                 >
                   ×
                 </button>
               </div>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Supplier Name
                   </label>
                   <input
                     type="text"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+                        : 'bg-white border-gray-300 text-gray-900'
+                    }`}
                     placeholder="Enter supplier name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Contact Person
                   </label>
                   <input
                     type="text"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+                        : 'bg-white border-gray-300 text-gray-900'
+                    }`}
                     placeholder="Enter contact person name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Email
                   </label>
                   <input
                     type="email"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+                        : 'bg-white border-gray-300 text-gray-900'
+                    }`}
                     placeholder="Enter email address"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Phone
                   </label>
                   <input
                     type="tel"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+                        : 'bg-white border-gray-300 text-gray-900'
+                    }`}
                     placeholder="Enter phone number"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Category
                   </label>
-                  <select className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <select className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                      : 'bg-white border-gray-300 text-gray-900'
+                  }`}>
                     <option value="">Select category</option>
                     <option value="Electronics">Electronics</option>
                     <option value="Components">Components</option>
@@ -515,12 +649,18 @@ const SupplierManagement = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Address
                   </label>
                   <textarea
                     rows={3}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+                        : 'bg-white border-gray-300 text-gray-900'
+                    }`}
                     placeholder="Enter full address"
                   />
                 </div>
@@ -528,7 +668,11 @@ const SupplierManagement = () => {
               <div className="flex justify-end space-x-3 mt-6">
                 <button
                   onClick={() => setShowCreateModal(false)}
-                  className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50"
+                  className={`border px-4 py-2 rounded-lg ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600' 
+                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
                 >
                   Cancel
                 </button>
@@ -547,13 +691,19 @@ const SupplierManagement = () => {
       {/* Supplier Details Modal */}
       {selectedSupplier && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-10 mx-auto p-5 border w-4/5 max-w-4xl shadow-lg rounded-md bg-white">
+          <div className={`relative top-10 mx-auto p-5 border w-4/5 max-w-4xl shadow-lg rounded-md ${
+            theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'
+          }`}>
             <div className="mt-3">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-medium text-gray-900">Supplier Details - {selectedSupplier.name}</h3>
+                <h3 className={`text-xl font-medium ${
+                  theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                }`}>Supplier Details - {selectedSupplier.name}</h3>
                 <button
                   onClick={() => setSelectedSupplier(null)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className={`${
+                    theme === 'dark' ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'
+                  }`}
                 >
                   ×
                 </button>
@@ -561,54 +711,100 @@ const SupplierManagement = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Basic Information */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h4>
+                <div className={`rounded-lg p-4 ${
+                  theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
+                }`}>
+                  <h4 className={`text-lg font-medium mb-4 ${
+                    theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Basic Information</h4>
                   <div className="space-y-3">
                     <div>
-                      <label className="text-sm font-medium text-gray-600">Company Name</label>
-                      <p className="text-gray-900">{selectedSupplier.name}</p>
+                      <label className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Company Name</label>
+                      <p className={`${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>{selectedSupplier.name}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-600">Contact Person</label>
-                      <p className="text-gray-900">{selectedSupplier.contactPerson}</p>
+                      <label className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Contact Person</label>
+                      <p className={`${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>{selectedSupplier.contactPerson}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-600">Category</label>
-                      <p className="text-gray-900">{selectedSupplier.category}</p>
+                      <label className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Category</label>
+                      <p className={`${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>{selectedSupplier.category}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-600">Address</label>
-                      <p className="text-gray-900">{selectedSupplier.address}</p>
+                      <label className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Address</label>
+                      <p className={`${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>{selectedSupplier.address}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-600">Payment Terms</label>
-                      <p className="text-gray-900">{selectedSupplier.paymentTerms}</p>
+                      <label className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Payment Terms</label>
+                      <p className={`${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>{selectedSupplier.paymentTerms}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Performance Metrics */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="text-lg font-medium text-gray-900 mb-4">Performance Metrics</h4>
+                <div className={`rounded-lg p-4 ${
+                  theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
+                }`}>
+                  <h4 className={`text-lg font-medium mb-4 ${
+                    theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Performance Metrics</h4>
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-600">Overall Rating</span>
-                      <span className="text-gray-900 font-medium">{selectedSupplier.rating}/5</span>
+                      <span className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Overall Rating</span>
+                      <span className={`font-medium ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>{selectedSupplier.rating}/5</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-600">On-Time Delivery</span>
-                      <span className="text-gray-900 font-medium">{selectedSupplier.onTimeDelivery}%</span>
+                      <span className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>On-Time Delivery</span>
+                      <span className={`font-medium ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>{selectedSupplier.onTimeDelivery}%</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-600">Quality Score</span>
-                      <span className="text-gray-900 font-medium">{selectedSupplier.qualityScore}/5</span>
+                      <span className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Quality Score</span>
+                      <span className={`font-medium ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>{selectedSupplier.qualityScore}/5</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-600">Average Lead Time</span>
-                      <span className="text-gray-900 font-medium">{selectedSupplier.leadTime} days</span>
+                      <span className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Average Lead Time</span>
+                      <span className={`font-medium ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>{selectedSupplier.leadTime} days</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-600">Risk Level</span>
+                      <span className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Risk Level</span>
                       <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getRiskColor(selectedSupplier.riskLevel)}`}>
                         {selectedSupplier.riskLevel.charAt(0).toUpperCase() + selectedSupplier.riskLevel.slice(1)}
                       </span>
@@ -617,35 +813,63 @@ const SupplierManagement = () => {
                 </div>
 
                 {/* Financial Information */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="text-lg font-medium text-gray-900 mb-4">Financial Summary</h4>
+                <div className={`rounded-lg p-4 ${
+                  theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
+                }`}>
+                  <h4 className={`text-lg font-medium mb-4 ${
+                    theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Financial Summary</h4>
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-600">Total Orders</span>
-                      <span className="text-gray-900 font-medium">{selectedSupplier.totalOrders}</span>
+                      <span className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Total Orders</span>
+                      <span className={`font-medium ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>{selectedSupplier.totalOrders}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-600">Total Spend</span>
-                      <span className="text-gray-900 font-medium">{formatCurrency(selectedSupplier.totalSpend)}</span>
+                      <span className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Total Spend</span>
+                      <span className={`font-medium ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>{formatCurrency(selectedSupplier.totalSpend)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-600">Average Order Value</span>
-                      <span className="text-gray-900 font-medium">{formatCurrency(selectedSupplier.averageOrderValue)}</span>
+                      <span className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Average Order Value</span>
+                      <span className={`font-medium ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>{formatCurrency(selectedSupplier.averageOrderValue)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-600">Last Order Date</span>
-                      <span className="text-gray-900 font-medium">{new Date(selectedSupplier.lastOrderDate).toLocaleDateString()}</span>
+                      <span className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Last Order Date</span>
+                      <span className={`font-medium ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>{new Date(selectedSupplier.lastOrderDate).toLocaleDateString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-600">Contract Expiry</span>
-                      <span className="text-gray-900 font-medium">{new Date(selectedSupplier.contractExpiry).toLocaleDateString()}</span>
+                      <span className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Contract Expiry</span>
+                      <span className={`font-medium ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>{new Date(selectedSupplier.contractExpiry).toLocaleDateString()}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Certifications */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="text-lg font-medium text-gray-900 mb-4">Certifications</h4>
+                <div className={`rounded-lg p-4 ${
+                  theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
+                }`}>
+                  <h4 className={`text-lg font-medium mb-4 ${
+                    theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Certifications</h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedSupplier.certifications.map((cert, index) => (
                       <span key={index} className="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
@@ -659,7 +883,11 @@ const SupplierManagement = () => {
               <div className="flex justify-end space-x-3 mt-6">
                 <button
                   onClick={() => setSelectedSupplier(null)}
-                  className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50"
+                  className={`border px-4 py-2 rounded-lg ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600' 
+                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
                 >
                   Close
                 </button>
