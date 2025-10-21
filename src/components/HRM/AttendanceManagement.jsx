@@ -18,8 +18,10 @@ import {
   TrendingDown,
   MapPin
 } from 'lucide-react';
+import useSettingsStore from '../../store/settingsStore';
 
 const AttendanceManagement = () => {
+  const { theme } = useSettingsStore();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -203,21 +205,26 @@ const AttendanceManagement = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'present': return 'bg-green-100 text-green-800';
-      case 'absent': return 'bg-red-100 text-red-800';
-      case 'late': return 'bg-yellow-100 text-yellow-800';
-      case 'partial': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'present': 
+        return theme === 'dark' ? 'bg-green-900/50 text-green-400' : 'bg-green-100 text-green-800';
+      case 'absent': 
+        return theme === 'dark' ? 'bg-red-900/50 text-red-400' : 'bg-red-100 text-red-800';
+      case 'late': 
+        return theme === 'dark' ? 'bg-yellow-900/50 text-yellow-400' : 'bg-yellow-100 text-yellow-800';
+      case 'partial': 
+        return theme === 'dark' ? 'bg-orange-900/50 text-orange-400' : 'bg-orange-100 text-orange-800';
+      default: 
+        return theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-800';
     }
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'present': return <CheckCircle size={16} className="text-green-600" />;
-      case 'absent': return <X size={16} className="text-red-600" />;
-      case 'late': return <AlertTriangle size={16} className="text-yellow-600" />;
-      case 'partial': return <Clock size={16} className="text-orange-600" />;
-      default: return <Clock size={16} className="text-gray-600" />;
+      case 'present': return <CheckCircle size={16} className={theme === 'dark' ? 'text-green-400' : 'text-green-600'} />;
+      case 'absent': return <X size={16} className={theme === 'dark' ? 'text-red-400' : 'text-red-600'} />;
+      case 'late': return <AlertTriangle size={16} className={theme === 'dark' ? 'text-yellow-400' : 'text-yellow-600'} />;
+      case 'partial': return <Clock size={16} className={theme === 'dark' ? 'text-orange-400' : 'text-orange-600'} />;
+      default: return <Clock size={16} className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} />;
     }
   };
 
@@ -366,20 +373,32 @@ const AttendanceManagement = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className={`p-6 min-h-screen ${
+      theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
+    }`}>
       {/* Header */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Attendance Management</h1>
-            <p className="text-gray-600">Track and manage employee attendance</p>
+            <h1 className={`text-2xl font-semibold ${
+              theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+            }`}>
+              Attendance Management
+            </h1>
+            <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+              Track and manage employee attendance
+            </p>
           </div>
           <div className="flex space-x-3">
             <input
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                theme === 'dark' 
+                  ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                  : 'border-gray-300 text-gray-900'
+              }`}
             />
             <button
               onClick={() => {
@@ -396,61 +415,101 @@ const AttendanceManagement = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className={`rounded-lg shadow p-6 ${
+            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+          }`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Employees</p>
+                <p className={`text-sm font-medium ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>
+                  Total Employees
+                </p>
                 <p className="text-2xl font-bold text-blue-600">{totalEmployees}</p>
               </div>
-              <div className="bg-blue-100 p-3 rounded-full">
+              <div className={`p-3 rounded-full ${
+                theme === 'dark' ? 'bg-blue-900/50' : 'bg-blue-100'
+              }`}>
                 <Users className="h-5 w-5 text-blue-600" />
               </div>
             </div>
           </div>
           
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className={`rounded-lg shadow p-6 ${
+            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+          }`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Present Today</p>
+                <p className={`text-sm font-medium ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>
+                  Present Today
+                </p>
                 <p className="text-2xl font-bold text-green-600">{presentEmployees}</p>
               </div>
-              <div className="bg-green-100 p-3 rounded-full">
+              <div className={`p-3 rounded-full ${
+                theme === 'dark' ? 'bg-green-900/50' : 'bg-green-100'
+              }`}>
                 <CheckCircle className="h-5 w-5 text-green-600" />
               </div>
             </div>
           </div>
           
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className={`rounded-lg shadow p-6 ${
+            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+          }`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Absent Today</p>
+                <p className={`text-sm font-medium ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>
+                  Absent Today
+                </p>
                 <p className="text-2xl font-bold text-red-600">{absentEmployees}</p>
               </div>
-              <div className="bg-red-100 p-3 rounded-full">
+              <div className={`p-3 rounded-full ${
+                theme === 'dark' ? 'bg-red-900/50' : 'bg-red-100'
+              }`}>
                 <X className="h-5 w-5 text-red-600" />
               </div>
             </div>
           </div>
           
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className={`rounded-lg shadow p-6 ${
+            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+          }`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Late Arrivals</p>
+                <p className={`text-sm font-medium ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>
+                  Late Arrivals
+                </p>
                 <p className="text-2xl font-bold text-yellow-600">{lateEmployees}</p>
               </div>
-              <div className="bg-yellow-100 p-3 rounded-full">
+              <div className={`p-3 rounded-full ${
+                theme === 'dark' ? 'bg-yellow-900/50' : 'bg-yellow-100'
+              }`}>
                 <AlertTriangle className="h-5 w-5 text-yellow-600" />
               </div>
             </div>
           </div>
           
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className={`rounded-lg shadow p-6 ${
+            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+          }`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Attendance Rate</p>
+                <p className={`text-sm font-medium ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>
+                  Attendance Rate
+                </p>
                 <p className="text-2xl font-bold text-purple-600">{attendanceRate}%</p>
               </div>
-              <div className="bg-purple-100 p-3 rounded-full">
+              <div className={`p-3 rounded-full ${
+                theme === 'dark' ? 'bg-purple-900/50' : 'bg-purple-100'
+              }`}>
                 <BarChart3 className="h-5 w-5 text-purple-600" />
               </div>
             </div>
@@ -459,18 +518,28 @@ const AttendanceManagement = () => {
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white rounded-lg shadow mb-6">
-        <div className="p-6 border-b border-gray-200">
+      <div className={`rounded-lg shadow mb-6 ${
+        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      }`}>
+        <div className={`p-6 border-b ${
+          theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+        }`}>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
             <div className="flex-1 max-w-lg">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-400'
+                }`} size={20} />
                 <input
                   type="text"
                   placeholder="Search employees..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+                      : 'border-gray-300 text-gray-900'
+                  }`}
                 />
               </div>
             </div>
@@ -478,7 +547,11 @@ const AttendanceManagement = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  theme === 'dark' 
+                    ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                    : 'border-gray-300 text-gray-900'
+                }`}
               >
                 <option value="All">All Status</option>
                 <option value="Present">Present</option>
@@ -490,7 +563,11 @@ const AttendanceManagement = () => {
               <select
                 value={departmentFilter}
                 onChange={(e) => setDepartmentFilter(e.target.value)}
-                className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  theme === 'dark' 
+                    ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                    : 'border-gray-300 text-gray-900'
+                }`}
               >
                 {departments.map(dept => (
                   <option key={dept} value={dept}>{dept}</option>
@@ -499,7 +576,11 @@ const AttendanceManagement = () => {
 
               <button 
                 onClick={() => setShowFilters(!showFilters)}
-                className="bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-50 flex items-center space-x-2"
+                className={`border px-3 py-2 rounded-lg flex items-center space-x-2 ${
+                  theme === 'dark' 
+                    ? 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600' 
+                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
               >
                 <Filter size={16} />
                 <span>More Filters</span>
@@ -517,10 +598,14 @@ const AttendanceManagement = () => {
 
           {/* Advanced Filters */}
           {showFilters && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+            <div className={`mt-4 p-4 rounded-lg ${
+              theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
+            }`}>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Date Range
                   </label>
                   <div className="flex space-x-2">
@@ -528,31 +613,51 @@ const AttendanceManagement = () => {
                       type="date"
                       value={dateRange.start}
                       onChange={(e) => setDateRange(prev => ({...prev, start: e.target.value}))}
-                      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className={`flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        theme === 'dark' 
+                          ? 'bg-gray-600 border-gray-500 text-gray-100' 
+                          : 'border-gray-300 text-gray-900'
+                      }`}
                     />
                     <input
                       type="date"
                       value={dateRange.end}
                       onChange={(e) => setDateRange(prev => ({...prev, end: e.target.value}))}
-                      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className={`flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        theme === 'dark' 
+                          ? 'bg-gray-600 border-gray-500 text-gray-100' 
+                          : 'border-gray-300 text-gray-900'
+                      }`}
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Location
                   </label>
-                  <select className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <select className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    theme === 'dark' 
+                      ? 'bg-gray-600 border-gray-500 text-gray-100' 
+                      : 'border-gray-300 text-gray-900'
+                  }`}>
                     <option value="All">All Locations</option>
                     <option value="Office">Office</option>
                     <option value="Remote">Remote</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Overtime
                   </label>
-                  <select className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <select className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    theme === 'dark' 
+                      ? 'bg-gray-600 border-gray-500 text-gray-100' 
+                      : 'border-gray-300 text-gray-900'
+                  }`}>
                     <option value="All">All</option>
                     <option value="With Overtime">With Overtime</option>
                     <option value="Without Overtime">Without Overtime</option>
@@ -566,86 +671,144 @@ const AttendanceManagement = () => {
         {/* Attendance Table */}
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>
                   Employee
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>
                   Department
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>
                   Check In
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>
                   Check Out
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>
                   Work Hours
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>
                   Location
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                }`}>
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className={`divide-y ${
+              theme === 'dark' ? 'divide-gray-600 bg-gray-800' : 'divide-gray-200 bg-white'
+            }`}>
               {filteredData.map((record) => {
                 const employee = getEmployeeDetails(record.employeeId);
                 return (
-                  <tr key={record.id} className="hover:bg-gray-50">
+                  <tr key={record.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
-                          <div className="h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center">
-                            <span className="text-sm font-medium text-gray-700">
+                          <div className={`h-10 w-10 rounded-full flex items-center justify-center ${
+                            theme === 'dark' ? 'bg-gray-600' : 'bg-gray-200'
+                          }`}>
+                            <span className={`text-sm font-medium ${
+                              theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                            }`}>
                               {employee.name?.split(' ').map(n => n[0]).join('')}
                             </span>
                           </div>
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{employee.name}</div>
-                          <div className="text-sm text-gray-500">{record.employeeId}</div>
+                          <div className={`text-sm font-medium ${
+                            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                          }`}>
+                            {employee.name}
+                          </div>
+                          <div className={`text-sm ${
+                            theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                          }`}>
+                            {record.employeeId}
+                          </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{employee.department}</div>
-                      <div className="text-sm text-gray-500">{employee.position}</div>
+                      <div className={`text-sm ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>
+                        {employee.department}
+                      </div>
+                      <div className={`text-sm ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`}>
+                        {employee.position}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 flex items-center">
+                      <div className={`text-sm flex items-center ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>
                         {record.checkIn ? (
                           <>
-                            <Clock size={16} className="mr-2 text-green-500" />
+                            <Clock size={16} className={`mr-2 ${
+                              theme === 'dark' ? 'text-green-400' : 'text-green-500'
+                            }`} />
                             {record.checkIn}
                           </>
                         ) : (
-                          <span className="text-gray-400">-- : --</span>
+                          <span className={theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}>
+                            -- : --
+                          </span>
                         )}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 flex items-center">
+                      <div className={`text-sm flex items-center ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>
                         {record.checkOut ? (
                           <>
-                            <Clock size={16} className="mr-2 text-red-500" />
+                            <Clock size={16} className={`mr-2 ${
+                              theme === 'dark' ? 'text-red-400' : 'text-red-500'
+                            }`} />
                             {record.checkOut}
                           </>
                         ) : (
-                          <span className="text-gray-400">-- : --</span>
+                          <span className={theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}>
+                            -- : --
+                          </span>
                         )}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{record.workHours}</div>
+                      <div className={`text-sm ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>
+                        {record.workHours}
+                      </div>
                       {record.overtime !== '-- --' && record.overtime !== '0h 00m' && (
-                        <div className="text-xs text-orange-600">OT: {record.overtime}</div>
+                        <div className={`text-xs ${
+                          theme === 'dark' ? 'text-orange-400' : 'text-orange-600'
+                        }`}>
+                          OT: {record.overtime}
+                        </div>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -657,19 +820,27 @@ const AttendanceManagement = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center text-sm text-gray-900">
-                        <MapPin size={16} className="mr-1 text-gray-400" />
+                      <div className={`flex items-center text-sm ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>
+                        <MapPin size={16} className={`mr-1 ${
+                          theme === 'dark' ? 'text-gray-400' : 'text-gray-400'
+                        }`} />
                         {record.location || 'N/A'}
                       </div>
                       {record.notes && (
-                        <div className="text-xs text-gray-500">{record.notes}</div>
+                        <div className={`text-xs ${
+                          theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                        }`}>
+                          {record.notes}
+                        </div>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
                         <button 
                           onClick={() => editAttendance(record.employeeId)}
-                          className="text-blue-600 hover:text-blue-900"
+                          className={theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'}
                         >
                           <Edit size={16} />
                         </button>
@@ -683,9 +854,17 @@ const AttendanceManagement = () => {
 
           {filteredData.length === 0 && (
             <div className="text-center py-12">
-              <Users className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No attendance records found</h3>
-              <p className="mt-1 text-sm text-gray-500">
+              <Users className={`mx-auto h-12 w-12 ${
+                theme === 'dark' ? 'text-gray-600' : 'text-gray-400'
+              }`} />
+              <h3 className={`mt-2 text-sm font-medium ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-900'
+              }`}>
+                No attendance records found
+              </h3>
+              <p className={`mt-1 text-sm ${
+                theme === 'dark' ? 'text-gray-500' : 'text-gray-500'
+              }`}>
                 Try adjusting your search or filters
               </p>
             </div>
@@ -696,26 +875,38 @@ const AttendanceManagement = () => {
       {/* Mark Attendance Modal */}
       {showMarkModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+          <div className={`relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md ${
+            theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+          }`}>
             <div className="mt-3">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">Mark Attendance</h3>
+                <h3 className={`text-lg font-medium ${
+                  theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                }`}>
+                  Mark Attendance
+                </h3>
                 <button
                   onClick={() => setShowMarkModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className={theme === 'dark' ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}
                 >
                   <X size={20} />
                 </button>
               </div>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Employee
                   </label>
                   <select 
                     value={markAttendanceData.employeeId}
                     onChange={(e) => setMarkAttendanceData(prev => ({...prev, employeeId: e.target.value}))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                   >
                     <option value="">Select employee</option>
                     {employees.map(emp => (
@@ -726,13 +917,19 @@ const AttendanceManagement = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Status
                   </label>
                   <select 
                     value={markAttendanceData.status}
                     onChange={(e) => setMarkAttendanceData(prev => ({...prev, status: e.target.value}))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                   >
                     <option value="present">Present</option>
                     <option value="absent">Absent</option>
@@ -744,35 +941,53 @@ const AttendanceManagement = () => {
                 {markAttendanceData.status !== 'absent' && (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className={`block text-sm font-medium mb-1 ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                      }`}>
                         Check In Time
                       </label>
                       <input
                         type="time"
                         value={markAttendanceData.checkIn}
                         onChange={(e) => setMarkAttendanceData(prev => ({...prev, checkIn: e.target.value}))}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          theme === 'dark' 
+                            ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                            : 'border-gray-300 text-gray-900'
+                        }`}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className={`block text-sm font-medium mb-1 ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                      }`}>
                         Check Out Time
                       </label>
                       <input
                         type="time"
                         value={markAttendanceData.checkOut}
                         onChange={(e) => setMarkAttendanceData(prev => ({...prev, checkOut: e.target.value}))}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          theme === 'dark' 
+                            ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                            : 'border-gray-300 text-gray-900'
+                        }`}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className={`block text-sm font-medium mb-1 ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                      }`}>
                         Location
                       </label>
                       <select 
                         value={markAttendanceData.location}
                         onChange={(e) => setMarkAttendanceData(prev => ({...prev, location: e.target.value}))}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          theme === 'dark' 
+                            ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                            : 'border-gray-300 text-gray-900'
+                        }`}
                       >
                         <option value="Office">Office</option>
                         <option value="Remote">Remote</option>
@@ -783,14 +998,20 @@ const AttendanceManagement = () => {
                 )}
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Notes (Optional)
                   </label>
                   <textarea
                     rows={3}
                     value={markAttendanceData.notes}
                     onChange={(e) => setMarkAttendanceData(prev => ({...prev, notes: e.target.value}))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                     placeholder="Add any notes or remarks"
                   />
                 </div>
@@ -798,7 +1019,11 @@ const AttendanceManagement = () => {
               <div className="flex justify-end space-x-3 mt-6">
                 <button
                   onClick={() => setShowMarkModal(false)}
-                  className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50"
+                  className={`border px-4 py-2 rounded-lg ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600' 
+                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
                 >
                   Cancel
                 </button>

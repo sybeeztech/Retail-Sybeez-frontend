@@ -2,35 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useEmployeeStore } from '../../store/employeeStore';
 import { useDepartmentStore } from '../../store/departmentStore';
 import { usePayrollStore } from '../../store/payrollStore';
+import useSettingsStore from '../../store/settingsStore';
 
 const PayrollDashboard = () => {
+  const { theme } = useSettingsStore();
   const [error, setError] = useState(null);
   
   // Safely access stores with error handling
-  // let employees = [], fetchEmployees = () => {}, departments = [], fetchDepartments = () => {};
-  // let payrollData = {}, processPayroll = () => {}, runPayroll = () => {}, generateTaxForms = () => {};
-  // let generateComplianceReport = () => {}, getEmployeeSalarySlip = () => {}, getPayrollHistory = () => {};
-  // let checkPayrollPermission = () => false, getCurrentUserInfo = () => ({ role: 'employee', department: '', employeeId: 'EMP001' });
-  
   try {
     const employeeStore = useEmployeeStore();
     const departmentStore = useDepartmentStore();
     const payrollStore = usePayrollStore();
-    
-    // employees = employeeStore.employees || [];
-    // fetchEmployees = employeeStore.fetchEmployees || (() => {});
-    // departments = departmentStore.departments || [];
-    // fetchDepartments = departmentStore.fetchDepartments || (() => {});
-    
-    // payrollData = payrollStore.payrollData || {};
-    // processPayroll = payrollStore.processPayroll || (() => {});
-    // runPayroll = payrollStore.runPayroll || (() => {});
-    // generateTaxForms = payrollStore.generateTaxForms || (() => {});
-    // generateComplianceReport = payrollStore.generateComplianceReport || (() => {});
-    // getEmployeeSalarySlip = payrollStore.getEmployeeSalarySlip || (() => {});
-    // getPayrollHistory = payrollStore.getPayrollHistory || (() => {});
-    // checkPayrollPermission = payrollStore.checkPayrollPermission || (() => false);
-    // getCurrentUserInfo = payrollStore.getCurrentUserInfo || (() => ({ role: 'employee', department: '', employeeId: 'EMP001' }));
   } catch (err) {
     console.error('Error initializing payroll stores:', err);
     setError(err.message);
@@ -195,18 +177,32 @@ const PayrollDashboard = () => {
   };
 
   return ( 
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className={`p-6 min-h-screen ${
+      theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
+    }`}>
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <div className={`border px-4 py-3 rounded mb-4 ${
+          theme === 'dark' 
+            ? 'bg-red-900/50 border-red-800 text-red-200' 
+            : 'bg-red-100 border-red-400 text-red-700'
+        }`}>
           <strong>Error loading payroll dashboard:</strong> {error}
           <br />
-          <small>Please check the console for more details or contact your administrator.</small>
+          <small className={theme === 'dark' ? 'text-red-300' : 'text-red-600'}>
+            Please check the console for more details or contact your administrator.
+          </small>
         </div>
       )}
 
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Payroll Dashboard</h1>
-        <div className="text-sm text-gray-600">
+        <h1 className={`text-2xl font-bold ${
+          theme === 'dark' ? 'text-gray-100' : 'text-gray-800'
+        }`}>
+          Payroll Dashboard
+        </h1>
+        <div className={`text-sm ${
+          theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+        }`}>
           Logged in as: <span className="font-medium capitalize">{currentUser.role}</span>
           {currentUser.department && ` • ${currentUser.department}`}
         </div>
@@ -214,26 +210,48 @@ const PayrollDashboard = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Payroll Controls */}
-        <div className="lg:col-span-1 bg-white p-6 rounded-lg shadow">
-          <h2 className="text-lg font-semibold mb-4">Payroll Controls</h2>
+        <div className={`lg:col-span-1 p-6 rounded-lg shadow ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
+          <h2 className={`text-lg font-semibold mb-4 ${
+            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>
+            Payroll Controls
+          </h2>
           
           {/* Pay Period Selection - Only for admins/managers */}
           {(canProcessPayroll || currentUser.role === 'manager') && (
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Pay Period</label>
+              <label className={`block text-sm font-medium mb-1 ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              }`}>
+                Pay Period
+              </label>
               <div className="flex gap-2">
                 <input
                   type="date"
                   value={payPeriod.startDate}
                   onChange={(e) => setPayPeriod({...payPeriod, startDate: e.target.value})}
-                  className="w-full p-2 border rounded-md"
+                  className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                      : 'border-gray-300 text-gray-900'
+                  }`}
                 />
-                <span className="self-center">to</span>
+                <span className={`self-center ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>
+                  to
+                </span>
                 <input
                   type="date"
                   value={payPeriod.endDate}
                   onChange={(e) => setPayPeriod({...payPeriod, endDate: e.target.value})}
-                  className="w-full p-2 border rounded-md"
+                  className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                      : 'border-gray-300 text-gray-900'
+                  }`}
                 />
               </div>
             </div>
@@ -263,13 +281,21 @@ const PayrollDashboard = () => {
           
           {/* Reports & Forms Section */}
           <div className="mt-6">
-            <h3 className="font-medium mb-2">Reports & Forms</h3>
+            <h3 className={`font-medium mb-2 ${
+              theme === 'dark' ? 'text-gray-300' : 'text-gray-900'
+            }`}>
+              Reports & Forms
+            </h3>
             <div className="flex flex-col gap-2">
               {/* Employee can view their own salary slip */}
               {canViewSelfSalary && (
                 <button 
                   onClick={() => handleViewSalarySlip(currentUser.employeeId)}
-                  className="text-left text-blue-600 hover:underline py-1"
+                  className={`text-left py-1 ${
+                    theme === 'dark' 
+                      ? 'text-blue-400 hover:text-blue-300' 
+                      : 'text-blue-600 hover:text-blue-800'
+                  }`}
                 >
                   View My Salary Slip
                 </button>
@@ -279,21 +305,33 @@ const PayrollDashboard = () => {
                 <>
                   <button 
                     onClick={handleGenerateTaxForms}
-                    className="text-left text-blue-600 hover:underline py-1"
+                    className={`text-left py-1 ${
+                      theme === 'dark' 
+                        ? 'text-blue-400 hover:text-blue-300' 
+                        : 'text-blue-600 hover:text-blue-800'
+                    }`}
                   >
                     Generate Form 16
                   </button>
                   
                   <button 
                     onClick={handleViewPayrollHistory}
-                    className="text-left text-blue-600 hover:underline py-1"
+                    className={`text-left py-1 ${
+                      theme === 'dark' 
+                        ? 'text-blue-400 hover:text-blue-300' 
+                        : 'text-blue-600 hover:text-blue-800'
+                    }`}
                   >
                     View Payroll History
                   </button>
                   
                   <button 
                     onClick={handleGenerateComplianceReport}
-                    className="text-left text-blue-600 hover:underline py-1"
+                    className={`text-left py-1 ${
+                      theme === 'dark' 
+                        ? 'text-blue-400 hover:text-blue-300' 
+                        : 'text-blue-600 hover:text-blue-800'
+                    }`}
                   >
                     PF & Compliance Reports
                   </button>
@@ -305,7 +343,11 @@ const PayrollDashboard = () => {
                       setShowComplianceReport(false);
                       setShowPayrollHistory(false);
                     }}
-                    className="text-left text-blue-600 hover:underline py-1"
+                    className={`text-left py-1 ${
+                      theme === 'dark' 
+                        ? 'text-blue-400 hover:text-blue-300' 
+                        : 'text-blue-600 hover:text-blue-800'
+                    }`}
                   >
                     {showSummary ? 'Hide' : 'Show'} Payroll Summary
                   </button>
@@ -316,15 +358,21 @@ const PayrollDashboard = () => {
         </div>
         
         {/* Employee Selection */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow">
-          <h2 className="text-lg font-semibold mb-4">
+        <div className={`lg:col-span-2 p-6 rounded-lg shadow ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
+          <h2 className={`text-lg font-semibold mb-4 ${
+            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>
             Employees 
             {currentUser.role === 'manager' && ` (${currentUser.department} Department)`}
             {currentUser.role === 'employee' && ` (Your Details)`}
           </h2>
           
           {filteredEmployees.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className={`text-center py-8 ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+            }`}>
               {currentUser.role === 'employee' 
                 ? "Your employee record is not available."
                 : "No employees found for your access level."
@@ -333,28 +381,84 @@ const PayrollDashboard = () => {
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead>
+                <thead className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}>
                   <tr>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Department</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">CTC (₹)</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    {canViewPayroll && <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>}
+                    <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                    }`}>
+                      Name
+                    </th>
+                    <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                    }`}>
+                      Department
+                    </th>
+                    <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                    }`}>
+                      CTC (₹)
+                    </th>
+                    <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                    }`}>
+                      Location
+                    </th>
+                    <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                    }`}>
+                      Status
+                    </th>
+                    {canViewPayroll && (
+                      <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                      }`}>
+                        Actions
+                      </th>
+                    )}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className={`divide-y ${
+                  theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'
+                }`}>
                   {filteredEmployees.map(employee => (
                     <tr 
                       key={employee.id} 
-                      className={`hover:bg-gray-50 ${selectedEmployee?.id === employee.id ? 'bg-blue-50' : ''}`}
+                      className={`${
+                        theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+                      } ${selectedEmployee?.id === employee.id ? (
+                        theme === 'dark' ? 'bg-blue-900/50' : 'bg-blue-50'
+                      ) : ''}`}
                     >
-                      <td className="px-4 py-3">{employee.firstName} {employee.lastName}</td>
-                      <td className="px-4 py-3">{employee.department}</td>
-                      <td className="px-4 py-3">₹{employee.ctc?.toLocaleString('en-IN') || '0'}</td>
-                      <td className="px-4 py-3">{employee.location || 'N/A'}</td>
+                      <td className={`px-4 py-3 ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>
+                        {employee.firstName} {employee.lastName}
+                      </td>
+                      <td className={`px-4 py-3 ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                      }`}>
+                        {employee.department}
+                      </td>
+                      <td className={`px-4 py-3 ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>
+                        ₹{employee.ctc?.toLocaleString('en-IN') || '0'}
+                      </td>
+                      <td className={`px-4 py-3 ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                      }`}>
+                        {employee.location || 'N/A'}
+                      </td>
                       <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs ${employee.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          employee.active 
+                            ? theme === 'dark' 
+                              ? 'bg-green-900/50 text-green-400' 
+                              : 'bg-green-100 text-green-800'
+                            : theme === 'dark'
+                              ? 'bg-red-900/50 text-red-400'
+                              : 'bg-red-100 text-red-800'
+                        }`}>
                           {employee.active ? 'Active' : 'Inactive'}
                         </span>
                       </td>
@@ -362,7 +466,11 @@ const PayrollDashboard = () => {
                         <td className="px-4 py-3">
                           <button
                             onClick={() => handleViewSalarySlip(employee.id)}
-                            className="text-blue-600 hover:text-blue-800 text-sm"
+                            className={`text-sm ${
+                              theme === 'dark' 
+                                ? 'text-blue-400 hover:text-blue-300' 
+                                : 'text-blue-600 hover:text-blue-800'
+                            }`}
                           >
                             View Salary Slip
                           </button>
@@ -379,26 +487,50 @@ const PayrollDashboard = () => {
 
       {/* Payroll Summary */}
       {showSummary && payrollData.processed && payrollData.results && payrollData.results.length > 0 && (
-        <div className="mt-6 bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Payroll Summary</h2>
+        <div className={`mt-6 p-6 rounded-lg shadow ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
+          <h2 className={`text-xl font-semibold mb-4 ${
+            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>
+            Payroll Summary
+          </h2>
           <div className="mb-4">
-            <p className="text-gray-600">
+            <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
               Period: {new Date(payrollData.payrollPeriod.startDate).toLocaleDateString()} - {new Date(payrollData.payrollPeriod.endDate).toLocaleDateString()}
             </p>
-            <p className="text-gray-600">Processed on: {new Date().toLocaleDateString()}</p>
+            <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+              Processed on: {new Date().toLocaleDateString()}
+            </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-blue-800">Total Gross Earnings</h3>
-              <p className="text-2xl font-bold text-blue-600">
+            <div className={`p-4 rounded-lg ${
+              theme === 'dark' ? 'bg-blue-900/50' : 'bg-blue-50'
+            }`}>
+              <h3 className={`font-semibold ${
+                theme === 'dark' ? 'text-blue-300' : 'text-blue-800'
+              }`}>
+                Total Gross Earnings
+              </h3>
+              <p className={`text-2xl font-bold ${
+                theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+              }`}>
                 ₹{payrollData.results.reduce((sum, result) => sum + (result.grossEarnings || 0), 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}
               </p>
             </div>
             
-            <div className="bg-red-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-red-800">Total Deductions</h3>
-              <p className="text-2xl font-bold text-red-600">
+            <div className={`p-4 rounded-lg ${
+              theme === 'dark' ? 'bg-red-900/50' : 'bg-red-50'
+            }`}>
+              <h3 className={`font-semibold ${
+                theme === 'dark' ? 'text-red-300' : 'text-red-800'
+              }`}>
+                Total Deductions
+              </h3>
+              <p className={`text-2xl font-bold ${
+                theme === 'dark' ? 'text-red-400' : 'text-red-600'
+              }`}>
                 ₹{payrollData.results.reduce((sum, result) => {
                   const deductions = result.deductions ? Object.values(result.deductions).reduce((dSum, value) => dSum + value, 0) : 0;
                   return sum + deductions;
@@ -406,40 +538,92 @@ const PayrollDashboard = () => {
               </p>
             </div>
             
-            <div className="bg-green-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-green-800">Total Net Pay</h3>
-              <p className="text-2xl font-bold text-green-600">
+            <div className={`p-4 rounded-lg ${
+              theme === 'dark' ? 'bg-green-900/50' : 'bg-green-50'
+            }`}>
+              <h3 className={`font-semibold ${
+                theme === 'dark' ? 'text-green-300' : 'text-green-800'
+              }`}>
+                Total Net Pay
+              </h3>
+              <p className={`text-2xl font-bold ${
+                theme === 'dark' ? 'text-green-400' : 'text-green-600'
+              }`}>
                 ₹{payrollData.results.reduce((sum, result) => sum + (result.netPay || 0), 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}
               </p>
             </div>
           </div>
           
-          <h3 className="font-semibold mb-3">Employee Breakdown</h3>
+          <h3 className={`font-semibold mb-3 ${
+            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>
+            Employee Breakdown
+          </h3>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead>
+              <thead className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}>
                 <tr>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Basic Salary</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Allowances</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Deductions</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Net Pay</th>
+                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>
+                    Employee
+                  </th>
+                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>
+                    Basic Salary
+                  </th>
+                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>
+                    Allowances
+                  </th>
+                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>
+                    Deductions
+                  </th>
+                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>
+                    Net Pay
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className={`divide-y ${
+                theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'
+              }`}>
                 {payrollData.results.map(result => {
                   const employee = employees.find(e => e.id === result.employeeId);
                   const totalDeductions = result.deductions ? Object.values(result.deductions).reduce((sum, value) => sum + value, 0) : 0;
                   
                   return (
-                    <tr key={result.employeeId}>
-                      <td className="px-4 py-3">
+                    <tr key={result.employeeId} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                      <td className={`px-4 py-3 ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>
                         {employee ? `${employee.firstName} ${employee.lastName}` : `Employee ${result.employeeId}`}
                       </td>
-                      <td className="px-4 py-3">₹{(result.basicSalary || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
-                      <td className="px-4 py-3">₹{((result.grossEarnings || 0) - (result.basicSalary || 0)).toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
-                      <td className="px-4 py-3">₹{totalDeductions.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
-                      <td className="px-4 py-3 font-medium">₹{(result.netPay || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                      <td className={`px-4 py-3 ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                      }`}>
+                        ₹{(result.basicSalary || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}
+                      </td>
+                      <td className={`px-4 py-3 ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                      }`}>
+                        ₹{((result.grossEarnings || 0) - (result.basicSalary || 0)).toLocaleString('en-IN', {minimumFractionDigits: 2})}
+                      </td>
+                      <td className={`px-4 py-3 ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                      }`}>
+                        ₹{totalDeductions.toLocaleString('en-IN', {minimumFractionDigits: 2})}
+                      </td>
+                      <td className={`px-4 py-3 font-medium ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>
+                        ₹{(result.netPay || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}
+                      </td>
                     </tr>
                   );
                 })}
@@ -449,126 +633,228 @@ const PayrollDashboard = () => {
         </div>
       )}
 
-
-
       {/* Payroll History */}
-{showPayrollHistory && payrollHistory.length > 0 && (
-  <div className="mt-6 bg-white p-6 rounded-lg shadow">
-    <h2 className="text-xl font-semibold mb-4">Payroll History</h2>
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead>
-          <tr>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Pay Period</th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Processed Date</th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Employees</th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Total Net Pay</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200">
-          {payrollHistory.map((payroll, index) => {
-            // Format pay period for display
-            const payPeriod = payroll.payrollPeriod;
-            const periodDisplay = payPeriod && payPeriod.startDate && payPeriod.endDate 
-              ? `${new Date(payPeriod.startDate).toLocaleDateString()} - ${new Date(payPeriod.endDate).toLocaleDateString()}`
-              : 'N/A';
-            
-            // Get processed date - use createdAt if available, otherwise current date
-            const processedDate = payroll.createdAt 
-              ? new Date(payroll.createdAt).toLocaleDateString()
-              : new Date().toLocaleDateString();
-            
-            // Count employees and calculate total net pay
-            const employeeCount = payroll.results ? payroll.results.length : 0;
-            const totalNetPay = payroll.results 
-              ? payroll.results.reduce((sum, result) => sum + (result.netPay || 0), 0)
-              : 0;
-
-            return (
-              <tr key={payroll.id || index}>
-                <td className="px-4 py-3">{periodDisplay}</td>
-                <td className="px-4 py-3">{processedDate}</td>
-                <td className="px-4 py-3">{employeeCount}</td>
-                <td className="px-4 py-3">
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    payroll.processed 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-yellow-100 text-yellow-800'
+      {showPayrollHistory && payrollHistory.length > 0 && (
+        <div className={`mt-6 p-6 rounded-lg shadow ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
+          <h2 className={`text-xl font-semibold mb-4 ${
+            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>
+            Payroll History
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}>
+                <tr>
+                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                   }`}>
-                    {payroll.processed ? 'Processed' : 'Pending'}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  ₹{totalNetPay.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+                    Pay Period
+                  </th>
+                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>
+                    Processed Date
+                  </th>
+                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>
+                    Employees
+                  </th>
+                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>
+                    Status
+                  </th>
+                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>
+                    Total Net Pay
+                  </th>
+                </tr>
+              </thead>
+              <tbody className={`divide-y ${
+                theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'
+              }`}>
+                {payrollHistory.map((payroll, index) => {
+                  // Format pay period for display
+                  const payPeriod = payroll.payrollPeriod;
+                  const periodDisplay = payPeriod && payPeriod.startDate && payPeriod.endDate 
+                    ? `${new Date(payPeriod.startDate).toLocaleDateString()} - ${new Date(payPeriod.endDate).toLocaleDateString()}`
+                    : 'N/A';
+                  
+                  // Get processed date - use createdAt if available, otherwise current date
+                  const processedDate = payroll.createdAt 
+                    ? new Date(payroll.createdAt).toLocaleDateString()
+                    : new Date().toLocaleDateString();
+                  
+                  // Count employees and calculate total net pay
+                  const employeeCount = payroll.results ? payroll.results.length : 0;
+                  const totalNetPay = payroll.results 
+                    ? payroll.results.reduce((sum, result) => sum + (result.netPay || 0), 0)
+                    : 0;
 
-    {/* Add a button to view details of a specific payroll run */}
-    <div className="mt-6 flex justify-between items-center">
-      <p className="text-sm text-gray-600">
-        Showing {payrollHistory.length} payroll runs
-      </p>
-      <button 
-        className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-        onClick={() => {
-          // You can implement functionality to view detailed breakdown of a specific payroll run
-          alert('Feature: View detailed payroll breakdown for a specific period');
-        }}
-      >
-        View Detailed Report
-      </button>
-    </div>
-  </div>
-)}
+                  return (
+                    <tr key={payroll.id || index} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                      <td className={`px-4 py-3 ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>
+                        {periodDisplay}
+                      </td>
+                      <td className={`px-4 py-3 ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                      }`}>
+                        {processedDate}
+                      </td>
+                      <td className={`px-4 py-3 ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                      }`}>
+                        {employeeCount}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          payroll.processed 
+                            ? theme === 'dark' 
+                              ? 'bg-green-900/50 text-green-400' 
+                              : 'bg-green-100 text-green-800'
+                            : theme === 'dark'
+                              ? 'bg-yellow-900/50 text-yellow-400'
+                              : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {payroll.processed ? 'Processed' : 'Pending'}
+                        </span>
+                      </td>
+                      <td className={`px-4 py-3 ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>
+                        ₹{totalNetPay.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
 
-{/* Show empty state if no payroll history */}
-{showPayrollHistory && payrollHistory.length === 0 && (
-  <div className="mt-6 bg-white p-6 rounded-lg shadow">
-    <h2 className="text-xl font-semibold mb-4">Payroll History</h2>
-    <div className="text-center py-8 text-gray-500">
-      <p>No payroll history found.</p>
-      <p className="text-sm mt-2">Process your first payroll to see history here.</p>
-    </div>
-  </div>
-)}
+          {/* Add a button to view details of a specific payroll run */}
+          <div className="mt-6 flex justify-between items-center">
+            <p className={`text-sm ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>
+              Showing {payrollHistory.length} payroll runs
+            </p>
+            <button 
+              className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+              onClick={() => {
+                // You can implement functionality to view detailed breakdown of a specific payroll run
+                alert('Feature: View detailed payroll breakdown for a specific period');
+              }}
+            >
+              View Detailed Report
+            </button>
+          </div>
+        </div>
+      )}
 
-
+      {/* Show empty state if no payroll history */}
+      {showPayrollHistory && payrollHistory.length === 0 && (
+        <div className={`mt-6 p-6 rounded-lg shadow ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
+          <h2 className={`text-xl font-semibold mb-4 ${
+            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>
+            Payroll History
+          </h2>
+          <div className={`text-center py-8 ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+          }`}>
+            <p>No payroll history found.</p>
+            <p className="text-sm mt-2">Process your first payroll to see history here.</p>
+          </div>
+        </div>
+      )}
 
       {/* Tax Forms Output */}
       {showTaxForms && taxForms.length > 0 && (
-        <div className="mt-6 bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Form 16 Generated</h2>
-          <p className="text-gray-600 mb-4">Form 16 for the current financial year (April {new Date().getFullYear() - 1} - March {new Date().getFullYear()})</p>
+        <div className={`mt-6 p-6 rounded-lg shadow ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
+          <h2 className={`text-xl font-semibold mb-4 ${
+            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>
+            Form 16 Generated
+          </h2>
+          <p className={`mb-4 ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+          }`}>
+            Form 16 for the current financial year (April {new Date().getFullYear() - 1} - March {new Date().getFullYear()})
+          </p>
           
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead>
+              <thead className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}>
                 <tr>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">PAN</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Financial Year</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Total Income (₹)</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Tax Deducted (₹)</th>
+                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>
+                    Employee
+                  </th>
+                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>
+                    PAN
+                  </th>
+                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>
+                    Financial Year
+                  </th>
+                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>
+                    Total Income (₹)
+                  </th>
+                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>
+                    Tax Deducted (₹)
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className={`divide-y ${
+                theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'
+              }`}>
                 {taxForms.map(form => {
                   const employee = employees.find(e => e.id === form.employeeId);
                   return (
-                    <tr key={form.employeeId}>
-                      <td className="px-4 py-3">
+                    <tr key={form.employeeId} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                      <td className={`px-4 py-3 ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>
                         {employee ? `${employee.firstName} ${employee.lastName}` : `Employee ${form.employeeId}`}
                       </td>
-                      <td className="px-4 py-3">{form.pan || employee?.pan || 'Not provided'}</td>
-                      <td className="px-4 py-3">{form.financialYear}</td>
-                      <td className="px-4 py-3">₹{(form.totalIncome || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
-                      <td className="px-4 py-3">₹{(form.taxDeducted || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                      <td className={`px-4 py-3 ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                      }`}>
+                        {form.pan || employee?.pan || 'Not provided'}
+                      </td>
+                      <td className={`px-4 py-3 ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                      }`}>
+                        {form.financialYear}
+                      </td>
+                      <td className={`px-4 py-3 ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>
+                        ₹{(form.totalIncome || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}
+                      </td>
+                      <td className={`px-4 py-3 ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>
+                        ₹{(form.taxDeducted || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}
+                      </td>
                     </tr>
                   );
                 })}
@@ -586,47 +872,92 @@ const PayrollDashboard = () => {
 
       {/* Compliance Report Output */}
       {showComplianceReport && complianceReport && (
-        <div className="mt-6 bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">{complianceReport.title}</h2>
+        <div className={`mt-6 p-6 rounded-lg shadow ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
+          <h2 className={`text-xl font-semibold mb-4 ${
+            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>
+            {complianceReport.title}
+          </h2>
           <div className="mb-4">
-            <p className="text-gray-600">Generated on: {new Date(complianceReport.generatedAt).toLocaleDateString()}</p>
-            <p className="text-gray-600">Status: 
+            <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+              Generated on: {new Date(complianceReport.generatedAt).toLocaleDateString()}
+            </p>
+            <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+              Status: 
               <span className={`ml-2 px-2 py-1 rounded-full text-xs ${
                 complianceReport.status === 'Compliant' 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-red-100 text-red-800'
+                  ? theme === 'dark' 
+                    ? 'bg-green-900/50 text-green-400' 
+                    : 'bg-green-100 text-green-800'
+                  : theme === 'dark'
+                    ? 'bg-red-900/50 text-red-400'
+                    : 'bg-red-100 text-red-800'
               }`}>
                 {complianceReport.status}
               </span>
             </p>
           </div>
           
-          <h3 className="font-semibold mb-3">Indian Compliance Checks</h3>
+          <h3 className={`font-semibold mb-3 ${
+            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>
+            Indian Compliance Checks
+          </h3>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead>
+              <thead className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}>
                 <tr>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Check</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Due Date</th>
+                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>
+                    Check
+                  </th>
+                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>
+                    Status
+                  </th>
+                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                  }`}>
+                    Due Date
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className={`divide-y ${
+                theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'
+              }`}>
                 {complianceReport.checks && complianceReport.checks.map((check, index) => (
-                  <tr key={index}>
-                    <td className="px-4 py-3">{check.name}</td>
+                  <tr key={index} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                    <td className={`px-4 py-3 ${
+                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>
+                      {check.name}
+                    </td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-1 rounded-full text-xs ${
                         check.status === 'Compliant' 
-                          ? 'bg-green-100 text-green-800' 
+                          ? theme === 'dark' 
+                            ? 'bg-green-900/50 text-green-400' 
+                            : 'bg-green-100 text-green-800'
                           : check.status === 'Not Applicable'
-                          ? 'bg-gray-100 text-gray-800'
-                          : 'bg-red-100 text-red-800'
+                          ? theme === 'dark'
+                            ? 'bg-gray-700 text-gray-300'
+                            : 'bg-gray-100 text-gray-800'
+                          : theme === 'dark'
+                            ? 'bg-red-900/50 text-red-400'
+                            : 'bg-red-100 text-red-800'
                       }`}>
                         {check.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3">{check.dueDate}</td>
+                    <td className={`px-4 py-3 ${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
+                      {check.dueDate}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -643,35 +974,57 @@ const PayrollDashboard = () => {
       
       {/* Payroll Details */}
       {selectedEmployee && (
-        <div className="mt-6 bg-white p-6 rounded-lg shadow">
-          <h2 className="text-lg font-semibold mb-4">Salary Breakdown for {selectedEmployee.firstName} {selectedEmployee.lastName}</h2>
+        <div className={`mt-6 p-6 rounded-lg shadow ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
+          <h2 className={`text-lg font-semibold mb-4 ${
+            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>
+            Salary Breakdown for {selectedEmployee.firstName} {selectedEmployee.lastName}
+          </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Earnings */}
             <div>
-              <h3 className="font-medium text-gray-700 mb-3">Earnings (₹)</h3>
+              <h3 className={`font-medium mb-3 ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              }`}>
+                Earnings (₹)
+              </h3>
               <div className="space-y-2">
-                <div className="flex justify-between">
+                <div className={`flex justify-between ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                }`}>
                   <span>Basic Salary (50% of CTC)</span>
                   <span>₹{(selectedEmployee.ctc * 0.5).toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className={`flex justify-between ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                }`}>
                   <span>House Rent Allowance (HRA)</span>
                   <span>₹{(selectedEmployee.ctc * 0.2).toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className={`flex justify-between ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                }`}>
                   <span>Conveyance Allowance</span>
                   <span>₹{(selectedEmployee.ctc * 0.05).toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className={`flex justify-between ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                }`}>
                   <span>Medical Allowance</span>
                   <span>₹{(selectedEmployee.ctc * 0.05).toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className={`flex justify-between ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                }`}>
                   <span>Special Allowance</span>
                   <span>₹{(selectedEmployee.ctc * 0.2).toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
                 </div>
-                <div className="border-t pt-2 font-medium flex justify-between">
+                <div className={`border-t pt-2 font-medium flex justify-between ${
+                  theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                }`}>
                   <span>Gross Salary</span>
                   <span>₹{selectedEmployee.ctc?.toLocaleString('en-IN', {minimumFractionDigits: 2}) || '0'}</span>
                 </div>
@@ -680,17 +1033,27 @@ const PayrollDashboard = () => {
             
             {/* Deductions */}
             <div>
-              <h3 className="font-medium text-gray-700 mb-3">Deductions (₹)</h3>
+              <h3 className={`font-medium mb-3 ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              }`}>
+                Deductions (₹)
+              </h3>
               <div className="space-y-2">
-                <div className="flex justify-between">
+                <div className={`flex justify-between ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                }`}>
                   <span>Provident Fund (PF) - 12%</span>
                   <span>₹{(selectedEmployee.ctc * 0.5 * 0.12).toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className={`flex justify-between ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                }`}>
                   <span>Professional Tax</span>
                   <span>₹200.00</span>
                 </div>
-                <div className="flex justify-between">
+                <div className={`flex justify-between ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                }`}>
                   <span>Income Tax (as per slab)</span>
                   <span>₹{calculateIndianTax(
                     selectedEmployee.ctc, 
@@ -699,7 +1062,9 @@ const PayrollDashboard = () => {
                     selectedEmployee.location === 'Mumbai' || selectedEmployee.location === 'Delhi' ? 'metro' : 'non-metro'
                   ).incomeTax.toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
                 </div>
-                <div className="border-t pt-2 font-medium flex justify-between">
+                <div className={`border-t pt-2 font-medium flex justify-between ${
+                  theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                }`}>
                   <span>Total Deductions</span>
                   <span>₹{(
                     (selectedEmployee.ctc * 0.5 * 0.12) + 
@@ -712,7 +1077,9 @@ const PayrollDashboard = () => {
                     ).incomeTax
                   ).toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
                 </div>
-                <div className="border-t pt-2 font-medium flex justify-between text-green-600">
+                <div className={`border-t pt-2 font-medium flex justify-between ${
+                  theme === 'dark' ? 'text-green-400' : 'text-green-600'
+                }`}>
                   <span>Net Pay (Take Home)</span>
                   <span>₹{(
                     selectedEmployee.ctc - 

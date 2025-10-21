@@ -15,8 +15,10 @@ import {
   Download,
   MoreVertical
 } from 'lucide-react';
+import useSettingsStore from '../../store/settingsStore';
 
 const EmployeeDirectory = () => {
+  const { theme } = useSettingsStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -322,16 +324,30 @@ const EmployeeDirectory = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className={`p-6 min-h-screen ${
+      theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
+    }`}>
       {/* Header */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Employee Directory</h1>
-            <p className="text-gray-600">Manage and view all employee information</p>
+            <h1 className={`text-2xl font-semibold ${
+              theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+            }`}>
+              Employee Directory
+            </h1>
+            <p className={`${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>
+              Manage and view all employee information
+            </p>
           </div>
           <div className="flex space-x-3">
-            <button className="bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
+            <button className={`border px-3 py-2 rounded-lg hover:bg-gray-50 flex items-center space-x-2 ${
+              theme === 'dark' 
+                ? 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700' 
+                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+            }`}>
               <Download size={16} />
               <span>Export</span>
             </button>
@@ -347,53 +363,101 @@ const EmployeeDirectory = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className={`rounded-lg shadow p-6 ${
+            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+          }`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Employees</p>
+                <p className={`text-sm font-medium ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>
+                  Total Employees
+                </p>
                 <p className="text-2xl font-bold text-blue-600">{totalEmployees}</p>
-                <p className="text-sm text-gray-500 mt-1">All departments</p>
+                <p className={`text-sm mt-1 ${
+                  theme === 'dark' ? 'text-gray-500' : 'text-gray-500'
+                }`}>
+                  All departments
+                </p>
               </div>
-              <div className="bg-blue-100 p-3 rounded-full">
+              <div className={`p-3 rounded-full ${
+                theme === 'dark' ? 'bg-blue-900/50' : 'bg-blue-100'
+              }`}>
                 <Users className="h-5 w-5 text-blue-600" />
               </div>
             </div>
           </div>
           
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className={`rounded-lg shadow p-6 ${
+            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+          }`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Active</p>
+                <p className={`text-sm font-medium ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>
+                  Active
+                </p>
                 <p className="text-2xl font-bold text-green-600">{activeEmployees}</p>
-                <p className="text-sm text-gray-500 mt-1">Currently working</p>
+                <p className={`text-sm mt-1 ${
+                  theme === 'dark' ? 'text-gray-500' : 'text-gray-500'
+                }`}>
+                  Currently working
+                </p>
               </div>
-              <div className="bg-green-100 p-3 rounded-full">
+              <div className={`p-3 rounded-full ${
+                theme === 'dark' ? 'bg-green-900/50' : 'bg-green-100'
+              }`}>
                 <User className="h-5 w-5 text-green-600" />
               </div>
             </div>
           </div>
           
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className={`rounded-lg shadow p-6 ${
+            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+          }`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Departments</p>
+                <p className={`text-sm font-medium ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>
+                  Departments
+                </p>
                 <p className="text-2xl font-bold text-purple-600">{departments.length - 1}</p>
-                <p className="text-sm text-gray-500 mt-1">Active departments</p>
+                <p className={`text-sm mt-1 ${
+                  theme === 'dark' ? 'text-gray-500' : 'text-gray-500'
+                }`}>
+                  Active departments
+                </p>
               </div>
-              <div className="bg-purple-100 p-3 rounded-full">
+              <div className={`p-3 rounded-full ${
+                theme === 'dark' ? 'bg-purple-900/50' : 'bg-purple-100'
+              }`}>
                 <Users className="h-5 w-5 text-purple-600" />
               </div>
             </div>
           </div>
           
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className={`rounded-lg shadow p-6 ${
+            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+          }`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">New Hires</p>
+                <p className={`text-sm font-medium ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>
+                  New Hires
+                </p>
                 <p className="text-2xl font-bold text-orange-600">3</p>
-                <p className="text-sm text-gray-500 mt-1">This month</p>
+                <p className={`text-sm mt-1 ${
+                  theme === 'dark' ? 'text-gray-500' : 'text-gray-500'
+                }`}>
+                  This month
+                </p>
               </div>
-              <div className="bg-orange-100 p-3 rounded-full">
+              <div className={`p-3 rounded-full ${
+                theme === 'dark' ? 'bg-orange-900/50' : 'bg-orange-100'
+              }`}>
                 <Calendar className="h-5 w-5 text-orange-600" />
               </div>
             </div>
@@ -402,18 +466,28 @@ const EmployeeDirectory = () => {
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white rounded-lg shadow mb-6">
-        <div className="p-6 border-b border-gray-200">
+      <div className={`rounded-lg shadow mb-6 ${
+        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      }`}>
+        <div className={`p-6 border-b ${
+          theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+        }`}>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
             <div className="flex-1 max-w-lg">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-400'
+                }`} size={20} />
                 <input
                   type="text"
                   placeholder="Search employees..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+                      : 'border-gray-300 text-gray-900'
+                  }`}
                 />
               </div>
             </div>
@@ -421,7 +495,11 @@ const EmployeeDirectory = () => {
               <select
                 value={departmentFilter}
                 onChange={(e) => setDepartmentFilter(e.target.value)}
-                className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  theme === 'dark' 
+                    ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                    : 'border-gray-300 text-gray-900'
+                }`}
               >
                 {departments.map(dept => (
                   <option key={dept} value={dept}>{dept}</option>
@@ -430,13 +508,21 @@ const EmployeeDirectory = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  theme === 'dark' 
+                    ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                    : 'border-gray-300 text-gray-900'
+                }`}
               >
                 {statuses.map(status => (
                   <option key={status} value={status}>{status}</option>
                 ))}
               </select>
-              <button className="bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
+              <button className={`border px-3 py-2 rounded-lg flex items-center space-x-2 ${
+                theme === 'dark' 
+                  ? 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600' 
+                  : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+              }`}>
                 <Filter size={16} />
                 <span>More Filters</span>
               </button>
@@ -448,24 +534,40 @@ const EmployeeDirectory = () => {
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredEmployees.map((employee) => (
-              <div key={employee.id} className="bg-gray-50 rounded-lg p-6 hover:shadow-md transition-shadow">
+              <div key={employee.id} className={`rounded-lg p-6 hover:shadow-md transition-shadow ${
+                theme === 'dark' 
+                  ? 'bg-gray-700 hover:bg-gray-600' 
+                  : 'bg-gray-50 hover:bg-white'
+              }`}>
                 {/* Employee Card Header */}
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-3">
-                    <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-lg font-medium text-blue-600">
+                    <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
+                      theme === 'dark' ? 'bg-blue-900/50' : 'bg-blue-100'
+                    }`}>
+                      <span className={`text-lg font-medium ${
+                        theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+                      }`}>
                         {getInitials(employee.firstName, employee.lastName)}
                       </span>
                     </div>
                     <div>
-                      <h3 className="text-lg font-medium text-gray-900">
+                      <h3 className={`text-lg font-medium ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>
                         {employee.firstName} {employee.lastName}
                       </h3>
-                      <p className="text-sm text-gray-500">{employee.employeeId}</p>
+                      <p className={`text-sm ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`}>
+                        {employee.employeeId}
+                      </p>
                     </div>
                   </div>
                   <div className="relative">
-                    <button className="text-gray-400 hover:text-gray-600">
+                    <button className={`${
+                      theme === 'dark' ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'
+                    }`}>
                       <MoreVertical size={16} />
                     </button>
                   </div>
@@ -474,30 +576,58 @@ const EmployeeDirectory = () => {
                 {/* Employee Info */}
                 <div className="space-y-3 mb-4">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{employee.position}</p>
-                    <p className="text-sm text-gray-600">{employee.department}</p>
+                    <p className={`text-sm font-medium ${
+                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>
+                      {employee.position}
+                    </p>
+                    <p className={`text-sm ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>
+                      {employee.department}
+                    </p>
                   </div>
                   
                   <div className="flex items-center space-x-2">
-                    <Mail size={14} className="text-gray-400" />
-                    <span className="text-sm text-gray-600 truncate">{employee.email}</span>
+                    <Mail size={14} className={theme === 'dark' ? 'text-gray-500' : 'text-gray-400'} />
+                    <span className={`text-sm ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    } truncate`}>
+                      {employee.email}
+                    </span>
                   </div>
                   
                   <div className="flex items-center space-x-2">
-                    <Phone size={14} className="text-gray-400" />
-                    <span className="text-sm text-gray-600">{employee.phone}</span>
+                    <Phone size={14} className={theme === 'dark' ? 'text-gray-500' : 'text-gray-400'} />
+                    <span className={`text-sm ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>
+                      {employee.phone}
+                    </span>
                   </div>
                   
                   <div className="flex items-center space-x-2">
-                    <MapPin size={14} className="text-gray-400" />
-                    <span className="text-sm text-gray-600">{employee.location}</span>
+                    <MapPin size={14} className={theme === 'dark' ? 'text-gray-500' : 'text-gray-400'} />
+                    <span className={`text-sm ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>
+                      {employee.location}
+                    </span>
                   </div>
                 </div>
 
                 {/* Status and Actions */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                <div className={`flex items-center justify-between pt-4 border-t ${
+                  theme === 'dark' ? 'border-gray-600' : 'border-gray-200'
+                }`}>
                   <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                    employee.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    employee.status === 'Active' 
+                      ? theme === 'dark' 
+                        ? 'bg-green-900/50 text-green-400' 
+                        : 'bg-green-100 text-green-800'
+                      : theme === 'dark'
+                        ? 'bg-gray-600 text-gray-300'
+                        : 'bg-gray-100 text-gray-800'
                   }`}>
                     {employee.status}
                   </span>
@@ -505,19 +635,19 @@ const EmployeeDirectory = () => {
                   <div className="flex space-x-2">
                     <button 
                       onClick={() => setSelectedEmployee(employee)}
-                      className="text-blue-600 hover:text-blue-900"
+                      className={theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'}
                     >
                       <Eye size={16} />
                     </button>
                     <button 
                       onClick={() => handleEditClick(employee)}
-                      className="text-gray-600 hover:text-gray-900"
+                      className={theme === 'dark' ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'}
                     >
                       <Edit size={16} />
                     </button>
                     <button 
                       onClick={() => handleDeleteEmployee(employee)}
-                      className="text-red-600 hover:text-red-900"
+                      className={theme === 'dark' ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'}
                     >
                       <Trash2 size={16} />
                     </button>
@@ -529,9 +659,17 @@ const EmployeeDirectory = () => {
 
           {filteredEmployees.length === 0 && (
             <div className="text-center py-12">
-              <Users className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No employees found</h3>
-              <p className="mt-1 text-sm text-gray-500">
+              <Users className={`mx-auto h-12 w-12 ${
+                theme === 'dark' ? 'text-gray-600' : 'text-gray-400'
+              }`} />
+              <h3 className={`mt-2 text-sm font-medium ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-900'
+              }`}>
+                No employees found
+              </h3>
+              <p className={`mt-1 text-sm ${
+                theme === 'dark' ? 'text-gray-500' : 'text-gray-500'
+              }`}>
                 Try adjusting your search or filters
               </p>
             </div>
@@ -542,26 +680,40 @@ const EmployeeDirectory = () => {
       {/* Employee Details Modal */}
       {selectedEmployee && !showEditModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-10 mx-auto p-5 border w-4/5 max-w-2xl shadow-lg rounded-md bg-white">
+          <div className={`relative top-10 mx-auto p-5 border w-4/5 max-w-2xl shadow-lg rounded-md ${
+            theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+          }`}>
             <div className="mt-3">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-4">
-                  <div className="h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span className="text-xl font-medium text-blue-600">
+                  <div className={`h-16 w-16 rounded-full flex items-center justify-center ${
+                    theme === 'dark' ? 'bg-blue-900/50' : 'bg-blue-100'
+                  }`}>
+                    <span className={`text-xl font-medium ${
+                      theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+                    }`}>
                       {getInitials(selectedEmployee.firstName, selectedEmployee.lastName)}
                     </span>
                   </div>
                   <div>
-                    <h3 className="text-2xl font-medium text-gray-900">
+                    <h3 className={`text-2xl font-medium ${
+                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>
                       {selectedEmployee.firstName} {selectedEmployee.lastName}
                     </h3>
-                    <p className="text-gray-600">{selectedEmployee.position}</p>
-                    <p className="text-sm text-gray-500">{selectedEmployee.employeeId} • {selectedEmployee.department}</p>
+                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                      {selectedEmployee.position}
+                    </p>
+                    <p className={`text-sm ${
+                      theme === 'dark' ? 'text-gray-500' : 'text-gray-500'
+                    }`}>
+                      {selectedEmployee.employeeId} • {selectedEmployee.department}
+                    </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setSelectedEmployee(null)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className={theme === 'dark' ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}
                 >
                   <Eye size={24} />
                 </button>
@@ -569,44 +721,90 @@ const EmployeeDirectory = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Contact Information */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="text-lg font-medium text-gray-900 mb-4">Contact Information</h4>
+                <div className={`rounded-lg p-4 ${
+                  theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
+                }`}>
+                  <h4 className={`text-lg font-medium mb-4 ${
+                    theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>
+                    Contact Information
+                  </h4>
                   <div className="space-y-3">
                     <div className="flex items-center space-x-3">
-                      <Mail size={16} className="text-gray-400" />
-                      <span className="text-gray-900">{selectedEmployee.email}</span>
+                      <Mail size={16} className={theme === 'dark' ? 'text-gray-400' : 'text-gray-400'} />
+                      <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-900'}>
+                        {selectedEmployee.email}
+                      </span>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <Phone size={16} className="text-gray-400" />
-                      <span className="text-gray-900">{selectedEmployee.phone}</span>
+                      <Phone size={16} className={theme === 'dark' ? 'text-gray-400' : 'text-gray-400'} />
+                      <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-900'}>
+                        {selectedEmployee.phone}
+                      </span>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <MapPin size={16} className="text-gray-400" />
-                      <span className="text-gray-900">{selectedEmployee.location}</span>
+                      <MapPin size={16} className={theme === 'dark' ? 'text-gray-400' : 'text-gray-400'} />
+                      <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-900'}>
+                        {selectedEmployee.location}
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 {/* Employment Details */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="text-lg font-medium text-gray-900 mb-4">Employment Details</h4>
+                <div className={`rounded-lg p-4 ${
+                  theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
+                }`}>
+                  <h4 className={`text-lg font-medium mb-4 ${
+                    theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>
+                    Employment Details
+                  </h4>
                   <div className="space-y-3">
                     <div>
-                      <span className="text-sm font-medium text-gray-600">Manager</span>
-                      <p className="text-gray-900">{selectedEmployee.manager || 'N/A'}</p>
+                      <span className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
+                        Manager
+                      </span>
+                      <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-900'}>
+                        {selectedEmployee.manager || 'N/A'}
+                      </p>
                     </div>
                     <div>
-                      <span className="text-sm font-medium text-gray-600">Hire Date</span>
-                      <p className="text-gray-900">{formatDate(selectedEmployee.hireDate)}</p>
+                      <span className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
+                        Hire Date
+                      </span>
+                      <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-900'}>
+                        {formatDate(selectedEmployee.hireDate)}
+                      </p>
                     </div>
                     <div>
-                      <span className="text-sm font-medium text-gray-600">Salary</span>
-                      <p className="text-gray-900">{selectedEmployee.salary}</p>
+                      <span className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
+                        Salary
+                      </span>
+                      <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-900'}>
+                        {selectedEmployee.salary}
+                      </p>
                     </div>
                     <div>
-                      <span className="text-sm font-medium text-gray-600">Status</span>
+                      <span className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
+                        Status
+                      </span>
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        selectedEmployee.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        selectedEmployee.status === 'Active' 
+                          ? theme === 'dark' 
+                            ? 'bg-green-900/50 text-green-400' 
+                            : 'bg-green-100 text-green-800'
+                          : theme === 'dark'
+                            ? 'bg-gray-600 text-gray-300'
+                            : 'bg-gray-100 text-gray-800'
                       }`}>
                         {selectedEmployee.status}
                       </span>
@@ -618,7 +816,11 @@ const EmployeeDirectory = () => {
               <div className="flex justify-end space-x-3 mt-6">
                 <button
                   onClick={() => setSelectedEmployee(null)}
-                  className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50"
+                  className={`border px-4 py-2 rounded-lg ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600' 
+                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
                 >
                   Close
                 </button>
@@ -637,74 +839,110 @@ const EmployeeDirectory = () => {
       {/* Add Employee Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-10 mx-auto p-5 border w-4/5 max-w-2xl shadow-lg rounded-md bg-white">
+          <div className={`relative top-10 mx-auto p-5 border w-4/5 max-w-2xl shadow-lg rounded-md ${
+            theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+          }`}>
             <div className="mt-3">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">Add New Employee</h3>
+                <h3 className={`text-lg font-medium ${
+                  theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                }`}>
+                  Add New Employee
+                </h3>
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className={theme === 'dark' ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}
                 >
                   <Plus size={20} className="rotate-45" />
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     First Name *
                   </label>
                   <input
                     type="text"
                     value={newEmployee.firstName}
                     onChange={(e) => handleNewEmployeeChange('firstName', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                     placeholder="Enter first name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Last Name *
                   </label>
                   <input
                     type="text"
                     value={newEmployee.lastName}
                     onChange={(e) => handleNewEmployeeChange('lastName', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                     placeholder="Enter last name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Email *
                   </label>
                   <input
                     type="email"
                     value={newEmployee.email}
                     onChange={(e) => handleNewEmployeeChange('email', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                     placeholder="Enter email address"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Phone
                   </label>
                   <input
                     type="tel"
                     value={newEmployee.phone}
                     onChange={(e) => handleNewEmployeeChange('phone', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                     placeholder="Enter phone number"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Department *
                   </label>
                   <select 
                     value={newEmployee.department}
                     onChange={(e) => handleNewEmployeeChange('department', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                   >
                     <option value="">Select department</option>
                     {departments.slice(1).map(dept => (
@@ -713,72 +951,108 @@ const EmployeeDirectory = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Position
                   </label>
                   <input
                     type="text"
                     value={newEmployee.position}
                     onChange={(e) => handleNewEmployeeChange('position', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                     placeholder="Enter job position"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Hire Date
                   </label>
                   <input
                     type="date"
                     value={newEmployee.hireDate}
                     onChange={(e) => handleNewEmployeeChange('hireDate', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Salary
                   </label>
                   <input
                     type="text"
                     value={newEmployee.salary}
                     onChange={(e) => handleNewEmployeeChange('salary', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                     placeholder="e.g., 75000"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Location
                   </label>
                   <input
                     type="text"
                     value={newEmployee.location}
                     onChange={(e) => handleNewEmployeeChange('location', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                     placeholder="e.g., New York, NY"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Manager
                   </label>
                   <input
                     type="text"
                     value={newEmployee.manager}
                     onChange={(e) => handleNewEmployeeChange('manager', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                     placeholder="Enter manager name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Status
                   </label>
                   <select 
                     value={newEmployee.status}
                     onChange={(e) => handleNewEmployeeChange('status', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                   >
                     {statuses.slice(1).map(status => (
                       <option key={status} value={status}>{status}</option>
@@ -789,7 +1063,11 @@ const EmployeeDirectory = () => {
               <div className="flex justify-end space-x-3 mt-6">
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50"
+                  className={`border px-4 py-2 rounded-lg ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600' 
+                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
                 >
                   Cancel
                 </button>
@@ -808,70 +1086,106 @@ const EmployeeDirectory = () => {
       {/* Edit Employee Modal */}
       {showEditModal && selectedEmployee && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-10 mx-auto p-5 border w-4/5 max-w-2xl shadow-lg rounded-md bg-white">
+          <div className={`relative top-10 mx-auto p-5 border w-4/5 max-w-2xl shadow-lg rounded-md ${
+            theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+          }`}>
             <div className="mt-3">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">Edit Employee</h3>
+                <h3 className={`text-lg font-medium ${
+                  theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                }`}>
+                  Edit Employee
+                </h3>
                 <button
                   onClick={() => setShowEditModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className={theme === 'dark' ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}
                 >
                   <Plus size={20} className="rotate-45" />
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     First Name *
                   </label>
                   <input
                     type="text"
                     value={selectedEmployee.firstName}
                     onChange={(e) => handleEditEmployeeChange('firstName', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Last Name *
                   </label>
                   <input
                     type="text"
                     value={selectedEmployee.lastName}
                     onChange={(e) => handleEditEmployeeChange('lastName', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Email *
                   </label>
                   <input
                     type="email"
                     value={selectedEmployee.email}
                     onChange={(e) => handleEditEmployeeChange('email', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Phone
                   </label>
                   <input
                     type="tel"
                     value={selectedEmployee.phone}
                     onChange={(e) => handleEditEmployeeChange('phone', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Department *
                   </label>
                   <select 
                     value={selectedEmployee.department}
                     onChange={(e) => handleEditEmployeeChange('department', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                   >
                     {departments.slice(1).map(dept => (
                       <option key={dept} value={dept}>{dept}</option>
@@ -879,68 +1193,104 @@ const EmployeeDirectory = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Position
                   </label>
                   <input
                     type="text"
                     value={selectedEmployee.position}
                     onChange={(e) => handleEditEmployeeChange('position', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Hire Date
                   </label>
                   <input
                     type="date"
                     value={selectedEmployee.hireDate}
                     onChange={(e) => handleEditEmployeeChange('hireDate', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Salary
                   </label>
                   <input
                     type="text"
                     value={selectedEmployee.salary}
                     onChange={(e) => handleEditEmployeeChange('salary', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Location
                   </label>
                   <input
                     type="text"
                     value={selectedEmployee.location}
                     onChange={(e) => handleEditEmployeeChange('location', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Manager
                   </label>
                   <input
                     type="text"
                     value={selectedEmployee.manager || ''}
                     onChange={(e) => handleEditEmployeeChange('manager', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Status
                   </label>
                   <select 
                     value={selectedEmployee.status}
                     onChange={(e) => handleEditEmployeeChange('status', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                   >
                     {statuses.slice(1).map(status => (
                       <option key={status} value={status}>{status}</option>
@@ -951,7 +1301,11 @@ const EmployeeDirectory = () => {
               <div className="flex justify-end space-x-3 mt-6">
                 <button
                   onClick={() => setShowEditModal(false)}
-                  className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50"
+                  className={`border px-4 py-2 rounded-lg ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600' 
+                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
                 >
                   Cancel
                 </button>

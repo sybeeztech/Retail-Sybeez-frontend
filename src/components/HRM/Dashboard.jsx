@@ -80,9 +80,15 @@ const HRMDashboard = () => {
     if (active && payload && payload.length) {
       const fullMonth = payload[0]?.payload?.fullMonth || label;
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded shadow-md">
-          <p className="font-medium text-gray-800">{fullMonth}</p>
-          <p className="text-sm text-blue-600">
+        <div className={`p-3 border rounded shadow-md ${
+          theme === 'dark' 
+            ? 'bg-gray-800 border-gray-700 text-gray-100' 
+            : 'bg-white border-gray-200 text-gray-800'
+        }`}>
+          <p className="font-medium">{fullMonth}</p>
+          <p className={`text-sm ${
+            theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+          }`}>
             {payload[0].value} employees
           </p>
         </div>
@@ -93,15 +99,21 @@ const HRMDashboard = () => {
 
   if (loading) {
     return (
-      <div className="p-6 flex justify-center items-center h-64">
-        <div className="text-gray-500">Loading dashboard data...</div>
+      <div className={`p-6 flex justify-center items-center h-64 ${
+        theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
+      }`}>
+        <div className={theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>
+          Loading dashboard data...
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-6 flex justify-center items-center h-64">
+      <div className={`p-6 flex justify-center items-center h-64 ${
+        theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
+      }`}>
         <div className="text-red-500">Error: {error}</div>
       </div>
     );
@@ -257,23 +269,41 @@ const HRMDashboard = () => {
             <div className="h-56">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={monthlyEmployeeData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <CartesianGrid 
+                    strokeDasharray="3 3" 
+                    stroke={theme === 'dark' ? '#374151' : '#e5e7eb'} 
+                  />
                   <XAxis 
                     dataKey="month" 
-                    tick={{ fontSize: 12, fill: '#374151' }}
+                    tick={{ 
+                      fontSize: 12, 
+                      fill: theme === 'dark' ? '#9CA3AF' : '#374151' 
+                    }}
+                    stroke={theme === 'dark' ? '#4B5563' : '#E5E7EB'}
                   />
                   <YAxis 
-                    tick={{ fontSize: 12, fill: '#374151' }}
+                    tick={{ 
+                      fontSize: 12, 
+                      fill: theme === 'dark' ? '#9CA3AF' : '#374151' 
+                    }}
+                    stroke={theme === 'dark' ? '#4B5563' : '#E5E7EB'}
                     allowDecimals={false}
                   />
                   <Tooltip content={<CustomTooltip />} />
                   <Line 
                     type="linear" 
                     dataKey="count" 
-                    stroke="#5389b0" 
+                    stroke={theme === 'dark' ? '#60A5FA' : '#5389b0'} 
                     strokeWidth={2}
-                    dot={{ fill: '#5389b0', strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 6, fill: '#2563eb' }}
+                    dot={{ 
+                      fill: theme === 'dark' ? '#60A5FA' : '#5389b0', 
+                      strokeWidth: 2, 
+                      r: 4 
+                    }}
+                    activeDot={{ 
+                      r: 6, 
+                      fill: theme === 'dark' ? '#3B82F6' : '#2563eb' 
+                    }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -282,17 +312,25 @@ const HRMDashboard = () => {
         )}
 
         {/* Recent Activities */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4">Recent Activities</h3>
+        <div className={`rounded-lg shadow p-6 ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
+          <h3 className={`text-lg font-semibold mb-4 ${
+            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>Recent Activities</h3>
           <ul className="space-y-4">
             {recentActivities.length > 0 ? (
               recentActivities.map((activity, index) => (
                 <li key={index} className="flex items-center">
                   <div className={`p-2 rounded-full ${
-                    activity.type === 'hire' ? 'bg-green-100' : 'bg-blue-100'
+                    theme === 'dark' 
+                      ? activity.type === 'hire' ? 'bg-green-900/50' : 'bg-blue-900/50'
+                      : activity.type === 'hire' ? 'bg-green-100' : 'bg-blue-100'
                   }`}>
                     <svg className={`h-5 w-5 ${
-                      activity.type === 'hire' ? 'text-green-600' : 'text-blue-600'
+                      theme === 'dark'
+                        ? activity.type === 'hire' ? 'text-green-400' : 'text-blue-400'
+                        : activity.type === 'hire' ? 'text-green-600' : 'text-blue-600'
                     }`} fill="currentColor" viewBox="0 0 20 20">
                       {activity.type === 'hire' ? (
                         <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"/>
@@ -302,25 +340,45 @@ const HRMDashboard = () => {
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm font-medium">{activity.message}</p>
-                    <p className="text-xs text-gray-500">{activity.timestamp}</p>
+                    <p className={`text-sm font-medium ${
+                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>
+                      {activity.message}
+                    </p>
+                    <p className={`text-xs ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>
+                      {activity.timestamp}
+                    </p>
                   </div>
                 </li>
               ))
             ) : (
-              <li className="text-center text-gray-500 py-4">No recent activities</li>
+              <li className={`text-center py-4 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              }`}>
+                No recent activities
+              </li>
             )}
           </ul>
         </div>
 
         {/* New Hires Section */}
         {newHires.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold mb-4">New Hires</h3>
+          <div className={`rounded-lg shadow p-6 ${
+            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+          }`}>
+            <h3 className={`text-lg font-semibold mb-4 ${
+              theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+            }`}>New Hires</h3>
             <div className="max-h-72 overflow-y-auto pr-2">
               <div className="grid grid-cols-1 gap-4">
                 {newHires.map(hire => (
-                  <div key={hire.id} className="border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                  <div key={hire.id} className={`border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow ${
+                    theme === 'dark' 
+                      ? 'border-gray-700 bg-gray-700/50 hover:bg-gray-700' 
+                      : 'border-gray-200 hover:bg-gray-50'
+                  }`}>
                     <div className="flex items-center space-x-3">
                       <div>
                         <img  
@@ -334,31 +392,61 @@ const HRMDashboard = () => {
                         <div className="flex flex-col items-start">
                           <h4 
                             onClick={() => navigate(`/hrm/employees/${hire.id}`)}
-                            className="font-semibold text-gray-900 truncate cursor-pointer hover:text-blue-700"
+                            className={`font-semibold truncate cursor-pointer ${
+                              theme === 'dark' 
+                                ? 'text-gray-100 hover:text-blue-400' 
+                                : 'text-gray-900 hover:text-blue-700'
+                            }`}
                           >
                             {hire.name}
                           </h4>
-                          <p className="text-sm text-gray-500 truncate">{hire.designation}</p>
+                          <p className={`text-sm truncate ${
+                            theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                          }`}>
+                            {hire.designation}
+                          </p>
                         </div>
                         <div className='flex items-end text-wrap'>
-                          <p className="text-sm text-gray-500 font-semibold truncate">{hire.department}</p>
+                          <p className={`text-sm font-semibold truncate ${
+                            theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                          }`}>
+                            {hire.department}
+                          </p>
                         </div>
                       </div>
                     </div>
                     <div className="mt-3 space-y-1">
-                      <div className="flex items-center text-sm text-gray-600">
+                      <div className={`flex items-center text-sm ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                      }`}>
                         <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
                           <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
                         </svg>
-                        <a href={`mailto:${hire.email}`} className="truncate">{hire.email}</a>
+                        <a 
+                          href={`mailto:${hire.email}`} 
+                          className={`truncate hover:underline ${
+                            theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+                          }`}
+                        >
+                          {hire.email}
+                        </a>
                       </div>
                       {hire.phone && (
-                        <div className="flex items-center text-sm text-gray-600">
+                        <div className={`flex items-center text-sm ${
+                          theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                        }`}>
                           <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
                           </svg>
-                          <a href={`tel:${hire.phone}`}>{hire.phone}</a>
+                          <a 
+                            href={`tel:${hire.phone}`}
+                            className={`hover:underline ${
+                              theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+                            }`}
+                          >
+                            {hire.phone}
+                          </a>
                         </div>
                       )}
                     </div>
@@ -371,19 +459,39 @@ const HRMDashboard = () => {
         
         {/* Department Overview */}
         {departmentOverview.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold mb-4">Department Overview</h3>
+          <div className={`rounded-lg shadow p-6 ${
+            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+          }`}>
+            <h3 className={`text-lg font-semibold mb-4 ${
+              theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+            }`}>Department Overview</h3>
             <div className="max-h-72 overflow-y-auto pr-2"> 
               <div className="space-y-4">
                 {departmentOverview.map(dept => (
                   <div key={dept.id} className="flex justify-between items-center">
                     <div>
-                      <h4 className="font-medium">{dept.name}</h4>
-                      <p className="text-sm text-gray-500">{dept.employeeCount} employees</p>
+                      <h4 className={`font-medium ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>
+                        {dept.name}
+                      </h4>
+                      <p className={`text-sm ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`}>
+                        {dept.employeeCount} employees
+                      </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm text-gray-500">Manager</p>
-                      <p className="font-medium">{dept.manager}</p>
+                      <p className={`text-sm ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`}>
+                        Manager
+                      </p>
+                      <p className={`font-medium ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>
+                        {dept.manager}
+                      </p>
                     </div>
                   </div>
                 ))}

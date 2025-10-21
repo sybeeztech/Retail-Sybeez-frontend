@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, User, LogOut, Settings, Menu, Search, ChevronDown, UserCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import useSettingsStore from '../../store/settingsStore';
 
 function TopBar({ onMobileMenuClick }) {

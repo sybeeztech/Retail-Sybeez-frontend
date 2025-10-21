@@ -91,8 +91,27 @@ const LoginPage = () => {
     setError('');
     
     console.log('Login attempt:', { email, password, rememberMe });
+    const { login } = useAuthStore.getState();
+    const { setupData, isSetupComplete, resetSetup } = useSetupStore.getState();
 
-    if (email === DEFAULT_CREDENTIALS.email && password === DEFAULT_CREDENTIALS.password) {
+    const result = await login({username: email, password: password});
+    if (result.success) {
+      // Check if business name exists in step2 or step3 as indicator of setup progress
+      // const hasBusinessData = 
+      //   setupData.step2.businessName?.trim() || 
+      //   setupData.step3.businessName?.trim() ||
+      //   isSetupComplete;
+      
+      // if (hasBusinessData) {
+      //   navigate('/retail-erp/dashboard');
+      // } else {
+      //   resetSetup();
+      //   navigate('/retail/setup/step1');
+      // }
+      resetSetup();
+      navigate('/retail/setup/step1');
+    }
+    else if (email === DEFAULT_CREDENTIALS.email && password === DEFAULT_CREDENTIALS.password) {
       console.log('Login successful');
       
       try {

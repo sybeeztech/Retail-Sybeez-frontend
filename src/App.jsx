@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Sidebar from './components/Layout/Sidebar';
 import TopBar from './components/Layout/TopBar';
 import SimpleChatbot from './components/SimpleChatbot';
-import LoginPage from './components/Auth/LoginPage';
+// import LoginPage from './components/Auth/LoginPage';
 
 // Login Component
 import LoginPage from './Login/LoginPage';
