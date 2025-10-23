@@ -17,6 +17,8 @@ import RetailERPDashboard from './components/RetailERP/RetailERPDashboard';
 import ProductInventoryManagement from './components/RetailERP/ProductInventoryManagement';
 import POSSystem from './components/RetailERP/POSSystem';
 import MultiBranchManagement from './components/RetailERP/MultiBranchManagement';
+import Customer from './components/RetailERP/Customer';
+import ReportsAnalytics from './components/RetailERP/ReportsAnalytics';
 
 import CRMDashboard from './components/CRM/CRMDashboard';
 import LeadsManagement from './components/CRM/LeadsManagement';
@@ -37,13 +39,13 @@ import BusinessAnalytics from './components/Analytics/BusinessAnalyticsOptimized
 import SalesTrends from './components/AI/SalesTrends';
 import CustomerTrends from './components/AI/CustomerTrends';
 import Alerts from './components/AI/Alerts';
-import SupplyChainDashboard from './components/SupplyChain/SupplyChainDashboard';
+// import SupplyChainDashboard from './components/SupplyChain/SupplyChainDashboard';
 import SupplierManagement from './components/SupplyChain/SupplierManagement';
 import Settings from './components/Settings/Settings';
 import ProfileSettings from './components/Profile/ProfileSettings';
 import HelpPage from './pages/HelpPage';
-import InventoryManagement from './components/SupplyChain/InventoryManagement';
-import WarehouseManagement from './components/SupplyChain/WarehouseManagement';
+// import InventoryManagement from './components/SupplyChain/InventoryManagement';
+// import WarehouseManagement from './components/SupplyChain/WarehouseManagement';
 import HRMDashboard from './components/HRM/Dashboard';
 import EmployeeDirectory from './components/HRM/EmployeeDirectory';
 import PayrollDashboard from './components/HRM/PayrollDashboard';
@@ -201,7 +203,9 @@ function App() {
                     <Route path="/retail-erp" element={<RetailERPDashboard />} />
                     <Route path="/retail-erp/dashboard" element={<RetailERPDashboard />} />
                     <Route path="/retail-erp/inventory" element={<ProductInventoryManagement />} />
-                    <Route path="/retail-erp/purchases" element={<SupplierManagement />} />
+                    <Route path="/retail-erp/Customer" element={<Customer />} />
+                    <Route path="/reports-analytics" element={<ReportsAnalytics />} />
+                    {/* <Route path="/retail-erp/purchases" element={<SupplierManagement />} /> */}
                     <Route path="/retail-erp/sales-pos" element={<POSSystem />} />
                     <Route path="/retail-erp/suppliers" element={<SupplierManagement />} />
                     <Route path="/retail-erp/branches" element={<MultiBranchManagement />} />
@@ -262,11 +266,11 @@ function App() {
                     <Route path="/ai/alerts" element={<Alerts />} />
                     
                     {/* Supply Chain Routes */}
-                    <Route path="/supply-chain" element={<SupplyChainDashboard />} />
-                    <Route path="/supply-chain/dashboard" element={<SupplyChainDashboard />} />
+                    {/* <Route path="/supply-chain" element={<SupplyChainDashboard />} />
+                    <Route path="/supply-chain/dashboard" element={<SupplyChainDashboard />} /> */}
                     <Route path="/supply-chain/suppliers" element={<SupplierManagement />} />
-                    <Route path="/supply-chain/inventory" element={<InventoryManagement />} />
-                    <Route path="/supply-chain/warehouse" element={<WarehouseManagement />} />
+                    {/* <Route path="/supply-chain/inventory" element={<InventoryManagement />} />
+                    <Route path="/supply-chain/warehouse" element={<WarehouseManagement />} /> */}
                   </Routes>
                 </main>
               </div>
