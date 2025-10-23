@@ -1,7 +1,7 @@
 import { createServer, Model, Factory, belongsTo, hasMany, Response } from 'miragejs';
 
-export function makeServer({ environment = 'development' } = {}) {
-// export function makeServer({ environment = 'production' } = {}) {
+// export function makeServer({ environment = 'development' } = {}) {
+export function makeServer({ environment = 'production' } = {}) {
   let server = createServer({
     environment,
 
