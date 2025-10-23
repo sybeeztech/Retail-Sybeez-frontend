@@ -376,7 +376,7 @@ const RetailERPDashboard = () => {
       </div>
 
       {/* Secondary Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div className={`rounded-lg shadow p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'
           }`}>
           <div className="flex items-center justify-between mb-4">
@@ -433,15 +433,15 @@ const RetailERPDashboard = () => {
           </div>
         </div>
 
-        <div className={`rounded-lg shadow p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-          }`}>
-          <div className="flex items-center justify-between mb-4">
+        {/* <div className={`rounded-lg shadow p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+          }`}> */}
+          {/* <div className="flex items-center justify-between mb-4">
             <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
               }`}>Quick Actions</h3>
             <Plus className={`h-5 w-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
               }`} />
-          </div>
-          <div className="space-y-2">
+          </div> */}
+          {/* <div className="space-y-2">
             <button className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm transition-colors">
               New Sale
             </button>
@@ -451,8 +451,8 @@ const RetailERPDashboard = () => {
             <button className="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 text-sm transition-colors">
               Manage Suppliers
             </button>
-          </div>
-        </div>
+          </div> */}
+        {/* </div> */}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
