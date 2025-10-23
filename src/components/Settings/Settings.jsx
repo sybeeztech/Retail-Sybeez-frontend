@@ -116,7 +116,7 @@ const Settings = () => {
                     <Moon className="w-6 h-6 text-indigo-500" />
                     <div>
                       <p className={`font-medium ${
-                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                        theme === 'dark' ? 'text-gray-900' : 'text-gray-900'
                       }`}>Dark Mode</p>
                       <p className={`text-sm ${
                         theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
