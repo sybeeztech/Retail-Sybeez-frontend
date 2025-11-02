@@ -54,6 +54,11 @@ import DepartmentManagement from './components/HRM/DepartmentManagement';
 import AttendanceManagement from './components/HRM/AttendanceManagement';
 import LeaveManagement from './components/HRM/LeaveManagement';
 import PerformanceManagement from './components/HRM/PerformanceManagement';
+
+import DailyAttendance from './modules/attendance/DailyAttendance'; 
+import AttendanceAnalytics from './modules/attendance/AttendanceAnalytics';
+import EmployeeAttendance from './modules/attendance/EmployeeAttendance';
+
 import { makeServer } from './mirage/server';
 
 
@@ -70,6 +75,7 @@ import SetupStep9 from './components/retailSetup/SetupStep9';
 
 // Import the settings store
 import useSettingsStore from './store/settingsStore';
+import EmployeeProfile from './components/HRM/EmployeeProfile';
 
 // Component placeholders
 const Dashboard = () => (
@@ -223,7 +229,11 @@ function App() {
                     <Route path="/hrm" element={<HRMDashboard />} />
                     <Route path="/hrm/dashboard" element={<HRMDashboard />} />
                     <Route path="/hrm/employees" element={<EmployeeDirectory />} />
+                    <Route path="/hrm/employees/:id" element={<EmployeeProfile />} />
                     <Route path="/hrm/attendance" element={<AttendanceManagement />} />
+                    <Route path="/hrm/daily-attendance" element={<DailyAttendance />} />
+                    <Route path="/hrm/attendance-analytics" element={<AttendanceAnalytics />} />
+                    <Route path="/hrm/employees/:id/attendance" element={<EmployeeAttendance />} />
                     <Route path="/hrm/leave" element={<LeaveManagement />} />
                     <Route path="/hrm/payroll" element={<PayrollDashboard />} />
                     <Route path="/hrm/performance" element={<PerformanceManagement />} />

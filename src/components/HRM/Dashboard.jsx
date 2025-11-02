@@ -2,79 +2,217 @@ import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useNavigate } from 'react-router-dom';
 import useSettingsStore from '../../store/settingsStore';
+import { useEmployeeStore } from '../../store/employeeStore';
+import { useAttendanceStore } from '../../store/attendanceStore';
 
 const HRMDashboard = () => {
   const { theme } = useSettingsStore();
-  const [userRole, setUserRole] = useState('admin');
+  const { 
+    employees, 
+    fetchEmployees, 
+    loading: employeesLoading, 
+    getEmployeesByDepartment 
+  } = useEmployeeStore();
+  const { 
+    getAttendanceStats, 
+    fetchAttendanceReport,
+    getCurrentUserRole 
+  } = useAttendanceStore();
+  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Mock data for now
+  // State for dashboard data
   const [stats, setStats] = useState({
-    totalEmployees: 125,
-    totalDepartments: 8,
-    attendanceRate: '94%',
-    newHires: 12,
-    pendingTickets: 5,
-    recentAttendance: 15
+    totalEmployees: 0,
+    totalDepartments: 0,
+    attendanceRate: '0%',
+    newHires: 0,
+    pendingTickets: 0,
+    recentAttendance: 0
   });
 
-  const [recentActivities, setRecentActivities] = useState([
-    {
-      type: 'hire',
-      message: 'New employee John Doe joined the Engineering team',
-      timestamp: '2 hours ago'
-    },
-    {
-      type: 'attendance',
-      message: 'Weekly attendance report generated',
-      timestamp: '4 hours ago'
-    },
-    {
-      type: 'leave',
-      message: 'Leave request approved for Sarah Wilson',
-      timestamp: '1 day ago'
-    }
-  ]);
-
-  const [monthlyEmployeeData, setMonthlyEmployeeData] = useState([
-    { month: 'Jan', count: 110, fullMonth: 'January 2025' },
-    { month: 'Feb', count: 115, fullMonth: 'February 2025' },
-    { month: 'Mar', count: 118, fullMonth: 'March 2025' },
-    { month: 'Apr', count: 122, fullMonth: 'April 2025' },
-    { month: 'May', count: 125, fullMonth: 'May 2025' }
-  ]);
-
-  const [newHires, setNewHires] = useState([
-    {
-      id: 1,
-      name: 'John Doe',
-      designation: 'Software Engineer',
-      department: 'Engineering',
-      email: 'john.doe@company.com',
-      phone: '+1 (555) 123-4567',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
-    },
-    {
-      id: 2,
-      name: 'Sarah Wilson',
-      designation: 'Marketing Specialist',
-      department: 'Marketing',
-      email: 'sarah.wilson@company.com',
-      phone: '+1 (555) 987-6543',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face'
-    }
-  ]);
-
-  const [departmentOverview, setDepartmentOverview] = useState([
-    { id: 1, name: 'Engineering', employeeCount: 25, manager: 'Alex Johnson' },
-    { id: 2, name: 'Marketing', employeeCount: 15, manager: 'Lisa Chen' },
-    { id: 3, name: 'Sales', employeeCount: 20, manager: 'Mike Rodriguez' },
-    { id: 4, name: 'HR', employeeCount: 8, manager: 'Emma Davis' },
-    { id: 5, name: 'Finance', employeeCount: 12, manager: 'David Kim' }
-  ]);
+  const [recentActivities, setRecentActivities] = useState([]);
+  const [monthlyEmployeeData, setMonthlyEmployeeData] = useState([]);
+  const [newHires, setNewHires] = useState([]);
+  const [departmentOverview, setDepartmentOverview] = useState([]);
 
   const navigate = useNavigate();
+
+  // Calculate department count and overview
+  const calculateDepartmentOverview = (employees) => {
+    if (!employees || employees.length === 0) return [];
+    
+    const departmentMap = {};
+    
+    employees.forEach(employee => {
+      if (!departmentMap[employee.department]) {
+        departmentMap[employee.department] = {
+          employeeCount: 0,
+          managers: new Set()
+        };
+      }
+      departmentMap[employee.department].employeeCount++;
+      
+      // Simple logic to identify managers - in real app, this would come from role data
+      if (employee.position?.toLowerCase().includes('manager') || 
+          employee.role === 'manager') {
+        departmentMap[employee.department].managers.add(`${employee.firstName} ${employee.lastName}`);
+      }
+    });
+
+    return Object.entries(departmentMap).map(([name, data], index) => ({
+      id: index + 1,
+      name,
+      employeeCount: data.employeeCount,
+      manager: Array.from(data.managers)[0] || 'Not assigned'
+    }));
+  };
+
+  // Get recent hires (last 90 days)
+  const getRecentHires = (employees) => {
+    if (!employees || employees.length === 0) return [];
+    
+    const ninetyDaysAgo = new Date();
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+    
+    return employees
+      .filter(employee => {
+        const hireDate = new Date(employee.startDate || employee.createdAt);
+        return hireDate >= ninetyDaysAgo;
+      })
+      .slice(0, 5) // Limit to 5 most recent
+      .map(employee => ({
+        id: employee.id,
+        name: `${employee.firstName} ${employee.lastName}`,
+        designation: employee.designation || 'Employee',
+        department: employee.department,
+        email: employee.email,
+        phone: employee.phone,
+        avatar: employee.avatar 
+      }));
+  };
+
+  // Generate monthly employee data for chart
+  const generateMonthlyEmployeeData = (employees) => {
+    if (!employees || employees.length === 0) return [];
+    
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const currentDate = new Date();
+    
+    // Generate last 5 months
+    const monthlyData = [];
+    for (let i = 4; i >= 0; i--) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+      const monthName = months[date.getMonth()];
+      const year = date.getFullYear();
+      const monthEnd = new Date(year, date.getMonth() + 1, 0);
+      
+      // Count all employees hired by the end of this month
+      const employeeCount = employees.filter(employee => {
+        const hireDate = employee.hireDate || employee.startDate;
+        if (!hireDate) return false;
+        return new Date(hireDate) <= monthEnd;
+      }).length;
+      
+      monthlyData.push({
+        month: monthName,
+        count: employeeCount,
+        fullMonth: `${monthName} ${year}`
+      });
+    }
+    
+    return monthlyData;
+  };
+
+  // Get recent activities
+  const getRecentActivities = (attendanceStats, recentHires) => {
+    const activities = [];
+    
+    // Add hire activities
+    recentHires.slice(0, 2).forEach(hire => {
+      activities.push({
+        type: 'hire',
+        message: `New employee ${hire.name} joined the ${hire.department} team`,
+        timestamp: 'Recently'
+      });
+    });
+    
+    // Add attendance activity
+    if (attendanceStats && attendanceStats.total > 0) {
+      activities.push({
+        type: 'attendance',
+        message: `Weekly attendance recorded: ${attendanceStats.present || 0} present, ${attendanceStats.absent || 0} absent`,
+        timestamp: 'Today'
+      });
+    }
+    
+    // Add sample leave activity
+    // activities.push({
+    //   type: 'leave',
+    //   message: 'Leave request approved for team member',
+    //   timestamp: '1 day ago'
+    // });
+    
+    return activities.slice(0, 3); // Limit to 3 activities
+  };
+
+  const getInitials = (firstName, lastName) => {
+    return `${firstName?.charAt(0) || ''}${lastName?.charAt(0) || ''}`;
+  };
+
+  // Calculate attendance rate
+  const calculateAttendanceRate = (attendanceStats) => {
+    if (!attendanceStats || attendanceStats.total === 0) return '0%';
+    
+    const presentCount = attendanceStats.present || 0;
+    const rate = (presentCount / attendanceStats.total) * 100;
+    return `${Math.round(rate)}%`;
+  };
+
+  // Load dashboard data
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        // Fetch employees data
+        await fetchEmployees();
+        
+        // Get attendance stats for today
+        const attendanceStats = getAttendanceStats();
+        
+        // Calculate dashboard statistics
+        const departmentOverviewData = calculateDepartmentOverview(employees);
+        const recentHiresData = getRecentHires(employees);
+        const monthlyData = generateMonthlyEmployeeData(employees);
+        const activitiesData = getRecentActivities(attendanceStats, recentHiresData);
+        
+        setStats({
+          totalEmployees: employees?.length || 0,
+          totalDepartments: departmentOverviewData.length,
+          attendanceRate: calculateAttendanceRate(attendanceStats),
+          newHires: recentHiresData.length,
+          pendingTickets: 5, // This would come from a tickets store
+          recentAttendance: attendanceStats?.present || 0
+        });
+        
+        setRecentActivities(activitiesData);
+        setMonthlyEmployeeData(monthlyData);
+        setNewHires(recentHiresData);
+        setDepartmentOverview(departmentOverviewData);
+        
+      } catch (err) {
+        console.error('Error loading dashboard data:', err);
+        setError('Failed to load dashboard data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboardData();
+  }, [employees.length]); // Re-run when employees data changes
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -97,7 +235,56 @@ const HRMDashboard = () => {
     return null;
   };
 
-  if (loading) {
+  // Empty state components
+  const EmptyChartState = () => (
+    <div className={`h-56 flex flex-col items-center justify-center border-2 border-dashed rounded-lg ${
+      theme === 'dark' ? 'border-gray-700 text-gray-400' : 'border-gray-300 text-gray-500'
+    }`}>
+      <svg className="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+      <p className="text-sm font-medium mb-1">No Employee Data</p>
+      <p className="text-xs text-center px-4">Employee headcount data will appear here once employees are added to the system.</p>
+    </div>
+  );
+
+  const EmptyActivitiesState = () => (
+    <div className={`flex flex-col items-center justify-center py-8 border-2 border-dashed rounded-lg ${
+      theme === 'dark' ? 'border-gray-700 text-gray-400' : 'border-gray-300 text-gray-500'
+    }`}>
+      <svg className="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <p className="text-sm font-medium mb-1">No Recent Activities</p>
+      <p className="text-xs text-center px-4">Recent activities will appear here as employees join and system events occur.</p>
+    </div>
+  );
+
+  const EmptyNewHiresState = () => (
+    <div className={`flex flex-col items-center justify-center py-8 border-2 border-dashed rounded-lg ${
+      theme === 'dark' ? 'border-gray-700 text-gray-400' : 'border-gray-300 text-gray-500'
+    }`}>
+      <svg className="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+      </svg>
+      <p className="text-sm font-medium mb-1">No New Hires</p>
+      <p className="text-xs text-center px-4">New employee hires from the last 90 days will appear here.</p>
+    </div>
+  );
+
+  const EmptyDepartmentsState = () => (
+    <div className={`flex flex-col items-center justify-center py-8 border-2 border-dashed rounded-lg ${
+      theme === 'dark' ? 'border-gray-700 text-gray-400' : 'border-gray-300 text-gray-500'
+    }`}>
+      <svg className="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+      </svg>
+      <p className="text-sm font-medium mb-1">No Departments</p>
+      <p className="text-xs text-center px-4">Department overview will appear here once departments are created and employees are assigned.</p>
+    </div>
+  );
+
+  if (loading || employeesLoading) {
     return (
       <div className={`p-6 flex justify-center items-center h-64 ${
         theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
@@ -259,13 +446,13 @@ const HRMDashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Employee Count Chart */}
-        {monthlyEmployeeData.length > 0 && (
-          <div className={`rounded-lg shadow p-6 ${
-            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-          }`}>
-            <h3 className={`text-lg font-semibold mb-4 ${
-              theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
-            }`}>Employee Head Count</h3>
+        <div className={`rounded-lg shadow p-6 ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
+          <h3 className={`text-lg font-semibold mb-4 ${
+            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>Employee Head Count</h3>
+          {monthlyEmployeeData.length > 0 ? (
             <div className="h-56">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={monthlyEmployeeData}>
@@ -308,8 +495,10 @@ const HRMDashboard = () => {
                 </LineChart>
               </ResponsiveContainer>
             </div>
-          </div>
-        )}
+          ) : (
+            <EmptyChartState />
+          )}
+        </div>
 
         {/* Recent Activities */}
         <div className={`rounded-lg shadow p-6 ${
@@ -318,9 +507,9 @@ const HRMDashboard = () => {
           <h3 className={`text-lg font-semibold mb-4 ${
             theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
           }`}>Recent Activities</h3>
-          <ul className="space-y-4">
-            {recentActivities.length > 0 ? (
-              recentActivities.map((activity, index) => (
+          {recentActivities.length > 0 ? (
+            <ul className="space-y-4">
+              {recentActivities.map((activity, index) => (
                 <li key={index} className="flex items-center">
                   <div className={`p-2 rounded-full ${
                     theme === 'dark' 
@@ -352,25 +541,21 @@ const HRMDashboard = () => {
                     </p>
                   </div>
                 </li>
-              ))
-            ) : (
-              <li className={`text-center py-4 ${
-                theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-              }`}>
-                No recent activities
-              </li>
-            )}
-          </ul>
+              ))}
+            </ul>
+          ) : (
+            <EmptyActivitiesState />
+          )}
         </div>
 
         {/* New Hires Section */}
-        {newHires.length > 0 && (
-          <div className={`rounded-lg shadow p-6 ${
-            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-          }`}>
-            <h3 className={`text-lg font-semibold mb-4 ${
-              theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
-            }`}>New Hires</h3>
+        <div className={`rounded-lg shadow p-6 ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
+          <h3 className={`text-lg font-semibold mb-4 ${
+            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>New Hires</h3>
+          {newHires.length > 0 ? (
             <div className="max-h-72 overflow-y-auto pr-2">
               <div className="grid grid-cols-1 gap-4">
                 {newHires.map(hire => (
@@ -381,12 +566,27 @@ const HRMDashboard = () => {
                   }`}>
                     <div className="flex items-center space-x-3">
                       <div>
-                        <img  
-                          src={hire.avatar} 
-                          alt={hire.name}
-                          onClick={() => navigate(`/hrm/employees/${hire.id}`)}
-                          className="w-12 h-12 cursor-pointer rounded-full object-cover border-2 border-gray-200"
-                        />
+                        {hire.avatar ? (
+                          <img  
+                            src={hire.avatar} 
+                            alt={hire.name}
+                            onClick={() => navigate(`/hrm/employees/${hire.id}`)}
+                            className="w-12 h-12 cursor-pointer rounded-full object-cover border-2 border-gray-200"
+                          />
+                        ) : (
+                          <div 
+                            className={`w-12 h-12 rounded-full flex items-center justify-center cursor-pointer ${
+                              theme === 'dark' ? 'bg-blue-900/50' : 'bg-blue-100'
+                            }`}
+                            onClick={() => navigate(`/hrm/employees/${hire.id}`)}
+                          >
+                            <span className={`text-lg font-medium ${
+                              theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+                            }`}>
+                              {getInitials(hire.name.split(' ')[0], hire.name.split(' ')[1] || '')}
+                            </span>
+                          </div>
+                        )}
                       </div>
                       <div className="flex w-full items-start justify-between">
                         <div className="flex flex-col items-start">
@@ -454,17 +654,19 @@ const HRMDashboard = () => {
                 ))}
               </div>
             </div>
-          </div>
-        )}
+          ) : (
+            <EmptyNewHiresState />
+          )}
+        </div>
         
         {/* Department Overview */}
-        {departmentOverview.length > 0 && (
-          <div className={`rounded-lg shadow p-6 ${
-            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-          }`}>
-            <h3 className={`text-lg font-semibold mb-4 ${
-              theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
-            }`}>Department Overview</h3>
+        <div className={`rounded-lg shadow p-6 ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
+          <h3 className={`text-lg font-semibold mb-4 ${
+            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>Department Overview</h3>
+          {departmentOverview.length > 0 ? (
             <div className="max-h-72 overflow-y-auto pr-2"> 
               <div className="space-y-4">
                 {departmentOverview.map(dept => (
@@ -481,7 +683,7 @@ const HRMDashboard = () => {
                         {dept.employeeCount} employees
                       </p>
                     </div>
-                    <div className="text-right">
+                    {/* <div className="text-right">
                       <p className={`text-sm ${
                         theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                       }`}>
@@ -492,13 +694,15 @@ const HRMDashboard = () => {
                       }`}>
                         {dept.manager}
                       </p>
-                    </div>
+                    </div> */}
                   </div>
                 ))}
               </div>
             </div>
-          </div>
-        )}
+          ) : (
+            <EmptyDepartmentsState />
+          )}
+        </div>
       </div>
     </div>
   );

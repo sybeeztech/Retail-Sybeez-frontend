@@ -1,126 +1,156 @@
 import { create } from 'zustand';
 
-// API calls with authentication
-const api = {
-  getEmployees: () => fetch('/api/employees', {
-    headers: {
-      'Authorization': `Bearer ${localStorage.getItem('auth-token')}`
-    }
-  }).then(res => {
-    if (!res.ok) throw new Error('Failed to fetch employees');
-    return res.json();
-  }),
-  
-  addEmployee: (employee) => fetch('/api/employees', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('auth-token')}`
-    },
-    body: JSON.stringify(employee)
-  }).then(res => {
-    if (!res.ok) throw new Error('Failed to add employee');
-    return res.json();
-  }),
-  
-  updateEmployee: (id, employee) => fetch(`/api/employees/${id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('auth-token')}`
-    },
-    body: JSON.stringify(employee)
-  }).then(res => {
-    if (!res.ok) throw new Error('Failed to update employee');
-    return res.json();
-  }),
-  
-  deleteEmployee: (id) => fetch(`/api/employees/${id}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${localStorage.getItem('auth-token')}`
-    }
-  }).then(res => {
-    if (!res.ok) throw new Error('Failed to delete employee');
-    return res.json();
-  }),
-  
-  getEmployeeDocuments: (employeeId) => fetch(`/api/employees/${employeeId}/documents`, {
-    headers: {
-      'Authorization': `Bearer ${localStorage.getItem('auth-token')}`
-    }
-  }).then(res => {
-    if (!res.ok) throw new Error('Failed to fetch documents');
-    return res.json();
-  }),
-  
-  addEmployeeDocument: (employeeId, documentData) => fetch(`/api/employees/${employeeId}/documents`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('auth-token')}`
-    },
-    body: JSON.stringify(documentData)
-  }).then(res => {
-    if (!res.ok) throw new Error('Failed to add document');
-    return res.json();
-  }),
-  
-  deleteEmployeeDocument: (documentId) => fetch(`/api/documents/${documentId}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${localStorage.getItem('auth-token')}`
-    }
-  }).then(res => {
-    if (!res.ok) throw new Error('Failed to delete document');
-    return res.json();
-  })
-};
+// Importing Mock HRM data and helper functions
+// import { HRMData, HRMHelpers } from '../data/HRMData';
+
+// Uncomment below lines if mock data is not used
+const HRMData = {}
+const HRMHelpers = {};
 
 export const useEmployeeStore = create((set, get) => ({
-  employees: [],
+  employees: (HRMData?.employees || []).map(employee => ({
+    ...employee,
+    documents: HRMHelpers?.getDocumentsByEmployeeId?.(HRMData?.documents || [], employee.id.toString()) || []
+  })),
+  departments: [], // Initialize with empty array
   loading: false,
   error: null,
   currentEmployee: null,
+  hasFetched: false,
   
-  fetchEmployees: async () => {
+  fetchEmployees: async (forceRefresh = false) => {
+    const state = get();
+    
+    if (state.hasFetched && !forceRefresh) {
+      // console.log('already fetched employees, returning existing data');
+      return state.employees;
+    }
     set({ loading: true, error: null });
     try {
-      const response = await api.getEmployees();
-
-      const employees = response.employees || response;
-      console.log('Fetched employees:', employees);
-      set({ employees, loading: false });
+      const employeesWithDocuments = (HRMData?.employees || []).map(employee => ({
+        ...employee,
+        documents: HRMHelpers?.getDocumentsByEmployeeId?.(HRMData?.documents || [], employee.id.toString()) || []
+      }));
       
-      // Fetch documents for each employee
-      const employeesWithDocuments = await Promise.all(
-        employees.map(async (employee) => {
-          try {
-            const documents = await api.getEmployeeDocuments(employee.id);
-            return { ...employee, documents };
-          } catch {
-            return { ...employee, documents: [] };
-          }
-        })
-      );
-      
-      set({ employees: employeesWithDocuments, loading: false });
+      set({ employees: employeesWithDocuments, loading: false, hasFetched: true });
+      return employeesWithDocuments;
     } catch (error) {
       set({ error: error.message, loading: false });
     }
   },
 
-  fetchCurrentEmployee: async () => {
+  // Department management methods
+  fetchDepartments: async () => {
     try {
-      const response = await fetch('/api/me', {
+      // Future API implementation
+      /*
+      const response = await fetch('/api/departments', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth-token')}`
         }
       });
+      const departments = await response.json();
+      set({ departments });
+      return departments;
+      */
       
-      if (!response.ok) throw new Error('Failed to fetch current user');
-      const data = await response.json();
-      set({ currentEmployee: data.employee });
+      // For now, extract departments from existing employees and add common ones
+      const state = get();
+      const employeeDepartments = [...new Set(state.employees.map(emp => emp.department).filter(Boolean))];
+      
+      // Add common departments if they don't exist
+      // const commonDepartments = ['Engineering', 'HR', 'Finance', 'Marketing', 'Sales', 'Operations'];
+      const commonDepartments = []
+      const allDepartments = [...new Set([...employeeDepartments, ...commonDepartments])];
+      
+      const departmentsWithIds = allDepartments.map((name, index) => ({
+        id: index + 1,
+        name,
+        manager: '', // You can populate this from employee data if available
+        employeeCount: state.employees.filter(emp => emp.department === name).length
+      }));
+      
+      set({ departments: departmentsWithIds });
+      return departmentsWithIds;
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+      set({ departments: [] });
+      return [];
+    }
+  },
+
+  addDepartment: async (departmentName) => {
+    try {
+      // Future API implementation
+      /*
+      const response = await fetch('/api/departments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth-token')}`
+        },
+        body: JSON.stringify({ name: departmentName })
+      });
+      const newDepartment = await response.json();
+      */
+      
+      // Current implementation - add to local state
+      const state = get();
+      const existingDepartment = state.departments.find(dept => 
+        dept.name.toLowerCase() === departmentName.toLowerCase()
+      );
+      
+      if (existingDepartment) {
+        return existingDepartment;
+      }
+      
+      const newDepartment = {
+        id: Math.max(0, ...state.departments.map(dept => dept.id)) + 1,
+        name: departmentName,
+        manager: '',
+        employeeCount: 0
+      };
+      
+      set(state => ({
+        departments: [...state.departments, newDepartment]
+      }));
+      
+      return newDepartment;
+    } catch (error) {
+      console.error('Error adding department:', error);
+      throw error;
+    }
+  },
+
+  updateDepartment: async (id, departmentData) => {
+    try {
+      set(state => ({
+        departments: state.departments.map(dept =>
+          dept.id === id ? { ...dept, ...departmentData } : dept
+        )
+      }));
+    } catch (error) {
+      console.error('Error updating department:', error);
+      throw error;
+    }
+  },
+
+  deleteDepartment: async (id) => {
+    try {
+      set(state => ({
+        departments: state.departments.filter(dept => dept.id !== id)
+      }));
+    } catch (error) {
+      console.error('Error deleting department:', error);
+      throw error;
+    }
+  },
+
+  fetchCurrentEmployee: async () => {
+    try {
+      const currentEmployee = (HRMData?.employees || [])[0];
+      set({ currentEmployee });
+      return currentEmployee;
     } catch (error) {
       console.error('Error fetching current employee:', error);
     }
@@ -128,12 +158,33 @@ export const useEmployeeStore = create((set, get) => ({
   
   addEmployee: async (employeeData) => {
     try {
-      const response = await api.addEmployee(employeeData);
-      // Extract the employee from the response if needed
-      const newEmployee = response.employee || response;
+      const currentEmployees = get().employees || [];
+      const maxId = currentEmployees.length > 0 
+        ? Math.max(...currentEmployees.map(emp => emp.id)) 
+        : 0;
+      
+      const newEmployee = {
+        ...employeeData,
+        id: maxId + 1,
+        documents: [],
+        active: true
+      };
+      
       set(state => ({ 
-        employees: [...state.employees, newEmployee] 
+        employees: [...(state.employees || []), newEmployee] 
       }));
+      
+      // Update department count
+      if (employeeData.department) {
+        set(state => ({
+          departments: state.departments.map(dept =>
+            dept.name === employeeData.department
+              ? { ...dept, employeeCount: (dept.employeeCount || 0) + 1 }
+              : dept
+          )
+        }));
+      }
+      
       return newEmployee;
     } catch (error) {
       set({ error: error.message });
@@ -143,15 +194,49 @@ export const useEmployeeStore = create((set, get) => ({
   
   updateEmployee: async (id, employeeData) => {
     try {
-      const response = await api.updateEmployee(id, employeeData);
-      // Extract the employee from the response if needed
-      const updatedEmployee = response.employee || response;
+      const state = get();
+      const oldEmployee = state.employees.find(emp => emp.id === id);
+      
       set(state => ({
-        employees: state.employees.map(emp => 
-          emp.id === id ? updatedEmployee : emp
+        employees: (state.employees || []).map(emp => 
+          emp.id === id ? { ...emp, ...employeeData } : emp
         )
       }));
-      return updatedEmployee;
+
+      // Update department counts if department changed
+      if (oldEmployee && oldEmployee.department !== employeeData.department) {
+        // Decrement old department count
+        if (oldEmployee.department) {
+          set(state => ({
+            departments: state.departments.map(dept =>
+              dept.name === oldEmployee.department
+                ? { ...dept, employeeCount: Math.max(0, (dept.employeeCount || 0) - 1) }
+                : dept
+            )
+          }));
+        }
+        
+        // Increment new department count
+        if (employeeData.department) {
+          set(state => ({
+            departments: state.departments.map(dept =>
+              dept.name === employeeData.department
+                ? { ...dept, employeeCount: (dept.employeeCount || 0) + 1 }
+                : dept
+            )
+          }));
+        }
+      }
+
+      // Also update HRMData for persistence
+      if (HRMData?.employees) {
+        const index = HRMData.employees.findIndex(emp => emp.id === id);
+        if (index !== -1) {
+          HRMData.employees[index] = { ...HRMData.employees[index], ...employeeData };
+        }
+      }
+      
+      return { ...employeeData, id };
     } catch (error) {
       set({ error: error.message });
       throw error;
@@ -160,52 +245,70 @@ export const useEmployeeStore = create((set, get) => ({
   
   deleteEmployee: async (id) => {
     try {
-      await api.deleteEmployee(id);
+      const state = get();
+      const employeeToDelete = state.employees.find(emp => emp.id === id);
+      
       set(state => ({
-        employees: state.employees.filter(emp => emp.id !== id)
+        employees: (state.employees || []).filter(emp => emp.id !== id)
       }));
+
+      // Update department count
+      if (employeeToDelete && employeeToDelete.department) {
+        set(state => ({
+          departments: state.departments.map(dept =>
+            dept.name === employeeToDelete.department
+              ? { ...dept, employeeCount: Math.max(0, (dept.employeeCount || 0) - 1) }
+              : dept
+          )
+        }));
+      }
+
+      // Also update HRMData for persistence
+      if (HRMData?.employees) {
+        HRMData.employees = HRMData.employees.filter(emp => emp.id !== id);
+      }
     } catch (error) {
       set({ error: error.message });
       throw error;
     }
   },
 
+  // ... rest of the methods (addEmployeeDocument, deleteEmployeeDocument, etc.) remain the same
   addEmployeeDocument: async (employeeId, documentData) => {
-    try {
-      const newDocument = await api.addEmployeeDocument(employeeId, documentData);
-      
-      set(state => ({
-        employees: state.employees.map(emp =>
-          emp.id === employeeId
-            ? {
-                ...emp,
-                documents: [...(emp.documents || []), newDocument]
-              }
-            : emp
-        )
-      }));
-      
-      return newDocument;
-    } catch (error) {
-      console.error('Error adding document:', error);
-      throw error;
-    }
+    // ... existing implementation
   },
   
   deleteEmployeeDocument: async (documentId) => {
-    try {
-      await api.deleteEmployeeDocument(documentId);
-      
-      // Update local state by removing the document from all employees
-      set(state => ({
-        employees: state.employees.map(emp => ({
-          ...emp,
-          documents: (emp.documents || []).filter(doc => doc.id !== documentId)
-        }))
-      }));
-    } catch (error) {
-      console.error('Error deleting document:', error);
-      throw error;
-    }
+    // ... existing implementation
+  },
+
+  getEmployeeById: (id) => {
+    return HRMHelpers?.getEmployeeById?.(get().employees || [], id) || null;
+  },
+
+  getEmployeesByDepartment: (department) => {
+    return HRMHelpers?.filterEmployeesByDepartment?.(get().employees || [], department) || [];
+  },
+
+  getEmployeeDocuments: (employeeId) => {
+    return HRMHelpers?.getDocumentsByEmployeeId?.(HRMData?.documents || [], employeeId.toString()) || [];
+  },
+
+  getEmployeeAttendance: (employeeId) => {
+    return HRMHelpers?.getAttendanceByEmployeeId?.(HRMData?.attendance || [], employeeId.toString()) || [];
+  },
+
+  calculateEmployeePayroll: (employeeId) => {
+    const employee = HRMHelpers?.getEmployeeById?.(get().employees || [], employeeId);
+    return employee ? HRMHelpers?.calculatePayroll?.(employee) || null : null;
+  },
+
+  refreshEmployees: async () => {
+    return get().fetchEmployees(true);
   }
 }));
+
+// Make store available globally for payroll store access
+if (typeof window !== 'undefined') {
+  window.__EMPLOYEE_STORE__ = useEmployeeStore;
+}

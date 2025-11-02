@@ -7,6 +7,8 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line, AreaChart, Area
 } from 'recharts';
+import useSettingsStore from '../../store/settingsStore';
+import { RotateCw, Download } from 'lucide-react';
 
 const AttendanceAnalytics = () => {
   const [dateRange, setDateRange] = useState({
@@ -19,17 +21,26 @@ const AttendanceAnalytics = () => {
 
   const { fetchAttendanceReport, attendanceByDate } = useAttendanceStore();
   const { employees, fetchEmployees } = useEmployeeStore();
-  const { departments, fetchDepartments } = useDepartmentStore();
+  const { departments, fetchDepartments } = useEmployeeStore();
+  const { theme } = useSettingsStore();
 
   const navigate = useNavigate();
 
-  // Colors for charts
+  // Colors for charts - adjusted for dark theme
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
   const STATUS_COLORS = {
     present: '#10B981',
     absent: '#EF4444',
     late: '#F59E0B',
     halfday: '#3B82F6'
+  };
+
+  // Chart styling based on theme
+  const chartTheme = {
+    textColor: theme === 'dark' ? '#E5E7EB' : '#374151',
+    gridColor: theme === 'dark' ? '#4B5563' : '#E5E7EB',
+    tooltipBg: theme === 'dark' ? '#1F2937' : '#FFFFFF',
+    tooltipBorder: theme === 'dark' ? '#374151' : '#E5E7EB',
   };
 
   useEffect(() => {
@@ -50,7 +61,6 @@ const AttendanceAnalytics = () => {
     loadReportData();
   }, [dateRange, selectedDepartment]);
 
-
   const loadReportData = async () => {
     setLoading(true);
     try {
@@ -60,15 +70,12 @@ const AttendanceAnalytics = () => {
         selectedDepartment || null
       );
       
-      // Log the data to see what's being returned
       console.log('API Response:', data);
       
-      // Process data for charts
       const processedData = processAttendanceData(data);
       setReportData(processedData);
     } catch (error) {
       console.error('Error loading report data:', error);
-      // Set empty data structure on error
       setReportData({
         summary: { present: 0, absent: 0, late: 0, total: 0 },
         dailyData: [],
@@ -82,18 +89,14 @@ const AttendanceAnalytics = () => {
   };
 
   const processAttendanceData = (rawData) => {
-    // Handle the case where data might be nested under 'attendances' key
     let dataArray = rawData;
     
-    // If rawData is an object with 'attendances' property, use that
     if (rawData && typeof rawData === 'object' && rawData.attendances) {
       dataArray = rawData.attendances;
     }
     
-    // Ensure dataArray is always an array
     dataArray = Array.isArray(dataArray) ? dataArray : [];
   
-    // If no data returned, create empty structure
     if (dataArray.length === 0) {
       return {
         summary: { present: 0, absent: 0, late: 0, total: 0 },
@@ -104,7 +107,6 @@ const AttendanceAnalytics = () => {
       };
     }
   
-    // Process summary statistics
     const summary = {
       present: dataArray.filter(item => item.status === 'present').length,
       absent: dataArray.filter(item => item.status === 'absent').length,
@@ -112,7 +114,6 @@ const AttendanceAnalytics = () => {
       total: dataArray.length
     };
   
-    // Process daily attendance data
     const dailyMap = {};
     dataArray.forEach(item => {
       if (!dailyMap[item.date]) {
@@ -125,16 +126,10 @@ const AttendanceAnalytics = () => {
       new Date(a.date) - new Date(b.date)
     );
   
-    // Process department data
     const deptMap = {};
     dataArray.forEach(item => {
-      // For department analysis, we need employee data which might not be included
-      // You might need to enhance your API to include employee details or fetch separately
-      
-      // Find the employee to get their department
       const employee = employees.find(emp => emp.id === item.employeeId);
       const dept = employee?.department || item.department || 'Unknown';
-      // const dept = item.department || 'Unknown'; // Fallback if no department info
       if (!deptMap[dept]) {
         deptMap[dept] = { department: dept, present: 0, absent: 0, late: 0, total: 0 };
       }
@@ -143,64 +138,57 @@ const AttendanceAnalytics = () => {
     });
     
     const departmentData = Object.values(deptMap);
-  
-    // Process employee performance
-    const empMap = {};
-  dataArray.forEach(item => {
-    const empId = item.employeeId;
-    const employee = employees.find(emp => emp.id === empId);
-    const employeeName = employee ? `${employee.firstName} ${employee.lastName}` : `Employee ${empId}`;
-    
-    if (!empMap[empId]) {
-      empMap[empId] = {
-        id: empId,
-        name: employeeName,
-        department: employee?.department || item.department || 'Unknown',
-        present: 0,
-        absent: 0,
-        late: 0,
-        total: 0,
-        attendanceRate: 0,
-        totalHours: 0, // Add total hours counter
-        daysWorked: 0  // Add days worked counter
-      };
-    }
-    if (item.status) empMap[empId][item.status]++;
-    empMap[empId].total++;
 
-    // Calculate hours worked for this day if checkIn and checkOut exist
-  if (item.checkIn && item.checkOut) {
-    try {
-      const checkInTime = new Date(item.checkIn);
-      const checkOutTime = new Date(item.checkOut);
+    const empMap = {};
+    dataArray.forEach(item => {
+      const empId = item.employeeId;
+      const employee = employees.find(emp => emp.id === empId);
+      const employeeName = employee ? `${employee.firstName} ${employee.lastName}` : `Employee ${empId}`;
       
-      if (!isNaN(checkInTime) && !isNaN(checkOutTime) && checkOutTime > checkInTime) {
-        const timeDiff = checkOutTime - checkInTime;
-        const hoursWorked = timeDiff / (1000 * 60 * 60);
-        empMap[empId].totalHours += hoursWorked;
-        empMap[empId].daysWorked++;
+      if (!empMap[empId]) {
+        empMap[empId] = {
+          id: empId,
+          name: employeeName,
+          department: employee?.department || item.department || 'Unknown',
+          present: 0,
+          absent: 0,
+          late: 0,
+          total: 0,
+          attendanceRate: 0,
+          totalHours: 0,
+          daysWorked: 0
+        };
       }
-    } catch (error) {
-      console.warn('Error calculating hours for employee:', empId, error);
-    }
-  }
-  });
-    
+      if (item.status) empMap[empId][item.status]++;
+      empMap[empId].total++;
+
+      if (item.checkIn && item.checkOut) {
+        try {
+          const checkInTime = new Date(item.checkIn);
+          const checkOutTime = new Date(item.checkOut);
+          
+          if (!isNaN(checkInTime) && !isNaN(checkOutTime) && checkOutTime > checkInTime) {
+            const timeDiff = checkOutTime - checkInTime;
+            const hoursWorked = timeDiff / (1000 * 60 * 60);
+            empMap[empId].totalHours += hoursWorked;
+            empMap[empId].daysWorked++;
+          }
+        } catch (error) {
+          console.warn('Error calculating hours for employee:', empId, error);
+        }
+      }
+    });
 
     const employeePerformance = Object.values(empMap).map(emp => ({
       ...emp,
       attendanceRate: emp.total > 0 ? ((emp.present + emp.late * 0.5) / emp.total) * 100 : 0,
       avgDailyHours: emp.daysWorked > 0 ? emp.totalHours / emp.daysWorked : 0
     })).sort((a, b) => {
-      // Calculate product of both metrics (employees good in both will rank higher)
       const aProduct = a.avgDailyHours * a.attendanceRate;
       const bProduct = b.avgDailyHours * b.attendanceRate;
-      
       return bProduct - aProduct;
     });
     
-  
-    // Process average check-in/check-out times
     const timeData = [];
     dataArray.filter(item => item.checkIn).forEach(item => {
       const date = item.date;
@@ -240,7 +228,7 @@ const AttendanceAnalytics = () => {
       summary,
       dailyData,
       departmentData,
-      employeePerformance: employeePerformance.slice(0, 10), // Top 10 only
+      employeePerformance: employeePerformance.slice(0, 10),
       timeData: timeData.sort((a, b) => new Date(a.date) - new Date(b.date))
     };
   };
@@ -250,20 +238,50 @@ const AttendanceAnalytics = () => {
     
     const { summary } = reportData;
     const cards = [
-      { title: 'Present', value: summary.present, color: 'bg-green-100 text-green-800', percentage: ((summary.present / summary.total) * 100).toFixed(1) },
-      { title: 'Absent', value: summary.absent, color: 'bg-red-100 text-red-800', percentage: ((summary.absent / summary.total) * 100).toFixed(1) },
-      { title: 'Late', value: summary.late, color: 'bg-yellow-100 text-yellow-800', percentage: ((summary.late / summary.total) * 100).toFixed(1) },
-      { title: 'Total Records', value: summary.total, color: 'bg-gray-100 text-gray-800', percentage: '100' }
+      { 
+        title: 'Present', 
+        value: summary.present, 
+        color: theme === 'dark' ? 'bg-green-900/50 text-green-400' : 'bg-green-100 text-green-800',
+        percentage: ((summary.present / summary.total) * 100).toFixed(1) 
+      },
+      { 
+        title: 'Absent', 
+        value: summary.absent, 
+        color: theme === 'dark' ? 'bg-red-900/50 text-red-400' : 'bg-red-100 text-red-800',
+        percentage: ((summary.absent / summary.total) * 100).toFixed(1) 
+      },
+      { 
+        title: 'Late', 
+        value: summary.late, 
+        color: theme === 'dark' ? 'bg-yellow-900/50 text-yellow-400' : 'bg-yellow-100 text-yellow-800',
+        percentage: ((summary.late / summary.total) * 100).toFixed(1) 
+      },
+      { 
+        title: 'Total Records', 
+        value: summary.total, 
+        color: theme === 'dark' ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-800',
+        percentage: '100' 
+      }
     ];
 
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         {cards.map((card, index) => (
-          <div key={index} className="bg-white rounded-lg shadow p-4">
+          <div key={index} className={`rounded-lg shadow p-4 ${
+            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+          }`}>
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-sm font-medium text-gray-500">{card.title}</p>
-                <p className="text-2xl font-bold">{card.value}</p>
+                <p className={`text-sm font-medium ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`}>
+                  {card.title}
+                </p>
+                <p className={`text-2xl font-bold ${
+                  theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                }`}>
+                  {card.value}
+                </p>
               </div>
               <span className={`px-2 py-1 rounded-full text-xs ${card.color}`}>
                 {card.percentage}%
@@ -275,28 +293,99 @@ const AttendanceAnalytics = () => {
     );
   };
 
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className={`p-3 rounded-lg shadow-lg border ${
+          theme === 'dark' 
+            ? 'bg-gray-800 border-gray-700' 
+            : 'bg-white border-gray-200'
+        }`}>
+          <p className={`font-medium ${
+            theme === 'dark' ? 'text-gray-200' : 'text-gray-900'
+          }`}>
+            {label}
+          </p>
+          {payload.map((entry, index) => (
+            <p key={index} style={{ color: entry.color }} className="text-sm">
+              {entry.name}: {entry.value}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
   const renderDailyAttendanceChart = () => {
     if (!reportData || reportData.dailyData.length === 0) {
-      return <div className="text-center py-10 text-gray-500">No daily attendance data available</div>;
+      return (
+        <div className={`text-center py-10 rounded-lg ${
+          theme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-500'
+        }`}>
+          No daily attendance data available
+        </div>
+      );
     }
 
     return (
-      <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Daily Attendance Trend</h3>
+      <div className={`rounded-lg shadow p-4 mb-6 ${
+        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      }`}>
+        <h3 className={`text-lg font-medium mb-4 ${
+          theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+        }`}>
+          Daily Attendance Trend
+        </h3>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={reportData.dailyData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Legend formatter={(value, entry, index) => <span className="text-black">{value}</span>} />
-              {/* <Area type="linear" dataKey="present" stackId="1" stroke={STATUS_COLORS.present} fill={STATUS_COLORS.present} />
-              <Area type="linear" dataKey="absent" stackId="1" stroke={STATUS_COLORS.absent} fill={STATUS_COLORS.absent} />
-              <Area type="linear" dataKey="late" stackId="1" stroke={STATUS_COLORS.late} fill={STATUS_COLORS.late} /> */}
-              <Area type="monotone" dataKey="present" stackId="1" stroke="#1b8a07" fill="#1b8a07" strokeWidth={1.5} />
-              <Area type="monotone" dataKey="absent" stackId="1" stroke="#a30714" fill="#a30714" strokeWidth={1.5} />
-              <Area type="monotone" dataKey="late" stackId="1" stroke="#f0880a" fill="#f0880a" strokeWidth={1.5} />
+              <CartesianGrid 
+                strokeDasharray="3 3" 
+                stroke={chartTheme.gridColor}
+              />
+              <XAxis 
+                dataKey="date" 
+                tick={{ fill: chartTheme.textColor }}
+                tickLine={{ stroke: chartTheme.gridColor }}
+              />
+              <YAxis 
+                tick={{ fill: chartTheme.textColor }}
+                tickLine={{ stroke: chartTheme.gridColor }}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend 
+                formatter={(value) => (
+                  <span style={{ color: chartTheme.textColor }}>{value}</span>
+                )}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="present" 
+                stackId="1" 
+                stroke="#1b8a07" 
+                fill="#1b8a07" 
+                strokeWidth={1.5} 
+                name="Present"
+              />
+              <Area 
+                type="monotone" 
+                dataKey="absent" 
+                stackId="1" 
+                stroke="#a30714" 
+                fill="#a30714" 
+                strokeWidth={1.5} 
+                name="Absent"
+              />
+              <Area 
+                type="monotone" 
+                dataKey="late" 
+                stackId="1" 
+                stroke="#f0880a" 
+                fill="#f0880a" 
+                strokeWidth={1.5} 
+                name="Late"
+              />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -306,34 +395,56 @@ const AttendanceAnalytics = () => {
 
   const renderDepartmentChart = () => {
     if (!reportData || reportData.departmentData.length === 0) {
-      return <div className="text-center py-10 text-gray-500">No department data available</div>;
+      return (
+        <div className={`text-center py-10 rounded-lg ${
+          theme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-500'
+        }`}>
+          No department data available
+        </div>
+      );
     }
 
-    // Calculate the maximum value across all departments for proper Y-axis scaling
-  const maxValue = Math.max(
-    ...reportData.departmentData.map(dept => 
-      Math.max(dept.present || 0, dept.absent || 0, dept.late || 0)
-    )
-  );
-
-  // Calculate a nice upper bound for the Y-axis
-  const niceMax = Math.ceil(maxValue / 5) * 5; // Round up to nearest multiple of 5
+    const maxValue = Math.max(
+      ...reportData.departmentData.map(dept => 
+        Math.max(dept.present || 0, dept.absent || 0, dept.late || 0)
+      )
+    );
+    const niceMax = Math.ceil(maxValue / 5) * 5;
 
     return (
-      <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Attendance by Department</h3>
+      <div className={`rounded-lg shadow p-4 mb-6 ${
+        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      }`}>
+        <h3 className={`text-lg font-medium mb-4 ${
+          theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+        }`}>
+          Attendance by Department
+        </h3>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={reportData.departmentData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="department" />
+              <CartesianGrid 
+                strokeDasharray="3 3" 
+                stroke={chartTheme.gridColor}
+              />
+              <XAxis 
+                dataKey="department" 
+                tick={{ fill: chartTheme.textColor }}
+                tickLine={{ stroke: chartTheme.gridColor }}
+              />
               <YAxis 
-              domain={[0, niceMax]} // Set proper domain to avoid duplicates
-              tickCount={6} // Control number of ticks
-              allowDecimals={false} // No decimal values
-            />
-              <Tooltip />
-              <Legend />
+                domain={[0, niceMax]}
+                tickCount={6}
+                allowDecimals={false}
+                tick={{ fill: chartTheme.textColor }}
+                tickLine={{ stroke: chartTheme.gridColor }}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend 
+                formatter={(value) => (
+                  <span style={{ color: chartTheme.textColor }}>{value}</span>
+                )}
+              />
               <Bar dataKey="present" fill={STATUS_COLORS.present} name="Present" />
               <Bar dataKey="absent" fill={STATUS_COLORS.absent} name="Absent" />
               <Bar dataKey="late" fill={STATUS_COLORS.late} name="Late" />
@@ -344,44 +455,92 @@ const AttendanceAnalytics = () => {
     );
   };
 
-
   const renderEmployeePerformance = () => {
     if (!reportData || reportData.employeePerformance.length === 0) {
-      return <div className="text-center py-10 text-gray-500">No employee performance data available</div>;
+      return (
+        <div className={`text-center py-10 rounded-lg ${
+          theme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-500'
+        }`}>
+          No employee performance data available
+        </div>
+      );
     }
 
+    const textColor = theme === 'dark' ? 'text-gray-100' : 'text-gray-900';
+    const textColorSecondary = theme === 'dark' ? 'text-gray-400' : 'text-gray-500';
+    const borderColor = theme === 'dark' ? 'border-gray-700' : 'border-gray-200';
+    const headerBg = theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50';
+    const rowHover = theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50';
+
     return (
-      <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Top Performing Employees</h3>
+      <div className={`rounded-lg shadow p-4 mb-6 ${
+        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      }`}>
+        <h3 className={`text-lg font-medium mb-4 ${
+          theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+        }`}>
+          Top Performing Employees
+        </h3>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className={headerBg}>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Present</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Absent</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Late</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Daily Hours</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attendance Rate</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textColorSecondary}`}>
+                  Employee
+                </th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textColorSecondary}`}>
+                  Department
+                </th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textColorSecondary}`}>
+                  Present
+                </th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textColorSecondary}`}>
+                  Absent
+                </th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textColorSecondary}`}>
+                  Late
+                </th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textColorSecondary}`}>
+                  Avg Daily Hours
+                </th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textColorSecondary}`}>
+                  Attendance Rate
+                </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className={`divide-y ${borderColor}`}>
               {reportData.employeePerformance.map((emp, index) => (
-                <tr key={index}>
+                <tr key={index} className={rowHover}>
                   <td 
-                  onClick={() => navigate(`/employees/${emp.id}`)}
-                  className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 hover:text-blue-800 cursor-pointer">{emp.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{emp.department}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{emp.present}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{emp.absent}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{emp.late}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {emp.avgDailyHours  ? emp.avgDailyHours.toFixed(1) + ' hrs' : 'N/A'}
+                    onClick={() => navigate(`/employees/${emp.id}`)}
+                    className={`px-6 py-4 whitespace-nowrap text-sm font-medium cursor-pointer ${
+                      theme === 'dark' 
+                        ? 'text-gray-100 hover:text-blue-400' 
+                        : 'text-gray-900 hover:text-blue-800'
+                    }`}
+                  >
+                    {emp.name}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${textColorSecondary}`}>
+                    {emp.department}
+                  </td>
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${textColorSecondary}`}>
+                    {emp.present}
+                  </td>
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${textColorSecondary}`}>
+                    {emp.absent}
+                  </td>
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${textColorSecondary}`}>
+                    {emp.late}
+                  </td>
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${textColorSecondary}`}>
+                    {emp.avgDailyHours ? emp.avgDailyHours.toFixed(1) + ' hrs' : 'N/A'}
+                  </td>
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${textColorSecondary}`}>
                     <div className="flex items-center">
-                      <div className="w-full bg-gray-200 rounded-full h-2.5 mr-2">
+                      <div className={`w-full rounded-full h-2.5 mr-2 ${
+                        theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'
+                      }`}>
                         <div 
                           className="bg-green-600 h-2.5 rounded-full" 
                           style={{ width: `${emp.attendanceRate}%` }}
@@ -401,22 +560,73 @@ const AttendanceAnalytics = () => {
 
   const renderTimeAnalysis = () => {
     if (!reportData || reportData.timeData.length === 0) {
-      return <div className="text-center py-10 text-gray-500">No time analysis data available</div>;
+      return (
+        <div className={`text-center py-10 rounded-lg ${
+          theme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-500'
+        }`}>
+          No time analysis data available
+        </div>
+      );
     }
 
+    const formatTime = (value) => {
+      return `${Math.floor(value)}:${(value % 1 * 60).toString().padStart(2, '0')}`;
+    };
+
     return (
-      <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Average Check-in Times</h3>
+      <div className={`rounded-lg shadow p-4 mb-6 ${
+        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      }`}>
+        <h3 className={`text-lg font-medium mb-4 ${
+          theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+        }`}>
+          Average Check-in Times
+        </h3>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={reportData.timeData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis domain={[8, 18]} tickFormatter={value => `${Math.floor(value)}:${(value % 1 * 60).toString().padStart(2, '0')}`} />
-              <Tooltip formatter={value => [`${Math.floor(value)}:${(value % 1 * 60).toString().padStart(2, '0')}`, 'Time']} />
-              <Legend />
-              <Line type="monotone" dataKey="avgCheckIn" stroke="#8884d8" name="Avg Check-in" />
-              <Line type="monotone" dataKey="avgCheckOut" stroke="#82ca9d" name="Avg Check-out" />
+              <CartesianGrid 
+                strokeDasharray="3 3" 
+                stroke={chartTheme.gridColor}
+              />
+              <XAxis 
+                dataKey="date" 
+                tick={{ fill: chartTheme.textColor }}
+                tickLine={{ stroke: chartTheme.gridColor }}
+              />
+              <YAxis 
+                domain={[8, 18]} 
+                tickFormatter={formatTime}
+                tick={{ fill: chartTheme.textColor }}
+                tickLine={{ stroke: chartTheme.gridColor }}
+              />
+              <Tooltip 
+                formatter={(value) => [formatTime(value), 'Time']}
+                contentStyle={{
+                  backgroundColor: chartTheme.tooltipBg,
+                  borderColor: chartTheme.tooltipBorder,
+                  color: chartTheme.textColor
+                }}
+              />
+              <Legend 
+                formatter={(value) => (
+                  <span style={{ color: chartTheme.textColor }}>{value}</span>
+                )}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="avgCheckIn" 
+                stroke="#8884d8" 
+                name="Avg Check-in" 
+                strokeWidth={2}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="avgCheckOut" 
+                stroke="#82ca9d" 
+                name="Avg Check-out" 
+                strokeWidth={2}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -435,12 +645,24 @@ const AttendanceAnalytics = () => {
     ].filter(item => item.value > 0);
 
     if (data.length === 0) {
-      return <div className="text-center py-10 text-gray-500">No status distribution data available</div>;
+      return (
+        <div className={`text-center py-10 rounded-lg ${
+          theme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-500'
+        }`}>
+          No status distribution data available
+        </div>
+      );
     }
 
     return (
-      <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Attendance Distribution</h3>
+      <div className={`rounded-lg shadow p-4 mb-6 ${
+        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      }`}>
+        <h3 className={`text-lg font-medium mb-4 ${
+          theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+        }`}>
+          Attendance Distribution
+        </h3>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
@@ -458,7 +680,13 @@ const AttendanceAnalytics = () => {
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: chartTheme.tooltipBg,
+                  borderColor: chartTheme.tooltipBorder,
+                  color: chartTheme.textColor
+                }}
+              />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -466,51 +694,119 @@ const AttendanceAnalytics = () => {
     );
   };
 
+  const handleExport = () => {
+    if (!reportData) return;
+    
+    try {
+      const exportData = {
+        summary: reportData.summary,
+        dateRange: dateRange,
+        department: selectedDepartment || 'All Departments',
+        generatedAt: new Date().toISOString()
+      };
+      
+      const dataStr = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `attendance-analytics-${new Date().toISOString().split('T')[0]}.json`);
+      link.style.visibility = 'hidden';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      alert('Analytics data exported successfully!');
+      
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert('Export failed. Please try again.');
+    }
+  };
+
+  const bgColor = theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50';
+  const textColor = theme === 'dark' ? 'text-gray-100' : 'text-gray-900';
+  const textColorSecondary = theme === 'dark' ? 'text-gray-400' : 'text-gray-600';
+  const cardBg = theme === 'dark' ? 'bg-gray-800' : 'bg-white';
+  const borderColor = theme === 'dark' ? 'border-gray-700' : 'border-gray-200';
+  const inputBg = theme === 'dark' ? 'bg-gray-800' : 'bg-white';
+  const inputBorder = theme === 'dark' ? 'border-gray-700' : 'border-gray-300';
+  const inputText = theme === 'dark' ? 'text-gray-100' : 'text-gray-900';
+  const placeholderColor = theme === 'dark' ? 'placeholder-gray-500' : 'placeholder-gray-400';
+
   return (
-    <div className="p-6">
+    <div className={`p-6 min-h-screen ${bgColor}`}>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Attendance Analytics</h2>
+        <div>
+          <h2 className={`text-2xl font-bold ${textColor}`}>
+            Attendance Analytics
+          </h2>
+          <p className={textColorSecondary}>
+            Comprehensive analysis of employee attendance patterns
+          </p>
+        </div>
+        
         <div className="flex items-center space-x-4">
+          <button
+            onClick={handleExport}
+            className={`border px-3 py-2 rounded-lg flex items-center space-x-2 ${
+              theme === 'dark' 
+                ? 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700' 
+                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <Download size={16} />
+            <span>Export Data</span>
+          </button>
+          
           <button
             onClick={loadReportData}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center"
             disabled={loading}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-rotate-cw-icon lucide-rotate-cw h-4 w-4 mr-2"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+            <RotateCw size={16} className="mr-2" />
             {loading ? 'Loading...' : 'Refresh Data'}
           </button>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow mb-6 p-4">
+      <div className={`rounded-lg shadow mb-6 p-4 ${cardBg}`}>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+            <label className={`block text-sm font-medium mb-1 ${textColorSecondary}`}>
+              Start Date
+            </label>
             <input 
               type="date" 
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${inputBg} ${inputBorder} ${inputText} ${placeholderColor}`}
               value={dateRange.startDate}
               onChange={e => setDateRange({...dateRange, startDate: e.target.value})}
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+            <label className={`block text-sm font-medium mb-1 ${textColorSecondary}`}>
+              End Date
+            </label>
             <input 
               type="date" 
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${inputBg} ${inputBorder} ${inputText} ${placeholderColor}`}
               value={dateRange.endDate}
               onChange={e => setDateRange({...dateRange, endDate: e.target.value})}
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+            <label className={`block text-sm font-medium mb-1 ${textColorSecondary}`}>
+              Department
+            </label>
             <select
               value={selectedDepartment}
               onChange={e => setSelectedDepartment(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${inputBg} ${inputBorder} ${inputText}`}
             >
               <option value="">All Departments</option>
               {departments.map(dept => (
@@ -528,7 +824,11 @@ const AttendanceAnalytics = () => {
                 });
                 setSelectedDepartment('');
               }}
-              className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+              className={`w-full px-4 py-2 rounded-lg ${
+                theme === 'dark' 
+                  ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
             >
               Reset Filters
             </button>
@@ -537,8 +837,8 @@ const AttendanceAnalytics = () => {
       </div>
 
       {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="text-gray-500">Loading analytics data...</div>
+        <div className={`flex justify-center items-center h-64 rounded-lg ${cardBg}`}>
+          <div className={textColorSecondary}>Loading analytics data...</div>
         </div>
       ) : (
         <>

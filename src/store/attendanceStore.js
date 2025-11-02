@@ -2,28 +2,77 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-// Helper function to get user info from localStorage
-const getUserInfoFromStorage = () => {
+// Importing Mock HRM data and helper functions
+// import { HRMData, HRMHelpers } from '../data/HRMData';
+
+// Uncomment below lines if mock data is not used
+const HRMData = { attendance: [], employees: [] };
+const HRMHelpers = {};
+
+// Explicit user objects for authentication (same as payrollStore)
+const mockAuthUsers = {
+  super_admin: {
+    role: 'super_admin',
+    department: 'Human Resources',
+    employeeId: '5',
+    employee_info: {
+      role: 'super_admin',
+      department: 'Human Resources',
+      id: 5
+    }
+  },
+  admin: {
+    role: 'admin',
+    department: 'Engineering',
+    employeeId: '2',
+    employee_info: {
+      role: 'admin',
+      department: 'Engineering',
+      id: 2
+    }
+  },
+  manager: {
+    role: 'manager',
+    department: 'Design',
+    employeeId: '3',
+    employee_info: {
+      role: 'manager',
+      department: 'Design',
+      id: 3
+    }
+  },
+  employee: {
+    role: 'employee',
+    department: 'Engineering',
+    employeeId: '1',
+    employee_info: {
+      role: 'employee',
+      department: 'Engineering',
+      id: 1
+    }
+  }
+};
+
+// Current user - change this to test different roles
+let CURRENT_USER = mockAuthUsers.super_admin; // Change to admin, manager, or employee
+
+// Helper function to get user info from mock auth system
+const getUserInfoFromAuth = () => {
   try {
-    const authStorage = localStorage.getItem('auth-storage');
-    if (!authStorage) return null;
-    
-    const authState = JSON.parse(authStorage).state;
-    if (!authState || !authState.user) return null;
-    
     return {
-      employeeId: authState.user.employeeId || '',
-      role: authState.user.employee?.role || 'employee',
-      department: authState.user.employee?.department || '',
-      userId: authState.user.id // if needed
+      employeeId: CURRENT_USER.employeeId || '',
+      role: CURRENT_USER.role || 'employee',
+      department: CURRENT_USER.department || '',
+      userId: CURRENT_USER.employeeId // if needed
     };
   } catch (error) {
-    console.error('Error reading auth storage:', error);
+    console.error('Error reading auth info:', error);
     return null;
   }
 };
 
-// Mock API calls for Mirage.js
+// Mock API calls (commented for future use)
+/*
 const api = {
   getAttendance: (params) => {
     const queryString = new URLSearchParams(params).toString();
@@ -59,6 +108,7 @@ const api = {
     });
   }
 };
+*/
 
 export const useAttendanceStore = create(
   persist(
@@ -69,9 +119,9 @@ export const useAttendanceStore = create(
       selectedDate: new Date().toISOString().split('T')[0],
       attendanceByDate: {},
       
-      // Helper function to get current user's role and department from localStorage
+      // Helper function to get current user's role and department from mock auth
       getCurrentUserInfo: () => {
-        const userInfo = getUserInfoFromStorage();
+        const userInfo = getUserInfoFromAuth();
         if (!userInfo) {
           throw new Error('User not authenticated');
         }
@@ -172,6 +222,72 @@ export const useAttendanceStore = create(
         
         return params;
       },
+
+      // Get employees from HRMData with fallback
+      getEmployeesFromHRMData: () => {
+        try {
+          if (HRMData?.employees && HRMData.employees.length > 0) {
+            // console.log('Using HRMData employees:', HRMData.employees.length);
+            return HRMData.employees;
+          }
+          
+          // Fallback to empty array if no HRMData
+          // console.log('No HRMData employees found, using empty array');
+          return [];
+        } catch (error) {
+          console.warn('Error accessing HRMData employees:', error);
+          return [];
+        }
+      },
+
+      // Get attendance from HRMData with fallback
+      getAttendanceFromHRMData: () => {
+        try {
+          if (HRMData?.attendance && HRMData.attendance.length > 0) {
+            // console.log('Using HRMData attendance:', HRMData.attendance.length);
+            return HRMData.attendance;
+          }
+          
+          // Fallback to empty array if no HRMData
+          // console.log('No HRMData attendance found, using empty array');
+          return [];
+        } catch (error) {
+          console.warn('Error accessing HRMData attendance:', error);
+          return [];
+        }
+      },
+
+      // Find employee by ID with better matching
+      findEmployeeById: (employeeId) => {
+        const employees = get().getEmployeesFromHRMData();
+        // console.log('All employees for search:', employees);
+        
+        if (employees.length === 0) {
+          console.warn('No employees available for search');
+          return null;
+        }
+        
+        // Try different ways to match the employee ID
+        const employee = employees.find(emp => {
+          // Exact match
+          if (emp.id === parseInt(employeeId)) return true;
+          if (emp.id === employeeId) return true;
+          
+          // String comparison
+          if (emp.id.toString() === employeeId.toString()) return true;
+          
+          // For string IDs
+          if (typeof emp.id === 'string' && emp.id === employeeId) return true;
+          
+          return false;
+        });
+        
+        if (!employee) {
+          console.warn('Employee not found with ID:', employeeId, 'Available employees:', employees.map(e => ({ id: e.id, name: `${e.firstName} ${e.lastName}` })));
+        }
+        
+        return employee;
+      },
       
       fetchAttendance: async (date = null, employeeId = null, department = null) => {
         const targetDate = date || get().selectedDate;
@@ -191,7 +307,7 @@ export const useAttendanceStore = create(
           const hasLocalData = localAttendance && localAttendance.length > 0;
           
           let finalAttendanceData = null;
-          let dataSource = 'server'; // Track where data came from
+          let dataSource = 'HRMData'; // Track where data came from
           
           // Step 1: Try localStorage first
           if (hasLocalData) {
@@ -228,66 +344,80 @@ export const useAttendanceStore = create(
               loading: false // Set loading false here for immediate display
             });
             
-            // Step 2: Then try to fetch from server in background to update data
-            // commented for now in frontend
-            // need to turn it on when backend is ready
-            // try {
-            //   const response = await api.getAttendance(params);
-              
-            //   // Only update if server data is different from local data
-            //   if (JSON.stringify(response) !== JSON.stringify(localAttendance)) {
-            //     set({ 
-            //       attendance: response,
-            //       selectedDate: targetDate
-            //     });
-                
-            //     // Update localStorage with fresh server data
-            //     const allAttendance = get().allAttendance || {};
-            //     allAttendance[targetDate] = response;
-            //     set({ allAttendance });
-                
-            //     dataSource = 'server'; // Data was updated from server
-            //     console.log('Data updated from server');
-            //   }
-              
-            // } catch (serverError) {
-            //   // Server request failed, but we already have local data
-            //   console.log('Server sync failed, but local data is available:', serverError.message);
-            //   // No need to show error since we have local data
-            // }
-            
           } else {
-            // Step 3: No local data available, try server
-            console.log('No local data, fetching from server...');
+            // Step 2: No local data available, try HRMData
+            console.log('No local data, fetching from HRMData...');
             
             try {
-              const response = await api.getAttendance(params);
+              // Get attendance data from HRMData
+              const hrmAttendance = get().getAttendanceFromHRMData();
+              
+              // Filter HRMData based on RBAC and parameters
+              let filteredAttendance = hrmAttendance.filter(record => record.date === targetDate);
+              
+              const { role, employeeId: userId, department: userDepartment } = userInfo;
+              
+              if (role === 'employee') {
+                filteredAttendance = filteredAttendance.filter(record => record.employeeId === userId);
+              } else if (role === 'manager') {
+                // For managers, we need to get employee department info
+                const departmentEmployees = get().getEmployeesFromHRMData()
+                  .filter(emp => emp.department === userDepartment)
+                  .map(emp => emp.id.toString());
+                
+                filteredAttendance = filteredAttendance.filter(record => 
+                  departmentEmployees.includes(record.employeeId)
+                );
+              }
+              
+              // Apply additional filters from parameters
+              if (employeeId) {
+                filteredAttendance = filteredAttendance.filter(record => record.employeeId === employeeId);
+              }
+              if (department) {
+                const departmentEmployees = get().getEmployeesFromHRMData()
+                  .filter(emp => emp.department === department)
+                  .map(emp => emp.id.toString());
+                
+                filteredAttendance = filteredAttendance.filter(record => 
+                  departmentEmployees.includes(record.employeeId)
+                );
+              }
+              
+              // Add department info to attendance records for local filtering
+              const attendanceWithDepartment = filteredAttendance.map(record => {
+                const employee = get().findEmployeeById(record.employeeId);
+                return {
+                  ...record,
+                  department: employee?.department || 'Unknown'
+                };
+              });
               
               set({ 
-                attendance: response,
+                attendance: attendanceWithDepartment,
                 selectedDate: targetDate,
                 loading: false 
               });
               
-              // Update localStorage with fresh server data
+              // Update localStorage with HRMData
               const allAttendance = get().allAttendance || {};
-              allAttendance[targetDate] = response;
+              allAttendance[targetDate] = attendanceWithDepartment;
               set({ allAttendance });
               
-              finalAttendanceData = response;
-              dataSource = 'server';
+              finalAttendanceData = attendanceWithDepartment;
+              dataSource = 'HRMData';
               
-            } catch (serverError) {
-              // Both localStorage and server failed
-              throw new Error(`No local data available and server unavailable: ${serverError.message}`);
+            } catch (hrmError) {
+              // Both localStorage and HRMData failed
+              throw new Error(`No local data available and HRMData unavailable: ${hrmError.message}`);
             }
           }
           
           // Log the data source for debugging
-          console.log(`Attendance data loaded from: ${dataSource}`);
+          // console.log(`Attendance data loaded from: ${dataSource}`);
           
         } catch (error) {
-          // Final fallback - if both localStorage and server fail
+          // Final fallback - if both localStorage and HRMData fail
           set({ 
             attendance: [],
             selectedDate: targetDate,
@@ -335,6 +465,9 @@ export const useAttendanceStore = create(
           };
           updatedAttendance[existingIndex] = recordToSave;
         } else {
+          // Get employee info for department
+          const employee = get().findEmployeeById(employeeId);
+          
           // Create new record with department info for local filtering
           recordToSave = {
             id: `att-${Date.now()}`,
@@ -343,7 +476,7 @@ export const useAttendanceStore = create(
             status: 'present',
             checkIn,
             checkOut: null,
-            department: userInfo.department, // Store department for local filtering
+            department: employee?.department || userInfo.department, // Store department for local filtering
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
           };
@@ -376,16 +509,22 @@ export const useAttendanceStore = create(
         
         set({ allAttendance });
         
-        // Also try to save to server
+        // Also update HRMData if available
         try {
-          if (existingIndex >= 0) {
-            await api.updateAttendance(recordToSave.id, recordToSave);
-          } else {
-            await api.markAttendance(recordToSave);
+          if (HRMData?.attendance) {
+            const existingIndexHRM = HRMData.attendance.findIndex(
+              record => record.employeeId === employeeId && record.date === selectedDate
+            );
+            
+            if (existingIndexHRM >= 0) {
+              HRMData.attendance[existingIndexHRM] = recordToSave;
+            } else {
+              HRMData.attendance.push(recordToSave);
+            }
+            console.log('Updated HRMData attendance');
           }
         } catch (error) {
-          console.error('Failed to save to server:', error);
-          // Even if server save fails, we keep the local data
+          console.error('Failed to update HRMData:', error);
         }
         
         return recordToSave;
@@ -420,6 +559,9 @@ export const useAttendanceStore = create(
           };
           updatedAttendance[existingIndex] = recordToSave;
         } else {
+          // Get employee info for department
+          const employee = get().findEmployeeById(employeeId);
+          
           recordToSave = {
             id: `att-${Date.now()}`,
             employeeId,
@@ -427,7 +569,7 @@ export const useAttendanceStore = create(
             status: 'absent',
             checkIn: null,
             checkOut: null,
-            department: userInfo.department,
+            department: employee?.department || userInfo.department,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
           };
@@ -457,15 +599,22 @@ export const useAttendanceStore = create(
         
         set({ allAttendance });
         
-        // Also try to save to server
+        // Also update HRMData if available
         try {
-          if (existingIndex >= 0) {
-            await api.updateAttendance(recordToSave.id, recordToSave);
-          } else {
-            await api.markAttendance(recordToSave);
+          if (HRMData?.attendance) {
+            const existingIndexHRM = HRMData.attendance.findIndex(
+              record => record.employeeId === employeeId && record.date === selectedDate
+            );
+            
+            if (existingIndexHRM >= 0) {
+              HRMData.attendance[existingIndexHRM] = recordToSave;
+            } else {
+              HRMData.attendance.push(recordToSave);
+            }
+            console.log('Updated HRMData attendance');
           }
         } catch (error) {
-          console.error('Failed to save to server:', error);
+          console.error('Failed to update HRMData:', error);
         }
         
         return recordToSave;
@@ -500,6 +649,9 @@ export const useAttendanceStore = create(
           };
           updatedAttendance[existingIndex] = recordToSave;
         } else {
+          // Get employee info for department
+          const employee = get().findEmployeeById(employeeId);
+          
           recordToSave = {
             id: `att-${Date.now()}`,
             employeeId,
@@ -507,7 +659,7 @@ export const useAttendanceStore = create(
             status: 'late',
             checkIn,
             checkOut: null,
-            department: userInfo.department,
+            department: employee?.department || userInfo.department,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
           };
@@ -535,14 +687,22 @@ export const useAttendanceStore = create(
         
         set({ allAttendance });
         
+        // Also update HRMData if available
         try {
-          if (existingIndex >= 0) {
-            await api.updateAttendance(recordToSave.id, recordToSave);
-          } else {
-            await api.markAttendance(recordToSave);
+          if (HRMData?.attendance) {
+            const existingIndexHRM = HRMData.attendance.findIndex(
+              record => record.employeeId === employeeId && record.date === selectedDate
+            );
+            
+            if (existingIndexHRM >= 0) {
+              HRMData.attendance[existingIndexHRM] = recordToSave;
+            } else {
+              HRMData.attendance.push(recordToSave);
+            }
+            console.log('Updated HRMData attendance');
           }
         } catch (error) {
-          console.error('Failed to save to server:', error);
+          console.error('Failed to update HRMData:', error);
         }
         
         return recordToSave;
@@ -581,10 +741,20 @@ export const useAttendanceStore = create(
         allAttendance[selectedDate] = updatedAttendance;
         set({ allAttendance });
         
+        // Also update HRMData if available
         try {
-          await api.updateAttendance(attendanceId, { checkOut });
+          if (HRMData?.attendance) {
+            const existingIndexHRM = HRMData.attendance.findIndex(
+              record => record.id === attendanceId
+            );
+            
+            if (existingIndexHRM >= 0) {
+              HRMData.attendance[existingIndexHRM] = recordToSave;
+            }
+            console.log('Updated HRMData attendance');
+          }
         } catch (error) {
-          console.error('Failed to save to server:', error);
+          console.error('Failed to update HRMData:', error);
         }
         
         return recordToSave;
@@ -618,60 +788,70 @@ export const useAttendanceStore = create(
             throw new Error('You can only view reports for your own department');
           }
           
-          const params = { startDate, endDate };
-          if (department) params.department = department;
-          if (employeeId) params.employeeId = employeeId;
-          
-          const response = await api.getAttendanceReport(params);
-          let report = response.attendances || response.attendance || response;
-          
-          if (Array.isArray(report)) {
-            report = report.filter(item => item !== null && item !== undefined);
-          }
-          
-          set({ loading: false });
-          return report;
-        } catch (error) {
-          // If server fails, try to generate report from local data with RBAC
+          // Try to generate report from HRMData with RBAC
           try {
             const userInfo = get().getCurrentUserInfo();
             const { role, employeeId: userId, department: userDepartment } = userInfo;
-            const allAttendance = get().allAttendance || {};
+            const hrmAttendance = get().getAttendanceFromHRMData();
             const report = [];
             
             const start = new Date(startDate);
             const end = new Date(endDate);
             
-            for (let date in allAttendance) {
-              const currentDate = new Date(date);
-              if (currentDate >= start && currentDate <= end) {
-                let dayAttendance = allAttendance[date];
-                
-                // Apply RBAC filters to local data
-                if (role === 'employee') {
-                  dayAttendance = dayAttendance.filter(record => record.employeeId === userId);
-                } else if (role === 'manager') {
-                  dayAttendance = dayAttendance.filter(record => record.department === userDepartment);
-                }
-                
-                // Apply additional filters
-                if (department) {
-                  dayAttendance = dayAttendance.filter(record => record.department === department);
-                }
-                if (employeeId) {
-                  dayAttendance = dayAttendance.filter(record => record.employeeId === employeeId);
-                }
-                
-                report.push(...dayAttendance);
-              }
+            // Filter HRMData attendance by date range
+            const dateFilteredAttendance = hrmAttendance.filter(record => {
+              const recordDate = new Date(record.date);
+              return recordDate >= start && recordDate <= end;
+            });
+            
+            // Apply RBAC filters to HRM data
+            let filteredAttendance = dateFilteredAttendance;
+            
+            if (role === 'employee') {
+              filteredAttendance = dateFilteredAttendance.filter(record => record.employeeId === userId);
+            } else if (role === 'manager') {
+              // For managers, filter by department employees
+              const departmentEmployees = get().getEmployeesFromHRMData()
+                .filter(emp => emp.department === userDepartment)
+                .map(emp => emp.id.toString());
+              
+              filteredAttendance = dateFilteredAttendance.filter(record => 
+                departmentEmployees.includes(record.employeeId)
+              );
             }
             
+            // Apply additional filters
+            if (department) {
+              const departmentEmployees = get().getEmployeesFromHRMData()
+                .filter(emp => emp.department === department)
+                .map(emp => emp.id.toString());
+              
+              filteredAttendance = filteredAttendance.filter(record => 
+                departmentEmployees.includes(record.employeeId)
+              );
+            }
+            if (employeeId) {
+              filteredAttendance = filteredAttendance.filter(record => record.employeeId === employeeId);
+            }
+            
+            // Add department info to records
+            const reportWithDepartment = filteredAttendance.map(record => {
+              const employee = get().findEmployeeById(record.employeeId);
+              return {
+                ...record,
+                department: employee?.department || 'Unknown'
+              };
+            });
+            
             set({ loading: false });
-            return report;
-          } catch (localError) {
-            set({ error: error.message, loading: false });
-            throw error;
+            return reportWithDepartment;
+          } catch (hrmError) {
+            throw new Error(`HRMData unavailable: ${hrmError.message}`);
           }
+          
+        } catch (error) {
+          set({ error: error.message, loading: false });
+          throw error;
         }
       },
       
@@ -702,6 +882,31 @@ export const useAttendanceStore = create(
         };
         
         return stats;
+      },
+
+      // Change current user role for testing (same as payrollStore)
+      setCurrentUser: (userRole) => {
+        if (mockAuthUsers[userRole]) {
+          CURRENT_USER = mockAuthUsers[userRole];
+          console.log('User changed to:', CURRENT_USER);
+          return true;
+        }
+        console.warn('Invalid user role:', userRole);
+        return false;
+      },
+
+      // Get current user role for UI display
+      getCurrentUserRole: () => {
+        return CURRENT_USER.role;
+      },
+
+      // Reset attendance data (useful for testing)
+      resetAttendanceData: () => {
+        set({
+          attendance: [],
+          selectedDate: new Date().toISOString().split('T')[0],
+          allAttendance: {}
+        });
       }
     }),
     {

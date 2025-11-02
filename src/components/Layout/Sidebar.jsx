@@ -54,7 +54,9 @@ import {
   ChevronDown,
   ChevronRight,
   Settings,
-  HelpCircle
+  HelpCircle,
+  Calendar1,
+  ChartColumnIncreasing
 } from 'lucide-react';
 
 function Sidebar() {
@@ -353,7 +355,7 @@ function Sidebar() {
                   Employees
                 </NavLink>
 
-                <NavLink
+                {/* <NavLink
                   to="/hrm/attendance"
                   className={({ isActive }) =>
                     `flex items-center px-3 py-2 text-sm rounded-md transition-colors ${isActive
@@ -366,6 +368,36 @@ function Sidebar() {
                 >
                   <Calendar className="mr-3 h-4 w-4" />
                   Attendance
+                </NavLink> */}
+
+                <NavLink
+                  to="/hrm/daily-attendance"
+                  className={({ isActive }) =>
+                    `flex items-center px-3 py-2 text-sm rounded-md transition-colors ${isActive
+                      ? 'bg-green-50 text-green-700'
+                      : theme === 'dark'
+                        ? 'text-gray-300 hover:bg-gray-700'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }`
+                  }
+                >
+                  <Calendar1 className="mr-3 h-4 w-4" />
+                  Daily Attendance
+                </NavLink>
+
+                <NavLink
+                  to="/hrm/attendance-analytics"
+                  className={({ isActive }) =>
+                    `flex items-center px-3 py-2 text-sm rounded-md transition-colors ${isActive
+                      ? 'bg-green-50 text-green-700'
+                      : theme === 'dark'
+                        ? 'text-gray-300 hover:bg-gray-700'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }` 
+                  }
+                >
+                  <ChartColumnIncreasing  className="mr-3 h-4 w-4" />
+                  Attendance Analytics
                 </NavLink>
 
                 <NavLink

@@ -27,6 +27,14 @@ const PayrollDashboard = () => {
     fetchEmployees();
     fetchDepartments();
   }, [fetchEmployees, fetchDepartments]);
+
+  // const employeeStore = useEmployeeStore();
+  // const payrollStore = usePayrollStore();
+
+  //   // Sync the stores
+  //   useEffect(() => {
+  //     payrollStore.syncWithEmployeeStore(employeeStore);
+  //   }, [payrollStore, employeeStore]);
   
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [showSummary, setShowSummary] = useState(false);
@@ -111,8 +119,9 @@ const PayrollDashboard = () => {
 
   const handleViewPayrollHistory = async () => {
     const history = await getPayrollHistory();
+    console.log(history[0].results)
     if (history) {
-      setPayrollHistory(history.results);
+      setPayrollHistory(history[0].results);
       setShowPayrollHistory(true);
       setShowSummary(false);
       setShowTaxForms(false);
@@ -200,12 +209,12 @@ const PayrollDashboard = () => {
         }`}>
           Payroll Dashboard
         </h1>
-        <div className={`text-sm ${
+        {/* <div className={`text-sm ${
           theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
         }`}>
           Logged in as: <span className="font-medium capitalize">{currentUser.role}</span>
           {currentUser.department && ` • ${currentUser.department}`}
-        </div>
+        </div> */}
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -871,106 +880,516 @@ const PayrollDashboard = () => {
       )}
 
       {/* Compliance Report Output */}
-      {showComplianceReport && complianceReport && (
-        <div className={`mt-6 p-6 rounded-lg shadow ${
-          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      {/* PF & Compliance Reports Output */}
+{showComplianceReport && complianceReport && (
+  <div className={`mt-6 p-6 rounded-lg shadow ${
+    theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+  }`}>
+    <div className="flex justify-between items-start mb-6">
+      <div>
+        <h2 className={`text-xl font-semibold ${
+          theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
         }`}>
-          <h2 className={`text-xl font-semibold mb-4 ${
-            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
-          }`}>
-            {complianceReport.title}
-          </h2>
-          <div className="mb-4">
-            <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-              Generated on: {new Date(complianceReport.generatedAt).toLocaleDateString()}
-            </p>
-            <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-              Status: 
-              <span className={`ml-2 px-2 py-1 rounded-full text-xs ${
-                complianceReport.status === 'Compliant' 
-                  ? theme === 'dark' 
-                    ? 'bg-green-900/50 text-green-400' 
-                    : 'bg-green-100 text-green-800'
-                  : theme === 'dark'
-                    ? 'bg-red-900/50 text-red-400'
-                    : 'bg-red-100 text-red-800'
-              }`}>
-                {complianceReport.status}
-              </span>
-            </p>
+          PF & Compliance Reports
+        </h2>
+        <p className={`mt-1 ${
+          theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+        }`}>
+          Generated on: {new Date(complianceReport.generatedDate).toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          })}
+        </p>
+      </div>
+      <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+        complianceReport.complianceStatus === 'COMPLIANT' 
+          ? theme === 'dark' 
+            ? 'bg-green-900/50 text-green-400 border border-green-800' 
+            : 'bg-green-100 text-green-800 border border-green-200'
+          : theme === 'dark'
+            ? 'bg-red-900/50 text-red-400 border border-red-800'
+            : 'bg-red-100 text-red-800 border border-red-200'
+      }`}>
+        {complianceReport.complianceStatus}
+      </div>
+    </div>
+
+    {/* Summary Cards */}
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div className={`p-4 rounded-lg border ${
+        theme === 'dark' ? 'bg-blue-900/20 border-blue-800' : 'bg-blue-50 border-blue-200'
+      }`}>
+        <h3 className={`text-sm font-medium ${
+          theme === 'dark' ? 'text-blue-300' : 'text-blue-800'
+        }`}>
+          Total Employees
+        </h3>
+        <p className={`text-2xl font-bold mt-1 ${
+          theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+        }`}>
+          {complianceReport.summary?.totalEmployees || 0}
+        </p>
+      </div>
+      
+      <div className={`p-4 rounded-lg border ${
+        theme === 'dark' ? 'bg-green-900/20 border-green-800' : 'bg-green-50 border-green-200'
+      }`}>
+        <h3 className={`text-sm font-medium ${
+          theme === 'dark' ? 'text-green-300' : 'text-green-800'
+        }`}>
+          Total Payout
+        </h3>
+        <p className={`text-2xl font-bold mt-1 ${
+          theme === 'dark' ? 'text-green-400' : 'text-green-600'
+        }`}>
+          ₹{(complianceReport.summary?.totalPayout || 0).toLocaleString('en-IN')}
+        </p>
+      </div>
+      
+      <div className={`p-4 rounded-lg border ${
+        theme === 'dark' ? 'bg-purple-900/20 border-purple-800' : 'bg-purple-50 border-purple-200'
+      }`}>
+        <h3 className={`text-sm font-medium ${
+          theme === 'dark' ? 'text-purple-300' : 'text-purple-800'
+        }`}>
+          TDS Deducted
+        </h3>
+        <p className={`text-2xl font-bold mt-1 ${
+          theme === 'dark' ? 'text-purple-400' : 'text-purple-600'
+        }`}>
+          ₹{(complianceReport.summary?.totalTaxDeductions || 0).toLocaleString('en-IN')}
+        </p>
+      </div>
+      
+      <div className={`p-4 rounded-lg border ${
+        theme === 'dark' ? 'bg-orange-900/20 border-orange-800' : 'bg-orange-50 border-orange-200'
+      }`}>
+        <h3 className={`text-sm font-medium ${
+          theme === 'dark' ? 'text-orange-300' : 'text-orange-800'
+        }`}>
+          PF Contributions
+        </h3>
+        <p className={`text-2xl font-bold mt-1 ${
+          theme === 'dark' ? 'text-orange-400' : 'text-orange-600'
+        }`}>
+          ₹{(complianceReport.summary?.totalPFContributions || 0).toLocaleString('en-IN')}
+        </p>
+      </div>
+    </div>
+
+    {/* Indian Statutory Compliance Checks */}
+    <div className="mb-6">
+      <h3 className={`text-lg font-semibold mb-4 ${
+        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+      }`}>
+        Statutory Compliance Status
+      </h3>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* PF Compliance */}
+        <div className={`p-4 rounded-lg border ${
+          theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'
+        }`}>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className={`font-medium ${
+              theme === 'dark' ? 'text-gray-200' : 'text-gray-800'
+            }`}>
+              Provident Fund (PF)
+            </h4>
+            <span className={`px-2 py-1 rounded-full text-xs ${
+              theme === 'dark' ? 'bg-green-900/50 text-green-400' : 'bg-green-100 text-green-800'
+            }`}>
+              COMPLIANT
+            </span>
           </div>
-          
-          <h3 className={`font-semibold mb-3 ${
-            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          <p className={`text-sm ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
           }`}>
-            Indian Compliance Checks
-          </h3>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}>
-                <tr>
-                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
-                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
-                  }`}>
-                    Check
-                  </th>
-                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
-                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
-                  }`}>
-                    Status
-                  </th>
-                  <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
-                    theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
-                  }`}>
-                    Due Date
-                  </th>
-                </tr>
-              </thead>
-              <tbody className={`divide-y ${
-                theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'
-              }`}>
-                {complianceReport.checks && complianceReport.checks.map((check, index) => (
-                  <tr key={index} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
-                    <td className={`px-4 py-3 ${
-                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
-                    }`}>
-                      {check.name}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        check.status === 'Compliant' 
-                          ? theme === 'dark' 
-                            ? 'bg-green-900/50 text-green-400' 
-                            : 'bg-green-100 text-green-800'
-                          : check.status === 'Not Applicable'
-                          ? theme === 'dark'
-                            ? 'bg-gray-700 text-gray-300'
-                            : 'bg-gray-100 text-gray-800'
-                          : theme === 'dark'
-                            ? 'bg-red-900/50 text-red-400'
-                            : 'bg-red-100 text-red-800'
-                      }`}>
-                        {check.status}
-                      </span>
-                    </td>
-                    <td className={`px-4 py-3 ${
-                      theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-                    }`}>
-                      {check.dueDate}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          
-          <div className="mt-6 flex justify-end">
-            <button className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
-              Download PF Returns
-            </button>
+            Employee & Employer contributions processed
+          </p>
+          <div className={`mt-2 text-xs ${
+            theme === 'dark' ? 'text-gray-500' : 'text-gray-500'
+          }`}>
+            Due: 15th of next month
           </div>
         </div>
-      )}
+
+        {/* ESI Compliance */}
+        <div className={`p-4 rounded-lg border ${
+          theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'
+        }`}>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className={`font-medium ${
+              theme === 'dark' ? 'text-gray-200' : 'text-gray-800'
+            }`}>
+              ESI (Employee State Insurance)
+            </h4>
+            <span className={`px-2 py-1 rounded-full text-xs ${
+              theme === 'dark' ? 'bg-green-900/50 text-green-400' : 'bg-green-100 text-green-800'
+            }`}>
+              COMPLIANT
+            </span>
+          </div>
+          <p className={`text-sm ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+          }`}>
+            Applicable for employees earning ≤ ₹21,000
+          </p>
+          <div className={`mt-2 text-xs ${
+            theme === 'dark' ? 'text-gray-500' : 'text-gray-500'
+          }`}>
+            Due: 15th of next month
+          </div>
+        </div>
+
+        {/* Professional Tax */}
+        <div className={`p-4 rounded-lg border ${
+          theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'
+        }`}>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className={`font-medium ${
+              theme === 'dark' ? 'text-gray-200' : 'text-gray-800'
+            }`}>
+              Professional Tax
+            </h4>
+            <span className={`px-2 py-1 rounded-full text-xs ${
+              theme === 'dark' ? 'bg-green-900/50 text-green-400' : 'bg-green-100 text-green-800'
+            }`}>
+              COMPLIANT
+            </span>
+          </div>
+          <p className={`text-sm ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+          }`}>
+            State-wise professional tax deducted
+          </p>
+          <div className={`mt-2 text-xs ${
+            theme === 'dark' ? 'text-gray-500' : 'text-gray-500'
+          }`}>
+            Monthly deduction applied
+          </div>
+        </div>
+
+        {/* TDS Compliance */}
+        <div className={`p-4 rounded-lg border ${
+          theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'
+        }`}>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className={`font-medium ${
+              theme === 'dark' ? 'text-gray-200' : 'text-gray-800'
+            }`}>
+              TDS (Tax Deducted at Source)
+            </h4>
+            <span className={`px-2 py-1 rounded-full text-xs ${
+              theme === 'dark' ? 'bg-green-900/50 text-green-400' : 'bg-green-100 text-green-800'
+            }`}>
+              COMPLIANT
+            </span>
+          </div>
+          <p className={`text-sm ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+          }`}>
+            Income tax deducted as per slabs
+          </p>
+          <div className={`mt-2 text-xs ${
+            theme === 'dark' ? 'text-gray-500' : 'text-gray-500'
+          }`}>
+            Quarterly returns due
+          </div>
+        </div>
+
+        {/* Labour Welfare Fund */}
+        <div className={`p-4 rounded-lg border ${
+          theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'
+        }`}>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className={`font-medium ${
+              theme === 'dark' ? 'text-gray-200' : 'text-gray-800'
+            }`}>
+              Labour Welfare Fund
+            </h4>
+            <span className={`px-2 py-1 rounded-full text-xs ${
+              theme === 'dark' ? 'bg-yellow-900/50 text-yellow-400' : 'bg-yellow-100 text-yellow-800'
+            }`}>
+              PENDING
+            </span>
+          </div>
+          <p className={`text-sm ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+          }`}>
+            State-specific welfare fund contributions
+          </p>
+          <div className={`mt-2 text-xs ${
+            theme === 'dark' ? 'text-yellow-500' : 'text-yellow-600'
+          }`}>
+            Due: 31st March {new Date().getFullYear()}
+          </div>
+        </div>
+
+        {/* Gratuity */}
+        <div className={`p-4 rounded-lg border ${
+          theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'
+        }`}>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className={`font-medium ${
+              theme === 'dark' ? 'text-gray-200' : 'text-gray-800'
+            }`}>
+              Gratuity Act
+            </h4>
+            <span className={`px-2 py-1 rounded-full text-xs ${
+              theme === 'dark' ? 'bg-green-900/50 text-green-400' : 'bg-green-100 text-green-800'
+            }`}>
+              COMPLIANT
+            </span>
+          </div>
+          <p className={`text-sm ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+          }`}>
+            Applicable for employees with 5+ years service
+          </p>
+          <div className={`mt-2 text-xs ${
+            theme === 'dark' ? 'text-gray-500' : 'text-gray-500'
+          }`}>
+            Annual calculation completed
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Detailed PF Report */}
+    <div className="mb-6">
+      <h3 className={`text-lg font-semibold mb-4 ${
+        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+      }`}>
+        Provident Fund Details
+      </h3>
+      
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}>
+            <tr>
+              <th className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+              }`}>
+                Employee
+              </th>
+              <th className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+              }`}>
+                UAN Number
+              </th>
+              <th className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+              }`}>
+                Employee PF (12%)
+              </th>
+              <th className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+              }`}>
+                Employer PF (12%)
+              </th>
+              <th className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+              }`}>
+                Employer EPS (8.33%)
+              </th>
+              <th className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+              }`}>
+                Total PF Contribution
+              </th>
+            </tr>
+          </thead>
+          <tbody className={`divide-y ${
+            theme === 'dark' ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'
+          }`}>
+            {employees.filter(emp => emp.active).map(employee => {
+              const basicSalary = employee.ctc * 0.5 / 12; // Monthly basic
+              const employeePF = basicSalary * 0.12;
+              const employerPF = basicSalary * 0.12;
+              const employerEPS = basicSalary * 0.0833;
+              const totalPF = employeePF + employerPF;
+              
+              return (
+                <tr key={employee.id} className={theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                  <td className={`px-4 py-3 ${
+                    theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>
+                    {employee.firstName} {employee.lastName}
+                  </td>
+                  <td className={`px-4 py-3 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
+                    {employee.uan || 'Not Provided'}
+                  </td>
+                  <td className={`px-4 py-3 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
+                    ₹{employeePF.toLocaleString('en-IN', {minimumFractionDigits: 2})}
+                  </td>
+                  <td className={`px-4 py-3 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
+                    ₹{employerPF.toLocaleString('en-IN', {minimumFractionDigits: 2})}
+                  </td>
+                  <td className={`px-4 py-3 ${
+                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
+                    ₹{employerEPS.toLocaleString('en-IN', {minimumFractionDigits: 2})}
+                  </td>
+                  <td className={`px-4 py-3 font-medium ${
+                    theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>
+                    ₹{totalPF.toLocaleString('en-IN', {minimumFractionDigits: 2})}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+          <tfoot className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}>
+            <tr>
+              <td colSpan="2" className={`px-4 py-3 font-medium ${
+                theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+              }`}>
+                Total
+              </td>
+              <td className={`px-4 py-3 font-medium ${
+                theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+              }`}>
+                ₹{employees.filter(emp => emp.active).reduce((sum, emp) => 
+                  sum + (emp.ctc * 0.5 / 12 * 0.12), 0
+                ).toLocaleString('en-IN', {minimumFractionDigits: 2})}
+              </td>
+              <td className={`px-4 py-3 font-medium ${
+                theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+              }`}>
+                ₹{employees.filter(emp => emp.active).reduce((sum, emp) => 
+                  sum + (emp.ctc * 0.5 / 12 * 0.12), 0
+                ).toLocaleString('en-IN', {minimumFractionDigits: 2})}
+              </td>
+              <td className={`px-4 py-3 font-medium ${
+                theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+              }`}>
+                ₹{employees.filter(emp => emp.active).reduce((sum, emp) => 
+                  sum + (emp.ctc * 0.5 / 12 * 0.0833), 0
+                ).toLocaleString('en-IN', {minimumFractionDigits: 2})}
+              </td>
+              <td className={`px-4 py-3 font-medium ${
+                theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+              }`}>
+                ₹{employees.filter(emp => emp.active).reduce((sum, emp) => 
+                  sum + (emp.ctc * 0.5 / 12 * 0.24), 0
+                ).toLocaleString('en-IN', {minimumFractionDigits: 2})}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    {/* Recommendations & Actions */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Recommendations */}
+      <div>
+        <h3 className={`text-lg font-semibold mb-3 ${
+          theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+        }`}>
+          Recommendations
+        </h3>
+        <div className="space-y-2">
+          {complianceReport.recommendations?.map((recommendation, index) => (
+            <div key={index} className={`flex items-start p-3 rounded-lg ${
+              theme === 'dark' ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'
+            }`}>
+              <div className={`flex-shrink-0 w-2 h-2 mt-2 rounded-full ${
+                theme === 'dark' ? 'bg-blue-400' : 'bg-blue-600'
+              }`}></div>
+              <p className={`ml-3 text-sm ${
+                theme === 'dark' ? 'text-blue-300' : 'text-blue-800'
+              }`}>
+                {recommendation}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Pending Actions */}
+      <div>
+        <h3 className={`text-lg font-semibold mb-3 ${
+          theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+        }`}>
+          Pending Actions
+        </h3>
+        <div className="space-y-2">
+          <div className={`flex items-start p-3 rounded-lg ${
+            theme === 'dark' ? 'bg-yellow-900/20 border border-yellow-800' : 'bg-yellow-50 border border-yellow-200'
+          }`}>
+            <div className={`flex-shrink-0 w-2 h-2 mt-2 rounded-full ${
+              theme === 'dark' ? 'bg-yellow-400' : 'bg-yellow-600'
+            }`}></div>
+            <div className="ml-3">
+              <p className={`text-sm font-medium ${
+                theme === 'dark' ? 'text-yellow-300' : 'text-yellow-800'
+              }`}>
+                Submit Labour Welfare Fund
+              </p>
+              <p className={`text-xs mt-1 ${
+                theme === 'dark' ? 'text-yellow-400' : 'text-yellow-600'
+              }`}>
+                Due: 31st March {new Date().getFullYear()}
+              </p>
+            </div>
+          </div>
+          
+          <div className={`flex items-start p-3 rounded-lg ${
+            theme === 'dark' ? 'bg-purple-900/20 border border-purple-800' : 'bg-purple-50 border border-purple-200'
+          }`}>
+            <div className={`flex-shrink-0 w-2 h-2 mt-2 rounded-full ${
+              theme === 'dark' ? 'bg-purple-400' : 'bg-purple-600'
+            }`}></div>
+            <div className="ml-3">
+              <p className={`text-sm font-medium ${
+                theme === 'dark' ? 'text-purple-300' : 'text-purple-800'
+              }`}>
+                File Quarterly TDS Returns
+              </p>
+              <p className={`text-xs mt-1 ${
+                theme === 'dark' ? 'text-purple-400' : 'text-purple-600'
+              }`}>
+                Due: 15th of next quarter
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Action Buttons */}
+    <div className="mt-6 flex justify-end space-x-4">
+      <button className={`py-2 px-4 rounded-md border ${
+        theme === 'dark' 
+          ? 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600' 
+          : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+      }`}>
+        Download PF Report
+      </button>
+      <button className={`py-2 px-4 rounded-md border ${
+        theme === 'dark' 
+          ? 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600' 
+          : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+      }`}>
+        Download Compliance Certificate
+      </button>
+      <button className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
+        Export All Reports
+      </button>
+    </div>
+  </div>
+)}
       
       {/* Payroll Details */}
       {selectedEmployee && (
